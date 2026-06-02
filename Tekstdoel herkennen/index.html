@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Tekstdoel herkennen - Begrijpend lezen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --sky-400:#5dd0f2; --sky-500:#25b7e8; --sky-600:#0f9ad1; --sky-700:#0a7aa8;
+    --or-500:#f28a2e; --or-600:#e06a11; --cream-100:#faf3e4; --ink-900:#15202b; --ink-700:#2c3e50; --ink-500:#526374;
+    --green:#38b24a; --red:#d64545; --gold:#ffd24a; --purple:#8c5fd3; --pink:#e85291; --teal:#19a68c;
+    --font-display:'Luckiest Guy',cursive; --font-body:'Nunito',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{
+    font-family:var(--font-body); color:#fff; overflow:hidden;
+    background:radial-gradient(140% 120% at 50% -20%, var(--sky-400) 0%, var(--sky-500) 38%, var(--sky-600) 72%, var(--sky-700) 100%);
+    -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent;
+  }
+  body::before{content:""; position:fixed; inset:0; pointer-events:none; opacity:.48; background-image:radial-gradient(rgba(255,255,255,.16) 2px, transparent 2px); background-size:34px 34px;}
+  #app{height:100%; display:flex; flex-direction:column; padding:22px 26px 24px; gap:16px; position:relative; z-index:1;}
+  .board{display:flex; align-items:center; justify-content:space-between; gap:18px;}
+  .title{display:flex; align-items:center; gap:14px; min-width:0;}
+  .logo{width:56px; height:56px; border-radius:50%; border:3px solid var(--ink-900); box-shadow:0 4px 0 var(--ink-900); background:#fff; object-fit:cover;}
+  h1{font-family:var(--font-display); font-size:36px; margin:0; line-height:.95; letter-spacing:.5px; -webkit-text-stroke:1.5px var(--ink-900); text-shadow:3px 3px 0 var(--ink-900);}
+  .sub{font-weight:900; color:rgba(255,255,255,.9); margin-top:3px;}
+  .top-actions{display:flex; gap:12px; align-items:center;}
+  .homebtn,.fsbtn{display:grid; grid-auto-flow:column; align-items:center; place-items:center; gap:8px; min-width:54px; min-height:54px; background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:18px; box-shadow:0 5px 0 var(--ink-900); padding:0 14px; cursor:pointer; text-decoration:none; font-weight:900; transition:transform .09s, box-shadow .09s, background .12s;}
+  .homebtn:hover,.fsbtn:hover{transform:translateY(-2px); box-shadow:0 7px 0 var(--ink-900); background:var(--gold);}
+  .goal-strip{display:flex; justify-content:space-between; align-items:center; gap:16px; background:rgba(7,55,80,.38); border:3px solid rgba(255,255,255,.42); border-radius:18px; padding:10px 14px;}
+  .goal-strip strong{font-family:var(--font-display); font-size:28px; line-height:1; text-shadow:2px 2px 0 var(--ink-900);}
+  .goal-strip span{font-weight:900; opacity:.92;}
+  .scores{display:flex; gap:12px; align-items:stretch;}
+  .score{background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:18px; box-shadow:0 5px 0 var(--ink-900); padding:8px 16px; text-align:center; min-width:78px;}
+  .score .n{font-family:var(--font-display); font-size:30px; line-height:1;}
+  .score .l{font-weight:800; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-500);}
+  .score.good .n{color:var(--green);} .score.bad .n{color:var(--red);}
+  .score.q{background:var(--ink-900); color:#fff;} .score.q .l{color:#9fb2c0;}
+  .streakbox{background:linear-gradient(180deg,#fff,#fff6e0); border:3px solid var(--ink-900); border-radius:18px; box-shadow:0 5px 0 var(--ink-900); padding:8px 14px; display:flex; align-items:center; gap:10px; transition:box-shadow .2s;}
+  .streakbox.hot{box-shadow:0 5px 0 var(--ink-900), 0 0 0 3px rgba(242,138,46,.45);}
+  .streak-ic{display:grid; place-items:center; width:30px; height:30px; color:var(--ink-500);}
+  .streak-ic svg{width:28px; height:28px;}
+  .streakbox .sn{font-family:var(--font-display); font-size:26px; color:var(--or-600); line-height:1;}
+  .streakbox .sl{font-weight:800; font-size:12px; text-transform:uppercase; color:var(--ink-500);}
+  .stage{flex:1; display:flex; flex-direction:column; gap:16px; min-height:0;}
+  .read{flex:1; background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:26px; box-shadow:0 10px 0 rgba(7,93,128,.55), 0 22px 40px rgba(7,40,60,.28); padding:22px 30px 24px; position:relative; min-height:0; display:flex; flex-direction:column;}
+  .read .ribbon{position:absolute; top:-16px; left:28px; background:var(--purple); color:#fff; border:3px solid var(--ink-900); border-radius:12px; padding:6px 16px; font-weight:900; text-transform:uppercase; letter-spacing:.06em; font-size:14px; box-shadow:0 4px 0 var(--ink-900);}
+  .read .prompt{margin:8px 0 12px; padding-top:6px; font-weight:800; color:var(--sky-700); font-size:16px; align-self:flex-end;}
+  .story{font-size:21px; line-height:1.55; margin:0; overflow:auto; text-wrap:pretty; padding-right:8px;}
+  .story p{margin:0 0 14px;}
+  .story p:last-child{margin-bottom:0;}
+  .feedback{display:block; background:var(--ink-900); color:#fff; border:3px solid var(--ink-900); border-radius:16px; padding:13px 18px 13px 58px; font-size:17px; font-weight:700; line-height:1.4; box-shadow:0 6px 0 rgba(7,93,128,.5); position:relative; min-height:54px;}
+  .feedback::before{content:"?"; position:absolute; left:14px; top:50%; transform:translateY(-50%); width:30px; height:30px; border-radius:50%; display:grid; place-items:center; background:#fff; color:var(--ink-900); font-weight:900;}
+  .feedback.is-good{background:var(--green);} .feedback.is-good::before{content:"\2713"; color:var(--green);}
+  .feedback.is-bad{background:var(--red);} .feedback.is-bad::before{content:"\2715"; color:var(--red);}
+  .feedback.is-neutral{background:rgba(7,55,80,.55); border-color:rgba(255,255,255,.4); font-weight:800;}
+  .choices{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .choice{display:flex; align-items:center; gap:18px; border:3px solid var(--ink-900); border-radius:22px; cursor:pointer; color:#fff; padding:18px 22px; box-shadow:0 8px 0 var(--ink-900); transition:transform .09s, box-shadow .09s, filter .12s; text-align:left;}
+  .choice .ic{flex:0 0 auto; width:58px; height:58px; border-radius:18px; background:rgba(255,255,255,.22); border:3px solid rgba(255,255,255,.6); display:grid; place-items:center;}
+  .choice .tx{display:flex; flex-direction:column;}
+  .choice .big{font-family:var(--font-display); font-size:28px; line-height:.95; letter-spacing:.5px;}
+  .choice .hint{font-weight:800; font-size:13px; opacity:.95;}
+  .choice.td-info{background:linear-gradient(180deg,#2bb6e8,#0f86bd);}
+  .choice.td-overtuig{background:linear-gradient(180deg,#9d73e8,#7141bd);}
+  .choice.td-vermaak{background:linear-gradient(180deg,#f26aa5,#cf3679);}
+  .choice.td-instrueer{background:linear-gradient(180deg,#28c4aa,#118a73);}
+  .choice.td-extra{background:linear-gradient(180deg,var(--or-500),var(--or-600));}
+  .choice:not(:disabled):hover{transform:translateY(-3px); box-shadow:0 11px 0 var(--ink-900); filter:brightness(1.06);}
+  .choice.is-dim{filter:grayscale(.6) brightness(.85); opacity:.5;}
+  .choice.is-correct{box-shadow:0 8px 0 var(--ink-900), 0 0 0 5px rgba(56,178,74,.6); animation:pop .35s ease;}
+  .choice.is-wrong{box-shadow:0 8px 0 var(--ink-900), 0 0 0 5px rgba(214,69,69,.55); animation:shake .4s ease;}
+  @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.04)}100%{transform:scale(1)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}50%{transform:translateX(7px)}75%{transform:translateX(-4px)}}
+  .foot{display:flex; align-items:center; gap:14px;}
+  .pgwrap{flex:1; height:16px; background:rgba(255,255,255,.28); border:3px solid var(--ink-900); border-radius:999px; overflow:hidden; box-shadow:0 4px 0 rgba(7,93,128,.4);}
+  .pg{height:100%; width:0%; background:linear-gradient(90deg,var(--gold),#fff); transition:width .3s;}
+  .btn{font-family:var(--font-body); font-weight:900; font-size:16px; border:3px solid var(--ink-900); border-radius:999px; background:#fff; color:var(--ink-900); padding:12px 22px; cursor:pointer; box-shadow:0 5px 0 var(--ink-900); transition:transform .09s, box-shadow .09s; white-space:nowrap;}
+  .btn:hover{transform:translateY(-2px); box-shadow:0 7px 0 var(--ink-900);}
+  .btn.primary{background:var(--gold);}
+  .btn.primary:disabled{background:rgba(255,255,255,.4); color:rgba(21,32,43,.4); box-shadow:0 5px 0 rgba(7,93,128,.3); cursor:default; transform:none;}
+  .overlay{position:absolute; inset:0; background:rgba(7,40,60,.6); backdrop-filter:blur(3px); display:grid; place-items:center; padding:24px; z-index:30;}
+  .panel{width:min(720px,100%); background:#fff; color:var(--ink-900); border:4px solid var(--ink-900); border-radius:28px; box-shadow:0 14px 0 rgba(7,93,128,.5), 0 28px 60px rgba(0,0,0,.35); padding:30px 34px; text-align:center;}
+  .panel h2{font-family:var(--font-display); font-size:46px; margin:0 0 8px; -webkit-text-stroke:1.5px var(--ink-900); text-shadow:3px 3px 0 var(--gold); color:#fff;}
+  .panel p{font-size:18px; color:var(--ink-700); margin:0 0 8px; line-height:1.5;}
+  .panel.menu{max-height:calc(100vh - 48px); overflow:auto;}
+  .menu-btns{display:flex; flex-direction:column; gap:14px; margin:22px 0 4px;}
+  .mbtn{display:flex; align-items:center; gap:16px; width:100%; text-align:left; border:4px solid var(--ink-900); border-radius:20px; padding:15px 20px; cursor:pointer; color:#fff; box-shadow:0 6px 0 var(--ink-900); transition:transform .09s, box-shadow .09s, filter .12s; font-family:var(--font-body);}
+  .mbtn:hover{transform:translateY(-3px); box-shadow:0 9px 0 var(--ink-900); filter:brightness(1.06);}
+  .mbtn .mic{flex:0 0 auto; width:52px; height:52px; border-radius:15px; background:rgba(255,255,255,.22); border:3px solid rgba(255,255,255,.6); display:grid; place-items:center; color:#fff;}
+  .mbtn .mtx{display:flex; flex-direction:column; gap:2px; line-height:1.12; min-width:0;}
+  .mbtn .mbig{font-weight:900; font-size:19px; letter-spacing:.2px; line-height:1.18; text-transform:uppercase;}
+  .mbtn.play .mbig{font-family:var(--font-display); font-size:24px; letter-spacing:.5px; line-height:1.05; text-transform:none;}
+  .mbtn .mhint{font-weight:800; font-size:13px; opacity:.95;}
+  .mbtn .mchev{margin-left:auto; font-weight:900; font-size:24px; transition:transform .2s;}
+  .mbtn.play{background:linear-gradient(180deg,#ffd968,#f6b932); color:var(--ink-900);}
+  .mbtn.play .mic{background:rgba(0,0,0,.12); border-color:rgba(0,0,0,.25); color:var(--ink-900);}
+  .mbtn.hz{background:linear-gradient(180deg,#9d73e8,#7141bd);}
+  .mbtn.dt{background:linear-gradient(180deg,var(--or-500),var(--or-600));}
+  .mbtn.is-open .mchev{transform:rotate(90deg);}
+  .explain{max-height:0; overflow:hidden; transition:max-height .32s ease;}
+  .explain.is-open{max-height:760px;}
+  .explain-inner{background:var(--cream-100); border:3px solid var(--ink-900); border-radius:16px; padding:16px 18px; margin-top:2px; text-align:left;}
+  .explain-inner p{font-size:16px; color:var(--ink-700); margin:0 0 10px; line-height:1.5;}
+  .extip{font-size:14px; color:var(--ink-500); font-weight:800; margin:10px 0 0;}
+  .example{background:#fff; border:3px solid var(--ink-900); border-radius:12px; padding:12px 14px; font-size:16px; line-height:1.7; color:var(--ink-900);}
+  .extag{display:inline-block; font-weight:900; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#fff; border:2px solid var(--ink-900); border-radius:8px; padding:2px 9px; margin-bottom:9px; background:var(--purple);}
+  .goal-list{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:8px;}
+  .goal-def{background:#fff; border:3px solid var(--ink-900); border-radius:12px; padding:10px 12px;}
+  .goal-def strong{display:block; font-size:13px; text-transform:uppercase; color:var(--purple); letter-spacing:.04em;}
+  .goal-def span{display:block; color:var(--ink-700); font-weight:800; line-height:1.35; margin-top:2px;}
+  .endbig{font-family:var(--font-display); font-size:80px; line-height:1; color:var(--sky-600); -webkit-text-stroke:2px var(--ink-900); text-shadow:4px 4px 0 var(--gold);}
+  .endstars{display:flex; justify-content:center; gap:18px; margin:4px 0 14px;}
+  .estar{display:grid; place-items:center;}
+  .estar svg{width:62px; height:62px;}
+  .estar .st{fill:#e7ecef; stroke:var(--ink-900); stroke-width:1.5;}
+  .estar.on .st{fill:var(--gold);}
+  .estar.on{animation:starpop .45s cubic-bezier(.2,1.3,.5,1) backwards;}
+  @keyframes starpop{0%{transform:scale(0) rotate(-35deg); opacity:0;}70%{transform:scale(1.25) rotate(8deg);}100%{transform:scale(1) rotate(0); opacity:1;}}
+  @media (max-width:900px){
+    body{overflow:auto;}
+    #app{min-height:100%; height:auto; padding:16px;}
+    .board,.goal-strip,.foot{flex-direction:column; align-items:stretch;}
+    .scores{display:grid; grid-template-columns:1fr 1fr;}
+    .choices{grid-template-columns:1fr;}
+    .story{font-size:19px;}
+    .goal-list{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div id="app" tabindex="0">
+  <header class="board">
+    <div class="title">
+      <img class="logo" src="../Hoofdzaak%20vs%20Detail/assets/logo-meesterdanny.png" alt="Meester Danny" />
+      <div>
+        <h1>Tekstdoel herkennen</h1>
+        <div class="sub">Begrijpend lezen - Supertool</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <a class="homebtn" href="../index.html" title="Terug naar doelen" aria-label="Terug naar doelen">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+        Doelen
+      </a>
+      <button class="fsbtn" id="fsBtn" title="Volledig scherm" aria-label="Volledig scherm">
+        <svg class="ic-open" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/></svg>
+        <svg class="ic-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M9 4v4a1 1 0 0 1-1 1H4M15 4v4a1 1 0 0 0 1 1h4M9 20v-4a1 1 0 0 0-1-1H4M15 20v-4a1 1 0 0 1 1-1h4"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <section class="goal-strip">
+    <div><strong>Tekstdoel herkennen</strong><span> Wat wil de schrijver bereiken?</span></div>
+    <div class="scores">
+      <div class="streakbox" id="tdStreakbox">
+        <span class="streak-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 18h6v2H9zM10 22h4v2h-4zM12 2a7 7 0 0 0-4 12.7c.6.4 1 1.1 1 1.8V17h6v-.5c0-.7.4-1.4 1-1.8A7 7 0 0 0 12 2z"/></svg></span>
+        <div><div class="sn"><span data-td-streak>0</span></div><div class="sl">reeks</div></div>
+      </div>
+      <div class="score good"><div class="n" data-td-good>0</div><div class="l">goed</div></div>
+      <div class="score bad"><div class="n" data-td-bad>0</div><div class="l">fout</div></div>
+      <div class="score q"><div class="n"><span data-td-qnow>0</span>/<span data-td-qtot>0</span></div><div class="l">vraag</div></div>
+    </div>
+  </section>
+
+  <main class="stage" data-td-game style="display:none;">
+    <div class="read">
+      <span class="ribbon" data-td-type>Tekstsoort</span>
+      <div class="prompt">Wat is het belangrijkste tekstdoel?</div>
+      <div class="story" data-td-story></div>
+    </div>
+    <div class="feedback is-neutral" data-td-feedback aria-live="polite">Lees de hele tekst. Kies daarna wat de schrijver vooral wil bereiken.</div>
+    <div class="choices" data-td-choices></div>
+    <div class="foot">
+      <div class="pgwrap"><div class="pg" data-td-progress></div></div>
+      <button class="btn" data-td-reset>Opnieuw</button>
+      <button class="btn primary" data-td-next disabled>Volgende</button>
+    </div>
+  </main>
+
+  <div class="overlay" data-td-menu>
+    <div class="panel menu">
+      <h2>Tekstdoel herkennen</h2>
+      <p>Lees straks de hele tekst. Vraag jezelf af: <strong>waarom heeft de schrijver dit geschreven?</strong> Je kiest steeds uit vier mogelijkheden.</p>
+      <div class="menu-btns">
+        <button class="mbtn play" data-td-menu-start>
+          <span class="mic"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+          <span class="mtx"><span class="mbig">SPELEN</span><span class="mhint">start met 5 testvragen</span></span>
+          <span class="mchev">></span>
+        </button>
+        <button class="mbtn hz" data-td-explain="basis" aria-expanded="false">
+          <span class="mic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M8 14c-1.4-1-2-2.6-2-4a6 6 0 1 1 12 0c0 1.4-.6 3-2 4-.8.6-1 1.2-1 2H9c0-.8-.2-1.4-1-2z"/></svg></span>
+          <span class="mtx"><span class="mbig">WAT IS EEN TEKSTDOEL?</span><span class="mhint">de bedoeling van de schrijver</span></span>
+          <span class="mchev">></span>
+        </button>
+        <div class="explain" data-td-panel="basis">
+          <div class="explain-inner">
+            <p>Een <strong>tekstdoel</strong> is wat de schrijver met de tekst wil bereiken. Soms wil de schrijver iets uitleggen, soms wil die jou iets laten vinden, laten doen, waarschuwen of gewoon vermaken.</p>
+            <div class="example"><span class="extag">Tip</span><div>Kijk naar woorden zoals <strong>moet</strong>, <strong>koop</strong>, <strong>pas op</strong>, <strong>ik vind</strong> en naar de tekstsoort: een recept wil meestal instrueren, een verhaal wil vaak vermaken.</div></div>
+            <p class="extip">Let op: een tekst kan meerdere dingen een beetje doen. Kies wat de schrijver vooral wil.</p>
+          </div>
+        </div>
+        <button class="mbtn dt" data-td-explain="doelen" aria-expanded="false">
+          <span class="mic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg></span>
+          <span class="mtx"><span class="mbig">WELKE DOELEN ZIJN ER?</span><span class="mhint">zeven doelen om te leren herkennen</span></span>
+          <span class="mchev">></span>
+        </button>
+        <div class="explain" data-td-panel="doelen">
+          <div class="explain-inner">
+            <div class="goal-list">
+              <div class="goal-def"><strong>Informeren</strong><span>De schrijver geeft informatie of legt iets uit.</span></div>
+              <div class="goal-def"><strong>Overtuigen</strong><span>De schrijver wil dat jij iets gaat vinden.</span></div>
+              <div class="goal-def"><strong>Vermaken</strong><span>De schrijver wil je laten genieten, lachen of meeleven.</span></div>
+              <div class="goal-def"><strong>Instrueren</strong><span>De schrijver legt stap voor stap uit wat je moet doen.</span></div>
+              <div class="goal-def"><strong>Overhalen</strong><span>De schrijver wil dat jij iets gaat doen of ergens aan meedoet.</span></div>
+              <div class="goal-def"><strong>Mening geven</strong><span>De schrijver laat duidelijk zien wat hij of zij ergens van vindt.</span></div>
+              <div class="goal-def"><strong>Waarschuwen</strong><span>De schrijver wil dat je oplet voor gevaar, risico of een probleem.</span></div>
+            </div>
+            <p class="extip">In deze testversie zitten 5 teksten. Later vullen we de set uit zodat alle doelen vaak terugkomen.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" data-td-end style="display:none;">
+    <div class="panel">
+      <h2>Goed gelezen!</h2>
+      <div class="endstars" id="tdEndStars"></div>
+      <div class="endbig"><span data-td-endscore>0</span>/<span data-td-endtotal>0</span></div>
+      <p style="font-family:var(--font-display); font-size:28px; color:var(--or-600); margin:6px 0;"><span data-td-endpct>0%</span> goed</p>
+      <p data-td-endmsg></p>
+      <button class="btn primary" data-td-replay style="margin-top:12px;">Nog een keer spelen</button>
+    </div>
+  </div>
+</div>
+
+<script src="items.js"></script>
+<script src="engine.js"></script>
+<script>
+  initTD(document.getElementById("app"));
+
+  const explainBtns = document.querySelectorAll("[data-td-explain]");
+  const explainPanels = document.querySelectorAll("[data-td-panel]");
+  function closeExplains(except){
+    explainBtns.forEach((b)=>{
+      if (b.getAttribute("data-td-explain") === except) return;
+      b.classList.remove("is-open");
+      b.setAttribute("aria-expanded", "false");
+    });
+    explainPanels.forEach((p)=>{ if (p.getAttribute("data-td-panel") !== except) p.classList.remove("is-open"); });
+  }
+  explainBtns.forEach((btn)=>{
+    const key = btn.getAttribute("data-td-explain");
+    const panel = document.querySelector('[data-td-panel="' + key + '"]');
+    btn.addEventListener("click", ()=>{
+      const open = btn.classList.toggle("is-open");
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      panel.classList.toggle("is-open", open);
+      if (open) closeExplains(key);
+    });
+  });
+
+  const fsBtn = document.getElementById("fsBtn");
+  const fsTarget = document.documentElement;
+  function fsElement(){ return document.fullscreenElement || document.webkitFullscreenElement || null; }
+  function enterFS(){ const r = fsTarget.requestFullscreen || fsTarget.webkitRequestFullscreen || fsTarget.webkitRequestFullScreen; if (r) { try { const p = r.call(fsTarget); if (p && p.catch) p.catch(()=>{}); } catch(e){} } }
+  function exitFS(){ const x = document.exitFullscreen || document.webkitExitFullscreen; if (x) { try { const p = x.call(document); if (p && p.catch) p.catch(()=>{}); } catch(e){} } }
+  fsBtn.addEventListener("click", ()=>{ fsElement() ? exitFS() : enterFS(); });
+  function syncFS(){
+    const on = !!fsElement();
+    fsBtn.querySelector(".ic-open").style.display = on ? "none" : "";
+    fsBtn.querySelector(".ic-close").style.display = on ? "" : "none";
+    fsBtn.title = on ? "Sluit volledig scherm (Esc)" : "Volledig scherm";
+  }
+  document.addEventListener("fullscreenchange", syncFS);
+  document.addEventListener("webkitfullscreenchange", syncFS);
+  document.addEventListener("keydown", (e)=>{ if ((e.key === "f" || e.key === "F") && !e.metaKey && !e.ctrlKey){ fsElement() ? exitFS() : enterFS(); } });
+</script>
+</body>
+</html>
