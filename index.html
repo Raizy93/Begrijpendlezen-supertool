@@ -73,7 +73,7 @@
 
   .goal-shell{height:100%; display:none; flex-direction:column; gap:16px; min-height:0;}
   body.in-goal .super-menu{display:none;}
-  body.in-goal .goal-shell{display:flex;}
+  body.in-goal .goal-shell.is-active{display:flex;}
   .goal-strip{display:flex; justify-content:space-between; align-items:center; gap:16px; background:rgba(7,55,80,.38); border:3px solid rgba(255,255,255,.42); border-radius:18px; padding:10px 14px;}
   .goal-strip strong{font-family:var(--font-display); font-size:28px; line-height:1; text-shadow:2px 2px 0 var(--ink-900);}
   .goal-strip span{font-weight:900; opacity:.92;}
@@ -121,6 +121,11 @@
   .choice .kbd{margin-left:auto; font-weight:900; font-size:13px; background:rgba(0,0,0,.2); padding:6px 12px; border-radius:10px; align-self:center;}
   .choice.hz{background:linear-gradient(180deg,#2bb6e8,#0f86bd);}
   .choice.dt{background:linear-gradient(180deg,var(--or-500),var(--or-600));}
+  .choice.td-info{background:linear-gradient(180deg,#2bb6e8,#0f86bd);}
+  .choice.td-overtuig{background:linear-gradient(180deg,#9d73e8,#7141bd);}
+  .choice.td-vermaak{background:linear-gradient(180deg,#f26aa5,#cf3679);}
+  .choice.td-instrueer{background:linear-gradient(180deg,#28c4aa,#118a73);}
+  .choice.td-extra{background:linear-gradient(180deg,var(--or-500),var(--or-600));}
   .choice:not(:disabled):hover{transform:translateY(-3px); box-shadow:0 11px 0 var(--ink-900); filter:brightness(1.06);}
   .choice:not(:disabled):active{transform:translateY(5px); box-shadow:0 3px 0 var(--ink-900);}
   .choice.is-dim{filter:grayscale(.6) brightness(.85); opacity:.5;}
@@ -237,7 +242,7 @@
         </div>
         <div class="legend">
           <strong>Nu beschikbaar</strong>
-          <span>1 doel</span>
+          <span>2 doelen</span>
         </div>
       </div>
 
@@ -247,8 +252,8 @@
           <span class="ic"><svg width="34" height="34" viewBox="0 0 46 46" fill="none"><circle cx="23" cy="23" r="12" fill="#fff"/><circle cx="23" cy="23" r="20" stroke="#fff" stroke-width="3" stroke-dasharray="4 6"/></svg></span>
           <div><h3>Hoofdzaak of detail</h3><p>Zie je de kern of juist extra informatie?</p></div>
         </button>
-        <button class="goal-card c-purple" disabled>
-          <span class="badge">Later</span><span class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M8 14c-1.4-1-2-2.6-2-4a6 6 0 1 1 12 0c0 1.4-.6 3-2 4-.8.6-1 1.2-1 2H9c0-.8-.2-1.4-1-2z"/></svg></span>
+        <button class="goal-card ready c-purple" data-open-goal="td">
+          <span class="badge">Speelbaar</span><span class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M8 14c-1.4-1-2-2.6-2-4a6 6 0 1 1 12 0c0 1.4-.6 3-2 4-.8.6-1 1.2-1 2H9c0-.8-.2-1.4-1-2z"/></svg></span>
           <div><h3>Tekstdoel herkennen</h3><p>Wil de tekst informeren, overtuigen of vermaken?</p></div>
         </button>
         <button class="goal-card c-orange" disabled>
@@ -286,7 +291,7 @@
       </div>
     </section>
 
-    <section class="goal-shell" data-goal-shell>
+    <section class="goal-shell" data-goal-shell="hzd">
       <div class="goal-strip">
         <div><strong>Hoofdzaak of detail</strong><span> De gemarkeerde zin staat centraal.</span></div>
         <div class="scores">
@@ -392,6 +397,85 @@
         </div>
       </div>
     </section>
+
+    <section class="goal-shell" data-goal-shell="td">
+      <div class="goal-strip">
+        <div><strong>Tekstdoel herkennen</strong><span> Wat wil de schrijver bereiken?</span></div>
+        <div class="scores">
+          <div class="streakbox" id="tdStreakbox">
+            <span class="streak-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 18h6v2H9zM10 22h4v2h-4zM12 2a7 7 0 0 0-4 12.7c.6.4 1 1.1 1 1.8V17h6v-.5c0-.7.4-1.4 1-1.8A7 7 0 0 0 12 2z"/></svg></span>
+            <div><div class="sn"><span data-td-streak>0</span></div><div class="sl">reeks</div></div>
+          </div>
+          <div class="score good"><div class="n" data-td-good>0</div><div class="l">goed</div></div>
+          <div class="score bad"><div class="n" data-td-bad>0</div><div class="l">fout</div></div>
+          <div class="score q"><div class="n"><span data-td-qnow>0</span>/<span data-td-qtot>0</span></div><div class="l">vraag</div></div>
+        </div>
+      </div>
+
+      <div class="stage" data-td-game style="display:none;">
+        <div class="read">
+          <span class="ribbon" data-td-type>Tekstsoort</span>
+          <div class="prompt">Wat is het belangrijkste tekstdoel?</div>
+          <p class="story" data-td-story></p>
+        </div>
+        <div class="feedback is-neutral" data-td-feedback aria-live="polite">Lees de hele tekst. Kies daarna wat de schrijver vooral wil bereiken.</div>
+        <div class="choices" data-td-choices></div>
+        <div class="foot">
+          <div class="pgwrap"><div class="pg" data-td-progress></div></div>
+          <button class="btn" data-td-reset>Opnieuw</button>
+          <button class="btn primary" data-td-next disabled>Volgende</button>
+        </div>
+      </div>
+
+      <div class="overlay" data-td-menu>
+        <div class="panel menu">
+          <h2>Tekstdoel herkennen</h2>
+          <p>Lees straks de hele tekst. Vraag jezelf af: <strong>waarom heeft de schrijver dit geschreven?</strong> Je kiest steeds uit vier mogelijkheden.</p>
+          <div class="menu-btns">
+            <button class="mbtn play" data-td-menu-start>
+              <span class="mic"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+              <span class="mtx"><span class="mbig">SPELEN</span><span class="mhint">start met 5 testvragen</span></span>
+              <span class="mchev">></span>
+            </button>
+            <button class="mbtn hz" data-td-explain="basis" aria-expanded="false">
+              <span class="mic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M8 14c-1.4-1-2-2.6-2-4a6 6 0 1 1 12 0c0 1.4-.6 3-2 4-.8.6-1 1.2-1 2H9c0-.8-.2-1.4-1-2z"/></svg></span>
+              <span class="mtx"><span class="mbig">WAT IS EEN TEKSTDOEL?</span><span class="mhint">de bedoeling van de schrijver</span></span>
+              <span class="mchev">></span>
+            </button>
+            <div class="explain" data-td-panel="basis">
+              <div class="explain-inner">
+                <p>Een <strong>tekstdoel</strong> is wat de schrijver met de tekst wil bereiken. Soms wil de schrijver iets uitleggen, soms wil die jou iets laten vinden, laten doen, waarschuwen of gewoon vermaken.</p>
+                <div class="example"><span class="extag hz">Tip</span><div>Kijk naar woorden zoals <strong>moet</strong>, <strong>koop</strong>, <strong>pas op</strong>, <strong>ik vind</strong> en naar de tekstsoort: een recept wil meestal instrueren, een verhaal wil vaak vermaken.</div></div>
+                <p class="extip">Let op: een tekst kan meerdere dingen een beetje doen. Kies wat de schrijver vooral wil.</p>
+              </div>
+            </div>
+            <button class="mbtn dt" data-td-explain="doelen" aria-expanded="false">
+              <span class="mic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg></span>
+              <span class="mtx"><span class="mbig">WELKE DOELEN ZIJN ER?</span><span class="mhint">zeven doelen om te leren herkennen</span></span>
+              <span class="mchev">></span>
+            </button>
+            <div class="explain" data-td-panel="doelen">
+              <div class="explain-inner">
+                <p><strong>Informeren</strong>: iets vertellen of uitleggen. <strong>Overtuigen</strong>: zorgen dat jij iets gaat vinden. <strong>Vermaken</strong>: je laten genieten, lachen of meeleven.</p>
+                <p><strong>Instrueren</strong>: stap voor stap uitleggen wat je moet doen. <strong>Overhalen iets te doen</strong>: je aanzetten tot actie. <strong>Mening geven</strong>: laten zien wat iemand ergens van vindt. <strong>Waarschuwen</strong>: zorgen dat je oplet voor gevaar of risico.</p>
+                <p class="extip">In deze testversie zitten 5 teksten. Later vullen we de set uit zodat alle doelen vaak terugkomen.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="overlay" data-td-end style="display:none;">
+        <div class="panel">
+          <h2>Goed gelezen!</h2>
+          <div class="endstars" id="tdEndStars"></div>
+          <div class="endbig"><span data-td-endscore>0</span>/<span data-td-endtotal>0</span></div>
+          <p style="font-family:var(--font-display); font-size:28px; color:var(--or-600); margin:6px 0;"><span data-td-endpct>0%</span> goed</p>
+          <p data-td-endmsg></p>
+          <button class="btn primary" data-td-replay style="margin-top:12px;">Nog een keer spelen</button>
+        </div>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -405,6 +489,18 @@
   const countOverlay = document.querySelector("[data-hzd-start]");
   const gameStage = document.querySelector("[data-hzd-game]");
   const endOverlay = document.querySelector("[data-hzd-end]");
+  const hzdShell = document.querySelector('[data-goal-shell="hzd"]');
+  const tdShell = document.querySelector('[data-goal-shell="td"]');
+
+  function activateGoal(shell){
+    document.querySelectorAll(".goal-shell").forEach(s=>s.classList.remove("is-active"));
+    shell.classList.add("is-active");
+    document.body.classList.add("in-goal");
+  }
+  function returnHome(){
+    document.querySelectorAll(".goal-shell").forEach(s=>s.classList.remove("is-active"));
+    document.body.classList.remove("in-goal");
+  }
 
   function starsForPct(pct){ return pct>=90 ? 3 : pct>=70 ? 2 : pct>=50 ? 1 : 0; }
   function renderEndStars(pct){
@@ -432,7 +528,7 @@
   }));
 
   document.querySelector('[data-open-goal="hzd"]').addEventListener("click", ()=>{
-    document.body.classList.add("in-goal");
+    activateGoal(hzdShell);
     menuOverlay.style.display = "";
     countOverlay.style.display = "none";
     endOverlay.style.display = "none";
@@ -441,7 +537,8 @@
 
   document.querySelector("[data-home]").addEventListener("click", ()=>{
     game.backToStart();
-    document.body.classList.remove("in-goal");
+    tdBackToStart();
+    returnHome();
     menuOverlay.style.display = "";
     countOverlay.style.display = "none";
     endOverlay.style.display = "none";
@@ -475,6 +572,298 @@
     countOverlay.style.display = "none";
     closeExplains(null);
     menuOverlay.style.display = "";
+  });
+
+  const TD_LABELS = {
+    informeren: { big:"INFORMEREN", hint:"iets vertellen of uitleggen", cls:"td-info" },
+    overtuigen: { big:"OVERTUIGEN", hint:"zorgen dat je iets gaat vinden", cls:"td-overtuig" },
+    vermaken: { big:"VERMAKEN", hint:"je laten genieten of meeleven", cls:"td-vermaak" },
+    instrueren: { big:"INSTRUEREN", hint:"uitleggen wat je moet doen", cls:"td-instrueer" },
+    overhalen: { big:"OVERHALEN", hint:"zorgen dat je iets gaat doen", cls:"td-extra" },
+    mening: { big:"MENING GEVEN", hint:"laten zien wat iemand vindt", cls:"td-overtuig" },
+    waarschuwen: { big:"WAARSCHUWEN", hint:"zorgen dat je oplet", cls:"td-extra" }
+  };
+  const TD_ITEMS = [
+    {
+      id:1,
+      type:"Nieuwsbericht",
+      correct:"informeren",
+      options:["informeren","overtuigen","waarschuwen","vermaken"],
+      zinnen:[
+        "Vanaf maandag krijgt de schoolbibliotheek een nieuwe indeling.",
+        "De informatieboeken komen voortaan bij elkaar in een kast dicht bij het raam.",
+        "De leesboeken blijven in het midden van de ruimte staan.",
+        "Ook komt er een aparte plank met boeken over natuur, techniek en geschiedenis.",
+        "Volgens de leescoordinator kunnen leerlingen zo sneller vinden wat ze nodig hebben.",
+        "Elke klas krijgt volgende week tien minuten uitleg over het nieuwe systeem.",
+        "Daarna mogen leerlingen zelf oefenen met zoeken op onderwerp.",
+        "De oude stickers op de boeken worden vervangen door duidelijke pictogrammen.",
+        "Boeken over dieren krijgen bijvoorbeeld een groene sticker met een pootafdruk.",
+        "Verhalenboeken krijgen een blauwe sticker met een open boek.",
+        "De uitleenbalie blijft op dezelfde plek bij de deur.",
+        "Leerlingen mogen nog steeds twee boeken tegelijk lenen.",
+        "De uitleentijd blijft drie weken.",
+        "Wie vragen heeft, kan tijdens de ochtendpauze bij de bibliotheekhulp terecht.",
+        "De school hoopt dat meer kinderen hierdoor makkelijker een passend boek kiezen."
+      ],
+      uitleg:"Deze tekst geeft vooral zakelijke informatie over de nieuwe indeling van de bibliotheek. De schrijver wil dat je weet wat er verandert."
+    },
+    {
+      id:2,
+      type:"Recept",
+      correct:"instrueren",
+      options:["instrueren","informeren","overhalen","vermaken"],
+      zinnen:[
+        "Was eerst je handen en leg alle spullen klaar op het aanrecht.",
+        "Pak een kom, een lepel, een snijplank en een scherp mes.",
+        "Snijd een appel in kleine blokjes.",
+        "Doe de appelblokjes in de kom.",
+        "Voeg twee eetlepels yoghurt toe.",
+        "Strooi er een handje havermout overheen.",
+        "Roer alles rustig door elkaar.",
+        "Als het mengsel te dik is, kun je een klein scheutje melk toevoegen.",
+        "Snijd daarna een halve banaan in plakjes.",
+        "Leg de plakjes boven op het mengsel.",
+        "Wie van kaneel houdt, strooit er een klein beetje overheen.",
+        "Laat de kom vijf minuten staan zodat de havermout zachter wordt.",
+        "Proef voorzichtig of je nog iets wilt toevoegen.",
+        "Ruim daarna de gebruikte spullen op.",
+        "Zo maak je snel een eenvoudig ontbijt of tussendoortje."
+      ],
+      uitleg:"Deze tekst geeft stap voor stap opdrachten. Het belangrijkste doel is instrueren: de lezer leert wat die moet doen."
+    },
+    {
+      id:3,
+      type:"Verhaalfragment",
+      correct:"vermaken",
+      options:["vermaken","informeren","mening","waarschuwen"],
+      zinnen:[
+        "Mila bleef staan voor de oude kast achter in het lokaal.",
+        "Niemand gebruikte die kast ooit, behalve de conciërge op vrijdagmiddag.",
+        "Toch hoorde ze nu zacht getik achter de deur.",
+        "Ze keek om zich heen, maar de gang was leeg.",
+        "Voorzichtig trok ze aan het koperen knopje.",
+        "De deur piepte zo hard dat Mila haar adem inhield.",
+        "Tussen de stapels oude schriften lag een klein rood doosje.",
+        "Het doosje trilde alsof er een telefoon in zat.",
+        "Mila bukte en zag dat er haar naam op stond.",
+        "Met bonzend hart pakte ze het op.",
+        "Op dat moment ging het licht in het lokaal vanzelf aan.",
+        "Een stem fluisterde: eindelijk ben je er.",
+        "Mila wilde wegrennen, maar haar nieuwsgierigheid won.",
+        "Ze klikte het doosje open.",
+        "Binnenin lag een sleutel die glinsterde als ijs."
+      ],
+      uitleg:"Deze tekst wil vooral spanning en nieuwsgierigheid oproepen. Dat past bij vermaken."
+    },
+    {
+      id:4,
+      type:"Actieposter",
+      correct:"overhalen",
+      options:["overhalen","informeren","instrueren","mening"],
+      zinnen:[
+        "Doe vrijdag mee met de grote pleinopruimactie.",
+        "Na de lunch verzamelen we bij de fietsenstalling.",
+        "Iedereen krijgt handschoenen en een afvalgrijper.",
+        "Met jouw hulp ziet het schoolplein er weer fris uit.",
+        "Een schoon plein is fijner om op te spelen.",
+        "Ook dieren in de buurt hebben minder last van rondzwervend plastic.",
+        "Neem daarom een vriend of vriendin mee.",
+        "Samen is opruimen sneller en leuker.",
+        "De klas die de meeste zakken vult, verdient een extra buitenspeelkwartier.",
+        "Je hoeft geen ervaring te hebben.",
+        "Een leerkracht loopt met elke groep mee.",
+        "Na afloop drinken we limonade op het plein.",
+        "Schrijf je naam vandaag nog op de lijst bij de ingang.",
+        "Wacht niet tot morgen, want we maken de groepen vanmiddag al.",
+        "Laat zien dat jij iets over hebt voor een schone school."
+      ],
+      uitleg:"De tekst geeft informatie, maar vooral om jou mee te laten doen. Het hoofddoel is overhalen iets te doen."
+    },
+    {
+      id:5,
+      type:"Waarschuwing",
+      correct:"waarschuwen",
+      options:["waarschuwen","informeren","overtuigen","instrueren"],
+      zinnen:[
+        "Let de komende dagen extra goed op bij de sloot achter het sportveld.",
+        "Door de regen is de oever zacht en glad geworden.",
+        "Je kunt er makkelijk uitglijden.",
+        "Het water lijkt ondiep, maar op sommige plekken is het dieper dan je denkt.",
+        "Blijf daarom op het pad als je naar de gymzaal loopt.",
+        "Loop niet over het gras langs de rand.",
+        "Duw elkaar daar ook niet voor de grap.",
+        "Een ongeluk gebeurt sneller dan je verwacht.",
+        "De conciërge zet vandaag lint neer om de gevaarlijke stukken af te sluiten.",
+        "Toch kan niet elke gladde plek meteen worden afgezet.",
+        "Zie je een los stuk grond, meld het dan bij je leerkracht.",
+        "Ga er niet zelf aan voelen of op springen.",
+        "Ook na schooltijd blijft de waarschuwing gelden.",
+        "Wacht met spelen bij de sloot tot de grond weer stevig is.",
+        "Zo voorkomen we dat iemand nat, vies of gewond raakt."
+      ],
+      uitleg:"De schrijver wil vooral dat je voorzichtig bent bij een gevaarlijke plek. Daarom is het tekstdoel waarschuwen."
+    }
+  ];
+  const TD_PRAISE = ["Goed gezien!", "Scherp gelezen!", "Precies!", "Knap gekozen!", "Mooi beredeneerd!"];
+  const td = {
+    menu: document.querySelector("[data-td-menu]"),
+    game: document.querySelector("[data-td-game]"),
+    end: document.querySelector("[data-td-end]"),
+    story: document.querySelector("[data-td-story]"),
+    type: document.querySelector("[data-td-type]"),
+    feedback: document.querySelector("[data-td-feedback]"),
+    choices: document.querySelector("[data-td-choices]"),
+    good: document.querySelector("[data-td-good]"),
+    bad: document.querySelector("[data-td-bad]"),
+    streak: document.querySelector("[data-td-streak]"),
+    qnow: document.querySelector("[data-td-qnow]"),
+    qtot: document.querySelector("[data-td-qtot]"),
+    progress: document.querySelector("[data-td-progress]"),
+    next: document.querySelector("[data-td-next]"),
+    endScore: document.querySelector("[data-td-endscore]"),
+    endTotal: document.querySelector("[data-td-endtotal]"),
+    endPct: document.querySelector("[data-td-endpct]"),
+    endMsg: document.querySelector("[data-td-endmsg]"),
+    stars: document.getElementById("tdEndStars"),
+    streakbox: document.getElementById("tdStreakbox")
+  };
+  let tdPool = [], tdIdx = 0, tdGood = 0, tdBad = 0, tdStreak = 0, tdBest = 0, tdAnswered = false;
+
+  function shuffleCopy(list){
+    const a = list.slice();
+    for(let i=a.length-1;i>0;i--){ const j = (Math.random()*(i+1))|0; [a[i],a[j]]=[a[j],a[i]]; }
+    return a;
+  }
+  function tdSetFeedback(state, html){
+    td.feedback.classList.remove("is-good","is-bad","is-neutral");
+    td.feedback.classList.add("is-" + state);
+    td.feedback.innerHTML = html;
+  }
+  function tdUpdateStats(){
+    td.good.textContent = tdGood;
+    td.bad.textContent = tdBad;
+    td.streak.textContent = tdStreak;
+    td.qnow.textContent = Math.min(tdIdx + 1, tdPool.length);
+    td.qtot.textContent = tdPool.length;
+    td.progress.style.width = tdPool.length ? Math.round((tdIdx / tdPool.length) * 100) + "%" : "0%";
+    td.streakbox.classList.toggle("hot", tdStreak >= 3);
+  }
+  function tdRenderQuestion(){
+    tdAnswered = false;
+    const item = tdPool[tdIdx];
+    td.type.textContent = item.type;
+    td.story.textContent = item.zinnen.join(" ");
+    td.choices.innerHTML = "";
+    item.options.forEach(label=>{
+      const meta = TD_LABELS[label];
+      const btn = document.createElement("button");
+      btn.className = "choice " + meta.cls;
+      btn.setAttribute("data-td-choice", label);
+      btn.innerHTML = `<span class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></span><span class="tx"><span class="big">${meta.big}</span><span class="hint">${meta.hint}</span></span>`;
+      btn.addEventListener("click", ()=>tdAnswer(label));
+      td.choices.appendChild(btn);
+    });
+    td.next.disabled = true;
+    tdSetFeedback("neutral", "Lees de hele tekst. Wat wil de schrijver vooral bereiken?");
+    tdUpdateStats();
+  }
+  function tdAnswer(choice){
+    if (tdAnswered) return;
+    tdAnswered = true;
+    const item = tdPool[tdIdx];
+    const correct = choice === item.correct;
+    Array.from(td.choices.children).forEach(btn=>{
+      const label = btn.getAttribute("data-td-choice");
+      btn.disabled = true;
+      if (label === item.correct) btn.classList.add("is-correct");
+      else btn.classList.add("is-dim");
+      if (label === choice && !correct) { btn.classList.remove("is-dim"); btn.classList.add("is-wrong"); }
+    });
+    if (correct) {
+      tdGood++; tdStreak++; tdBest = Math.max(tdBest, tdStreak);
+      const praise = TD_PRAISE[(Math.random()*TD_PRAISE.length)|0];
+      tdSetFeedback("good", `<strong>${praise}</strong> ${item.uitleg}`);
+    } else {
+      tdBad++; tdStreak = 0;
+      tdSetFeedback("bad", `<strong>Net niet.</strong> Het beste antwoord is <strong>${TD_LABELS[item.correct].big.toLowerCase()}</strong>. ${item.uitleg}`);
+    }
+    td.next.disabled = false;
+    td.next.focus();
+    tdUpdateStats();
+  }
+  function tdNext(){
+    if (!tdAnswered) return;
+    tdIdx++;
+    if (tdIdx >= tdPool.length) return tdFinish();
+    tdRenderQuestion();
+  }
+  function tdFinish(){
+    const pct = Math.round((tdGood / tdPool.length) * 100);
+    td.endScore.textContent = tdGood;
+    td.endTotal.textContent = tdPool.length;
+    td.endPct.textContent = pct + "%";
+    td.endMsg.textContent = pct >= 80 ? "Sterk! Je kijkt goed naar de bedoeling van de schrijver." : pct >= 60 ? "Goed op weg. Let vooral op woorden die actie, mening of gevaar laten zien." : "Blijf oefenen. Vraag steeds: wat wil de schrijver dat ik weet, vind, voel of doe?";
+    renderStarsIn(td.stars, pct);
+    td.game.style.display = "none";
+    td.end.style.display = "";
+  }
+  function tdStart(){
+    tdPool = shuffleCopy(TD_ITEMS);
+    tdIdx = 0; tdGood = 0; tdBad = 0; tdStreak = 0; tdBest = 0;
+    td.menu.style.display = "none";
+    td.end.style.display = "none";
+    td.game.style.display = "";
+    tdRenderQuestion();
+  }
+  function tdBackToStart(){
+    td.menu.style.display = "";
+    td.end.style.display = "none";
+    td.game.style.display = "none";
+    td.streakbox.classList.remove("hot");
+  }
+  function renderStarsIn(target, pct){
+    const earned = starsForPct(pct);
+    target.innerHTML = "";
+    for(let i=0;i<3;i++){
+      const s = document.createElement("span");
+      s.className = "estar" + (i < earned ? " on" : "");
+      s.style.animationDelay = (0.15 + i*0.18) + "s";
+      s.innerHTML = STAR;
+      target.appendChild(s);
+    }
+  }
+
+  document.querySelector('[data-open-goal="td"]').addEventListener("click", ()=>{
+    activateGoal(tdShell);
+    tdBackToStart();
+  });
+  document.querySelector("[data-td-menu-start]").addEventListener("click", tdStart);
+  document.querySelector("[data-td-next]").addEventListener("click", tdNext);
+  document.querySelector("[data-td-reset]").addEventListener("click", tdBackToStart);
+  document.querySelector("[data-td-replay]").addEventListener("click", tdBackToStart);
+  document.addEventListener("keydown", (e)=>{
+    if (!tdShell.classList.contains("is-active") || td.game.style.display === "none") return;
+    if ((e.key === "Enter" || e.key === " ") && tdAnswered) { e.preventDefault(); tdNext(); }
+  });
+  const tdExplainBtns = document.querySelectorAll("[data-td-explain]");
+  const tdExplainPanels = document.querySelectorAll("[data-td-panel]");
+  function tdCloseExplains(except){
+    tdExplainBtns.forEach(b=>{
+      if (b.getAttribute("data-td-explain") === except) return;
+      b.classList.remove("is-open"); b.setAttribute("aria-expanded","false");
+    });
+    tdExplainPanels.forEach(p=>{ if (p.getAttribute("data-td-panel") !== except) p.classList.remove("is-open"); });
+  }
+  tdExplainBtns.forEach(btn=>{
+    const key = btn.getAttribute("data-td-explain");
+    const panel = document.querySelector('[data-td-panel="'+key+'"]');
+    btn.addEventListener("click", ()=>{
+      const open = btn.classList.toggle("is-open");
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      panel.classList.toggle("is-open", open);
+      if (open) tdCloseExplains(key);
+    });
   });
 
   const fsBtn = document.getElementById("fsBtn");
