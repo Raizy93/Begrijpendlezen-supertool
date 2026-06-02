@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Hoofdzaak of detail? — Digibord</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --sky-400:#5dd0f2; --sky-500:#25b7e8; --sky-600:#0f9ad1; --sky-700:#0a7aa8; --sky-800:#075d80;
+    --or-300:#ffc37a; --or-500:#f28a2e; --or-600:#e06a11;
+    --cream-100:#faf3e4; --ink-900:#15202b; --ink-700:#2c3e50; --ink-500:#526374; --ink-100:#e3e8ec;
+    --green:#38b24a; --red:#d64545; --gold:#ffd24a; --purple:#8c5fd3;
+    --font-display:'Luckiest Guy',cursive; --font-body:'Nunito',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{
+    font-family:var(--font-body); color:#fff;
+    background:
+      radial-gradient(140% 120% at 50% -20%, var(--sky-400) 0%, var(--sky-500) 38%, var(--sky-600) 72%, var(--sky-700) 100%);
+    -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent; overflow:hidden;
+  }
+  /* subtle classroom dots */
+  body::before{content:""; position:fixed; inset:0; pointer-events:none; opacity:.5;
+    background-image:radial-gradient(rgba(255,255,255,.16) 2px, transparent 2px); background-size:34px 34px;}
+  #db{height:100%; display:flex; flex-direction:column; padding:22px 26px 24px; gap:16px; position:relative; z-index:1;}
+
+  /* ---- Scoreboard ---- */
+  .board{display:flex; align-items:center; justify-content:space-between; gap:18px;}
+  .title{display:flex; align-items:center; gap:14px;}
+  .title h1{font-family:var(--font-display); font-size:36px; margin:0; line-height:.95; letter-spacing:.5px;
+    -webkit-text-stroke:1.5px var(--ink-900); text-shadow:3px 3px 0 var(--ink-900); color:#fff;}
+  .logo{width:56px;height:56px;border-radius:50%;border:3px solid var(--ink-900);box-shadow:0 4px 0 var(--ink-900);background:#fff;object-fit:cover;}
+  .scores{display:flex; gap:12px; align-items:stretch;}
+  .fsbtn{display:grid; place-items:center; background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:18px; box-shadow:0 5px 0 var(--ink-900); padding:0 14px; cursor:pointer; transition:transform .09s, box-shadow .09s, background .12s;}
+  .fsbtn:hover{transform:translateY(-2px); box-shadow:0 7px 0 var(--ink-900); background:var(--gold);}
+  .fsbtn:active{transform:translateY(3px); box-shadow:0 2px 0 var(--ink-900);}
+  .score{background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:18px; box-shadow:0 5px 0 var(--ink-900);
+    padding:8px 16px; text-align:center; min-width:78px;}
+  .score .n{font-family:var(--font-display); font-size:30px; line-height:1;}
+  .score .l{font-weight:800; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-500);}
+  .score.good .n{color:var(--green);} .score.bad .n{color:var(--red);}
+  .score.q{background:var(--ink-900); color:#fff;} .score.q .l{color:#9fb2c0;}
+  .streakbox{background:linear-gradient(180deg,#fff,#fff6e0); border:3px solid var(--ink-900); border-radius:18px; box-shadow:0 5px 0 var(--ink-900); padding:8px 14px; display:flex; align-items:center; gap:10px; transition:box-shadow .2s;}
+  .streak-ic{display:grid; place-items:center; width:30px; height:30px; color:var(--ink-300); transition:transform .2s, color .2s;}
+  .streak-ic svg{width:28px; height:28px;}
+  .streakbox.hot{box-shadow:0 5px 0 var(--ink-900), 0 0 0 3px rgba(242,138,46,.45);}
+  .streakbox.hot .streak-ic{color:var(--or-500); transform:scale(1.12);}
+  .streakbox .sn{font-family:var(--font-display); font-size:26px; color:var(--or-600); line-height:1;}
+  .streakbox .sl{font-weight:800; font-size:12px; text-transform:uppercase; color:var(--ink-500);}
+
+  /* ---- Reading card ---- */
+  .stage{flex:1; display:flex; flex-direction:column; gap:16px; min-height:0;}
+  .read{flex:1; background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:26px; box-shadow:0 10px 0 rgba(7,93,128,.55), 0 22px 40px rgba(7,40,60,.28);
+    padding:22px 30px 24px; position:relative; min-height:0; display:flex; flex-direction:column;}
+  .read .ribbon{position:absolute; top:-16px; left:28px; background:var(--purple); color:#fff; border:3px solid var(--ink-900); border-radius:12px;
+    padding:6px 16px; font-weight:900; text-transform:uppercase; letter-spacing:.06em; font-size:14px; box-shadow:0 4px 0 var(--ink-900);}
+  .read .prompt{margin:8px 0 12px; padding-top:6px; font-weight:800; color:var(--sky-700); font-size:16px; align-self:flex-end;}
+  .story{font-size:24px; line-height:1.7; margin:0; overflow:auto; text-wrap:pretty; padding-right:8px;}
+  .hzd-hl{background:linear-gradient(180deg, rgba(255,210,74,0) 52%, var(--gold) 52%); padding:0 4px; font-weight:900; box-decoration-break:clone; -webkit-box-decoration-break:clone; border-radius:3px; transition:all .2s;}
+  .hzd-hl.is-good{background:rgba(56,178,74,.2); box-shadow:inset 0 0 0 2.5px var(--green); border-radius:10px;}
+  .hzd-hl.is-bad{background:rgba(214,69,69,.16); box-shadow:inset 0 0 0 2.5px var(--red); border-radius:10px;}
+
+  /* feedback banner sits over read bottom */
+  .feedback{display:block; background:var(--ink-900); color:#fff; border:3px solid var(--ink-900); border-radius:16px; padding:13px 18px 13px 58px; font-size:17px; font-weight:700; line-height:1.4; box-shadow:0 6px 0 rgba(7,93,128,.5); position:relative; min-height:54px;}
+  .feedback::before{content:"?"; position:absolute; left:14px; top:50%; transform:translateY(-50%); width:30px; height:30px; border-radius:50%; display:grid; place-items:center; background:#fff; color:var(--ink-900); font-weight:900;}
+  .feedback.is-good{background:var(--green); border-color:var(--ink-900);} .feedback.is-good::before{content:"\2713"; color:var(--green);}
+  .feedback.is-bad{background:var(--red); border-color:var(--ink-900);} .feedback.is-bad::before{content:"\2715"; color:var(--red);}
+  .feedback.is-neutral{background:rgba(7,55,80,.55); border-color:rgba(255,255,255,.4); font-weight:800;}
+  .hzd-streakmsg{margin-left:6px; color:var(--gold); font-weight:900;}
+
+  /* ---- Choice bars ---- */
+  .choices{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .choice{display:flex; align-items:center; gap:18px; border:3px solid var(--ink-900); border-radius:22px; cursor:pointer; color:#fff;
+    padding:18px 24px; box-shadow:0 8px 0 var(--ink-900); transition:transform .09s, box-shadow .09s, filter .12s; text-align:left;}
+  .choice .ic{flex:0 0 auto; width:64px; height:64px; border-radius:18px; background:rgba(255,255,255,.22); border:3px solid rgba(255,255,255,.6); display:grid; place-items:center;}
+  .choice .tx{display:flex; flex-direction:column;}
+  .choice .big{font-family:var(--font-display); font-size:34px; line-height:.95; letter-spacing:.5px;}
+  .choice .hint{font-weight:800; font-size:14px; opacity:.95;}
+  .choice .kbd{margin-left:auto; font-weight:900; font-size:13px; background:rgba(0,0,0,.2); padding:6px 12px; border-radius:10px; align-self:center;}
+  .choice.hz{background:linear-gradient(180deg,#2bb6e8,#0f86bd);}
+  .choice.dt{background:linear-gradient(180deg,var(--or-500),var(--or-600));}
+  .choice:not(:disabled):hover{transform:translateY(-3px); box-shadow:0 11px 0 var(--ink-900); filter:brightness(1.06);}
+  .choice:not(:disabled):active{transform:translateY(5px); box-shadow:0 3px 0 var(--ink-900);}
+  .choice.is-dim{filter:grayscale(.6) brightness(.85); opacity:.5;}
+  .choice.is-correct{box-shadow:0 8px 0 var(--ink-900), 0 0 0 5px rgba(56,178,74,.6); animation:pop .35s ease;}
+  .choice.is-wrong{box-shadow:0 8px 0 var(--ink-900), 0 0 0 5px rgba(214,69,69,.55); animation:shake .4s ease;}
+  @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.04)}100%{transform:scale(1)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}50%{transform:translateX(7px)}75%{transform:translateX(-4px)}}
+
+  /* ---- Footer controls ---- */
+  .foot{display:flex; align-items:center; gap:14px;}
+  .pgwrap{flex:1; height:16px; background:rgba(255,255,255,.28); border:3px solid var(--ink-900); border-radius:999px; overflow:hidden; box-shadow:0 4px 0 rgba(7,93,128,.4);}
+  .pg{height:100%; width:0%; background:linear-gradient(90deg,var(--gold),#fff); transition:width .3s;}
+  .btn{font-family:var(--font-body); font-weight:900; font-size:16px; border:3px solid var(--ink-900); border-radius:999px; background:#fff; color:var(--ink-900); padding:12px 22px; cursor:pointer; box-shadow:0 5px 0 var(--ink-900); transition:transform .09s, box-shadow .09s; white-space:nowrap;}
+  .btn:hover{transform:translateY(-2px); box-shadow:0 7px 0 var(--ink-900);} .btn:active{transform:translateY(3px); box-shadow:0 2px 0 var(--ink-900);}
+  .btn.primary{background:var(--gold);} .btn.primary:disabled{background:rgba(255,255,255,.4); color:rgba(21,32,43,.4); box-shadow:0 5px 0 rgba(7,93,128,.3); cursor:default; transform:none;}
+  .sound{display:flex; align-items:center; gap:8px; font-weight:900; font-size:14px; color:#fff; cursor:pointer;}
+  .sw{width:50px;height:30px;border-radius:999px;background:rgba(255,255,255,.35);border:3px solid var(--ink-900);position:relative;transition:background .15s;}
+  .sw .kn{position:absolute;top:0;left:0;width:24px;height:24px;border-radius:50%;background:#fff;border:3px solid var(--ink-900);transition:left .15s;}
+  .sw.is-on, .sound.is-on .sw{background:var(--green);}
+  .sw.is-on .kn, .sound.is-on .sw .kn{left:20px;}
+
+  /* ---- Overlays ---- */
+  .overlay{position:absolute; inset:0; background:rgba(7,40,60,.6); backdrop-filter:blur(3px); display:grid; place-items:center; padding:24px; z-index:30;}
+  .panel{width:min(660px,100%); background:#fff; color:var(--ink-900); border:4px solid var(--ink-900); border-radius:28px; box-shadow:0 14px 0 rgba(7,93,128,.5), 0 28px 60px rgba(0,0,0,.35); padding:30px 34px; text-align:center;}
+  .panel h2{font-family:var(--font-display); font-size:46px; margin:0 0 8px; -webkit-text-stroke:1.5px var(--ink-900); text-shadow:3px 3px 0 var(--gold); color:#fff;}
+  .panel p{font-size:18px; color:var(--ink-700); margin:0 0 8px; line-height:1.5;}
+  .countrow{display:flex; gap:14px; margin:20px 0 8px;}
+  .count{flex:1; font-family:var(--font-display); font-size:34px; padding:18px 0; border:4px solid var(--ink-900); border-radius:20px; background:var(--sky-400); color:#fff; cursor:pointer; box-shadow:0 6px 0 var(--ink-900); transition:transform .09s, box-shadow .09s;
+    -webkit-text-stroke:1px var(--ink-900);}
+  .count:hover{transform:translateY(-3px); box-shadow:0 9px 0 var(--ink-900); background:var(--or-500);} .count:active{transform:translateY(4px); box-shadow:0 2px 0 var(--ink-900);}
+  .count small{display:block; -webkit-text-stroke:0; font-family:var(--font-body); font-weight:800; font-size:12px; color:rgba(255,255,255,.92);}
+  .endbig{font-family:var(--font-display); font-size:80px; line-height:1; color:var(--sky-600); -webkit-text-stroke:2px var(--ink-900); text-shadow:4px 4px 0 var(--gold);}
+
+  /* ---- Eindsterren ---- */
+  .endstars{display:flex; justify-content:center; gap:18px; margin:4px 0 14px;}
+  .estar{display:grid; place-items:center;}
+  .estar svg{width:62px; height:62px;}
+  .estar .st{fill:#e7ecef; stroke:var(--ink-900); stroke-width:1.5;}
+  .estar.on .st{fill:var(--gold);}
+  .estar.on{animation:starpop .45s cubic-bezier(.2,1.3,.5,1) backwards;}
+  @keyframes starpop{0%{transform:scale(0) rotate(-35deg); opacity:0;}70%{transform:scale(1.25) rotate(8deg);}100%{transform:scale(1) rotate(0); opacity:1;}}
+
+  /* ---- Startmenu ---- */
+  .panel.menu{max-height:calc(100vh - 48px); overflow:auto;}
+  .menu-btns{display:flex; flex-direction:column; gap:14px; margin:22px 0 4px;}
+  .mbtn{display:flex; align-items:center; gap:16px; width:100%; text-align:left; border:4px solid var(--ink-900); border-radius:20px; padding:15px 20px; cursor:pointer; color:#fff; box-shadow:0 6px 0 var(--ink-900); transition:transform .09s, box-shadow .09s, filter .12s; font-family:var(--font-body);}
+  .mbtn:hover{transform:translateY(-3px); box-shadow:0 9px 0 var(--ink-900); filter:brightness(1.06);}
+  .mbtn:active{transform:translateY(4px); box-shadow:0 2px 0 var(--ink-900);}
+  .mbtn .mic{flex:0 0 auto; width:52px; height:52px; border-radius:15px; background:rgba(255,255,255,.22); border:3px solid rgba(255,255,255,.6); display:grid; place-items:center; color:#fff;}
+  .mbtn .mtx{display:flex; flex-direction:column; gap:2px; line-height:1.12; min-width:0;}
+  .mbtn .mbig{font-family:var(--font-body); font-weight:900; font-size:19px; letter-spacing:.2px; line-height:1.18; text-transform:uppercase;}
+  .mbtn.play .mbig{font-family:var(--font-display); font-size:24px; letter-spacing:.5px; line-height:1.05; text-transform:none;}
+  .mbtn .mhint{font-weight:800; font-size:13px; opacity:.95;}
+  .mbtn .mchev{margin-left:auto; font-weight:900; font-size:24px; transition:transform .2s;}
+  .mbtn.play{background:linear-gradient(180deg,#ffd968,#f6b932); color:var(--ink-900);}
+  .mbtn.play .mic{background:rgba(0,0,0,.12); border-color:rgba(0,0,0,.25); color:var(--ink-900);}
+  .mbtn.hz{background:linear-gradient(180deg,#2bb6e8,#0f86bd);}
+  .mbtn.dt{background:linear-gradient(180deg,var(--or-500),var(--or-600));}
+  .mbtn.is-open .mchev{transform:rotate(90deg);}
+
+  .explain{max-height:0; overflow:hidden; transition:max-height .32s ease;}
+  .explain.is-open{max-height:520px;}
+  .explain-inner{background:var(--cream-100); border:3px solid var(--ink-900); border-radius:16px; padding:16px 18px; margin-top:2px; text-align:left;}
+  .explain-inner p{font-size:16px; color:var(--ink-700); margin:0 0 10px; line-height:1.5;}
+  .explain-inner .extip{font-size:14px; color:var(--ink-500); font-weight:800; margin:10px 0 0;}
+  .example{background:#fff; border:3px solid var(--ink-900); border-radius:12px; padding:12px 14px; font-size:16px; line-height:1.7; color:var(--ink-900);}
+  .extag{display:inline-block; font-weight:900; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#fff; border:2px solid var(--ink-900); border-radius:8px; padding:2px 9px; margin-bottom:9px;}
+  .extag.hz{background:var(--sky-600);} .extag.dt{background:var(--or-600);}
+  .backbtn{background:none; border:none; color:var(--ink-500); font-family:var(--font-body); font-weight:900; font-size:15px; cursor:pointer; padding:8px 10px; margin-bottom:6px; border-radius:10px;}
+  .backbtn:hover{color:var(--ink-900); background:rgba(21,32,43,.06);}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;}}
+</style>
+</head>
+<body>
+<template id="__bundler_thumbnail">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+    <rect width="200" height="200" rx="28" fill="#25b7e8"/>
+    <circle cx="100" cy="86" r="34" fill="none" stroke="#fff" stroke-width="9"/>
+    <line x1="124" y1="110" x2="150" y2="136" stroke="#fff" stroke-width="11" stroke-linecap="round"/>
+    <path d="M100 60l5.5 11.2 12.4 1.8-9 8.7 2.2 12.3L100 99.4 88.9 105.3l2.1-12.3-9-8.7 12.4-1.8z" fill="#ffd24a"/>
+  </svg>
+</template>
+<div id="db" tabindex="0">
+  <div class="board">
+    <div class="title">
+      <img class="logo" src="assets/logo-meesterdanny.png" alt="Meester Danny" />
+      <h1>Hoofdzaak of detail?</h1>
+    </div>
+    <div class="scores">
+      <div class="streakbox" id="streakbox">
+        <span class="streak-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c0 3-4 4.5-4 8a4 4 0 0 0 1.2 2.9C9 11.5 10.5 10 10.5 10c0 2 .5 2.6 1.5 3.8 1 1.2 1.5 2 1.5 3.2a3.5 3.5 0 0 1-7 .2C6.5 19.7 8 21.5 12 22c4.5 0 8-3 8-7 0-5-3-6-4-8-1 1.5-2 2-2.5 1C12.8 6.7 13 4.5 12 2z"/></svg></span>
+        <div><div class="sn"><span data-hzd-streak>0</span></div><div class="sl">reeks</div></div>
+      </div>
+      <div class="score good"><div class="n" data-hzd-good>0</div><div class="l">goed</div></div>
+      <div class="score bad"><div class="n" data-hzd-bad>0</div><div class="l">fout</div></div>
+      <div class="score q"><div class="n"><span data-hzd-qnow>0</span>/<span data-hzd-qtot>0</span></div><div class="l">vraag</div></div>
+      <button class="fsbtn" id="fsBtn" title="Volledig scherm" aria-label="Volledig scherm">
+        <svg class="ic-open" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/></svg>
+        <svg class="ic-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M9 4v4a1 1 0 0 1-1 1H4M15 4v4a1 1 0 0 0 1 1h4M9 20v-4a1 1 0 0 0-1-1H4M15 20v-4a1 1 0 0 1 1-1h4"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="stage" data-hzd-game style="display:none;">
+    <div class="read">
+      <span class="ribbon" data-hzd-topic>Onderwerp</span>
+      <div class="prompt">Welke rol heeft de gemarkeerde zin?</div>
+      <p class="story" data-hzd-story></p>
+    </div>
+
+    <div class="feedback is-neutral" data-hzd-feedback aria-live="polite"><span class="fic">?</span><span>Lees de tekst en kies hieronder.</span></div>
+
+    <div class="choices">
+      <button class="choice hz" data-hzd-choice="hoofdzaak">
+        <span class="ic"><svg width="36" height="36" viewBox="0 0 46 46" fill="none"><circle cx="23" cy="23" r="12" fill="#fff"/><circle cx="23" cy="23" r="20" stroke="#fff" stroke-width="3" stroke-dasharray="4 6"/></svg></span>
+        <span class="tx"><span class="big">HOOFDZAAK</span><span class="hint">de belangrijkste gedachte</span></span>
+        <span class="kbd">←</span>
+      </button>
+      <button class="choice dt" data-hzd-choice="detail">
+        <span class="ic"><svg width="36" height="36" viewBox="0 0 46 46" fill="none"><circle cx="20" cy="20" r="11" stroke="#fff" stroke-width="3.5"/><line x1="28" y1="28" x2="39" y2="39" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg></span>
+        <span class="tx"><span class="big">DETAIL</span><span class="hint">extra info, voorbeeld of getal</span></span>
+        <span class="kbd">→</span>
+      </button>
+    </div>
+
+    <div class="foot">
+      <div class="sound" data-hzd-sound role="switch" aria-checked="false" tabindex="0"><span>Geluid</span><span class="sw"><span class="kn"></span></span></div>
+      <div class="pgwrap"><div class="pg" data-hzd-progress></div></div>
+      <button class="btn" data-hzd-reset>Opnieuw</button>
+      <button class="btn primary" data-hzd-next disabled>Volgende →</button>
+    </div>
+  </div>
+
+  <!-- Startmenu -->
+  <div class="overlay" data-menu>
+    <div class="panel menu">
+      <h2>Hoofdzaak of detail?</h2>
+      <p>Lees straks een kort stukje tekst en kijk goed naar de <strong>gele zin</strong>. Is dat de hoofdzaak of een detail? Weet je het verschil nog niet zeker? Lees dan eerst even de uitleg hieronder.</p>
+      <div class="menu-btns">
+        <button class="mbtn play" data-menu-start>
+          <span class="mic"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+          <span class="mtx"><span class="mbig">SPELEN</span><span class="mhint">kies daarna hoeveel vragen</span></span>
+          <span class="mchev">→</span>
+        </button>
+
+        <button class="mbtn hz" data-explain="hz" aria-expanded="false">
+          <span class="mic"><svg width="28" height="28" viewBox="0 0 46 46" fill="none"><circle cx="23" cy="23" r="12" fill="#fff"/><circle cx="23" cy="23" r="20" stroke="#fff" stroke-width="3" stroke-dasharray="4 6"/></svg></span>
+          <span class="mtx"><span class="mbig">WAT IS EEN HOOFDZAAK?</span><span class="mhint">de belangrijkste gedachte</span></span>
+          <span class="mchev">›</span>
+        </button>
+        <div class="explain" data-panel="hz">
+          <div class="explain-inner">
+            <p>De <strong>hoofdzaak</strong> is waar het hele stukje echt over gaat. Het is de belangrijkste gedachte. Zou je in één zin vertellen waar de tekst over ging? Dan noem je de hoofdzaak.</p>
+            <div class="example">
+              <span class="extag hz">Hoofdzaak</span>
+              <div><mark class="hzd-hl">Een hond is een fijne vriend voor de mens.</mark> Honden kunnen heel goed ruiken. Een speurhond vindt zelfs een verstopte koffer terug. Daarom werken sommige honden bij de politie.</div>
+            </div>
+            <p class="extip">Tip: de hoofdzaak staat vaak vooraan of juist helemaal achteraan.</p>
+          </div>
+        </div>
+
+        <button class="mbtn dt" data-explain="dt" aria-expanded="false">
+          <span class="mic"><svg width="28" height="28" viewBox="0 0 46 46" fill="none"><circle cx="20" cy="20" r="11" stroke="#fff" stroke-width="3.5"/><line x1="28" y1="28" x2="39" y2="39" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg></span>
+          <span class="mtx"><span class="mbig">WAT IS EEN DETAIL?</span><span class="mhint">extra info, voorbeeld of getal</span></span>
+          <span class="mchev">›</span>
+        </button>
+        <div class="explain" data-panel="dt">
+          <div class="explain-inner">
+            <p>Een <strong>detail</strong> is extra informatie in de tekst: een voorbeeld, een naam, een getal of iets wat één keer gebeurt. Leuk of handig om te weten, maar je hebt het niet nodig om te snappen waar het stukje over gaat.</p>
+            <div class="example">
+              <span class="extag dt">Detail</span>
+              <div>Een hond is een fijne vriend voor de mens. Honden kunnen heel goed ruiken. <mark class="hzd-hl">Een speurhond vindt zelfs een verstopte koffer terug.</mark> Daarom werken sommige honden bij de politie.</div>
+            </div>
+            <p class="extip">Tip: een detail herken je vaak aan een naam, een getal of een voorbeeld.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vragen kiezen -->
+  <div class="overlay" data-hzd-start style="display:none;">
+    <div class="panel">
+      <button class="backbtn" data-menu-back>← Terug naar het menu</button>
+      <h2>Hoofdzaak of detail?</h2>
+      <p>Lees de tekst op het bord. Bekijk de <strong>gele gemarkeerde zin</strong>. Druk samen: is het de <strong>hoofdzaak</strong> of een <strong>detail</strong>?</p>
+      <p style="color:var(--or-600); font-weight:800;">Hoe meer goed op rij, hoe meer sterren je verdient!</p>
+      <div class="countrow">
+        <button class="count" data-hzd-count data-count="5">5<small>kort</small></button>
+        <button class="count" data-hzd-count data-count="10">10<small>standaard</small></button>
+        <button class="count" data-hzd-count data-count="15">15<small>lang</small></button>
+        <button class="count" data-hzd-count data-count="20">20<small>marathon</small></button>
+      </div>
+      <p style="font-size:14px;color:var(--ink-500);margin-top:14px;">← hoofdzaak · → detail · Enter = volgende</p>
+    </div>
+  </div>
+
+  <!-- Einde -->
+  <div class="overlay" data-hzd-end style="display:none;">
+    <div class="panel">
+      <h2>Goed gespeeld!</h2>
+      <div class="endstars" id="endStars"></div>
+      <div class="endbig"><span data-hzd-endscore>0</span>/<span data-hzd-endtotal>0</span></div>
+      <p style="font-family:var(--font-display); font-size:28px; color:var(--or-600); margin:6px 0;"><span data-hzd-endpct>0%</span> goed</p>
+      <p data-hzd-endmsg></p>
+      <button class="btn primary" data-hzd-replay style="margin-top:12px;">Nog een keer spelen</button>
+    </div>
+  </div>
+</div>
+
+<script src="items.js"></script>
+<script src="engine.js"></script>
+<script>
+  // sterren-beoordeling (eindscherm) + reeks-vlam
+  const STAR = '<svg viewBox="0 0 24 24"><path class="st" d="M12 2l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 18.9 6.1 22l1.2-6.5L2.5 8.9 9.1 8z"/></svg>';
+  const endStarsEl = document.getElementById("endStars");
+  const streakboxEl = document.getElementById("streakbox");
+  function starsForPct(pct){ return pct>=90 ? 3 : pct>=70 ? 2 : pct>=50 ? 1 : 0; }
+  function renderEndStars(pct){
+    const earned = starsForPct(pct);
+    endStarsEl.innerHTML = "";
+    for(let i=0;i<3;i++){
+      const s = document.createElement("span");
+      s.className = "estar" + (i < earned ? " on" : "");
+      s.style.animationDelay = (0.15 + i*0.18) + "s";
+      s.innerHTML = STAR;
+      endStarsEl.appendChild(s);
+    }
+  }
+  const game = initHZD(document.getElementById("db"), {
+    captureGlobalKeys:true,
+    onAnswer:(correct, item, st)=>{
+      streakboxEl.classList.toggle("hot", st.streak >= 3);
+    },
+    onFinish:(res)=>{ renderEndStars(res.pct); }
+  });
+  // reset reeks-vlam bij een nieuwe ronde
+  document.querySelectorAll("[data-hzd-count],[data-hzd-replay]").forEach(b=>b.addEventListener("click",()=>{
+    streakboxEl.classList.remove("hot");
+  }));
+
+  // --- Startmenu ---
+  const menuOverlay = document.querySelector("[data-menu]");
+  const countOverlay = document.querySelector("[data-hzd-start]");
+  const explainBtns = document.querySelectorAll("[data-explain]");
+  const explainPanels = document.querySelectorAll("[data-panel]");
+  function closeExplains(except){
+    explainBtns.forEach(b=>{
+      if (b.getAttribute("data-explain") === except) return;
+      b.classList.remove("is-open"); b.setAttribute("aria-expanded","false");
+    });
+    explainPanels.forEach(p=>{ if (p.getAttribute("data-panel") !== except) p.classList.remove("is-open"); });
+  }
+  explainBtns.forEach(btn=>{
+    const key = btn.getAttribute("data-explain");
+    const panel = document.querySelector('[data-panel="'+key+'"]');
+    btn.addEventListener("click", ()=>{
+      const open = btn.classList.toggle("is-open");
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      panel.classList.toggle("is-open", open);
+      if (open) closeExplains(key);
+    });
+  });
+  document.querySelector("[data-menu-start]").addEventListener("click", ()=>{
+    menuOverlay.style.display = "none";
+    countOverlay.style.display = "";
+  });
+  document.querySelector("[data-menu-back]").addEventListener("click", ()=>{
+    countOverlay.style.display = "none";
+    closeExplains(null);
+    menuOverlay.style.display = "";
+  });
+
+  // --- Volledig scherm ---
+  const fsBtn = document.getElementById("fsBtn");
+  const fsTarget = document.documentElement;
+  function fsElement(){ return document.fullscreenElement || document.webkitFullscreenElement || null; }
+  function enterFS(){
+    const r = fsTarget.requestFullscreen || fsTarget.webkitRequestFullscreen || fsTarget.webkitRequestFullScreen;
+    if (r) { try { const p = r.call(fsTarget); if (p && p.catch) p.catch(()=>{}); } catch(e){} }
+  }
+  function exitFS(){
+    const x = document.exitFullscreen || document.webkitExitFullscreen;
+    if (x) { try { const p = x.call(document); if (p && p.catch) p.catch(()=>{}); } catch(e){} }
+  }
+  fsBtn.addEventListener("click", ()=>{ fsElement() ? exitFS() : enterFS(); });
+  function syncFS(){
+    const on = !!fsElement();
+    fsBtn.querySelector(".ic-open").style.display = on ? "none" : "";
+    fsBtn.querySelector(".ic-close").style.display = on ? "" : "none";
+    fsBtn.title = on ? "Sluit volledig scherm (Esc)" : "Volledig scherm";
+  }
+  document.addEventListener("fullscreenchange", syncFS);
+  document.addEventListener("webkitfullscreenchange", syncFS);
+  // 'F' als sneltoets (niet tijdens overlay-typen — er zijn geen invoervelden)
+  document.addEventListener("keydown", (e)=>{ if ((e.key === "f" || e.key === "F") && !e.metaKey && !e.ctrlKey){ fsElement() ? exitFS() : enterFS(); } });
+</script>
+</body>
+</html>

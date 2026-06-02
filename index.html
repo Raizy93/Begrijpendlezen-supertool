@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Begrijpend lezen Supertool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --sky-400:#5dd0f2; --sky-500:#25b7e8; --sky-600:#0f9ad1; --sky-700:#0a7aa8; --sky-800:#075d80;
+    --or-300:#ffc37a; --or-500:#f28a2e; --or-600:#e06a11;
+    --cream-100:#faf3e4; --ink-900:#15202b; --ink-700:#2c3e50; --ink-500:#526374; --ink-100:#e3e8ec;
+    --green:#38b24a; --red:#d64545; --gold:#ffd24a; --purple:#8c5fd3; --pink:#e85291; --teal:#19a68c;
+    --font-display:'Luckiest Guy',cursive; --font-body:'Nunito',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{
+    font-family:var(--font-body); color:#fff;
+    background:
+      radial-gradient(140% 120% at 50% -20%, var(--sky-400) 0%, var(--sky-500) 38%, var(--sky-600) 72%, var(--sky-700) 100%);
+    -webkit-font-smoothing:antialiased; -webkit-tap-highlight-color:transparent; overflow:hidden;
+  }
+  body::before{content:""; position:fixed; inset:0; pointer-events:none; opacity:.48;
+    background-image:radial-gradient(rgba(255,255,255,.16) 2px, transparent 2px); background-size:34px 34px;}
+  #app{height:100%; display:flex; flex-direction:column; padding:22px 26px 24px; gap:16px; position:relative; z-index:1;}
+
+  .board{display:flex; align-items:center; justify-content:space-between; gap:18px;}
+  .title{display:flex; align-items:center; gap:14px; min-width:0;}
+  .title h1{font-family:var(--font-display); font-size:36px; margin:0; line-height:.95; letter-spacing:.5px;
+    -webkit-text-stroke:1.5px var(--ink-900); text-shadow:3px 3px 0 var(--ink-900); color:#fff;}
+  .title .sub{font-weight:900; color:rgba(255,255,255,.9); margin-top:3px;}
+  .logo{width:56px;height:56px;border-radius:50%;border:3px solid var(--ink-900);box-shadow:0 4px 0 var(--ink-900);background:#fff;object-fit:cover;}
+  .top-actions{display:flex; gap:12px; align-items:center;}
+  .fsbtn,.homebtn{display:grid; place-items:center; min-width:54px; min-height:54px; background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:18px; box-shadow:0 5px 0 var(--ink-900); padding:0 14px; cursor:pointer; transition:transform .09s, box-shadow .09s, background .12s;}
+  .homebtn{display:none; font-weight:900; gap:8px; grid-auto-flow:column;}
+  .fsbtn:hover,.homebtn:hover{transform:translateY(-2px); box-shadow:0 7px 0 var(--ink-900); background:var(--gold);}
+  .fsbtn:active,.homebtn:active{transform:translateY(3px); box-shadow:0 2px 0 var(--ink-900);}
+  body.in-goal .homebtn{display:grid;}
+
+  .screen{flex:1; min-height:0;}
+  .super-menu{height:100%; display:flex; flex-direction:column; gap:18px; min-height:0;}
+  .intro{display:flex; justify-content:space-between; gap:24px; align-items:flex-end;}
+  .intro h2{font-family:var(--font-display); font-size:58px; line-height:.95; margin:4px 0 8px; -webkit-text-stroke:1.5px var(--ink-900); text-shadow:4px 4px 0 var(--ink-900);}
+  .intro p{max-width:760px; margin:0; font-size:20px; line-height:1.45; font-weight:800; color:rgba(255,255,255,.94);}
+  .legend{background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:18px; box-shadow:0 5px 0 var(--ink-900); padding:12px 16px; min-width:210px;}
+  .legend strong{display:block; font-size:14px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-500);}
+  .legend span{display:block; font-family:var(--font-display); color:var(--sky-700); font-size:27px; line-height:1;}
+
+  .goal-grid{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:14px; min-height:0;}
+  .goal-card{position:relative; min-height:150px; display:flex; flex-direction:column; justify-content:space-between; align-items:flex-start; gap:14px; text-align:left; color:#fff; border:3px solid var(--ink-900); border-radius:20px; box-shadow:0 7px 0 var(--ink-900); padding:16px; overflow:hidden; cursor:pointer; transition:transform .09s, box-shadow .09s, filter .12s; font-family:var(--font-body);}
+  .goal-card::after{content:""; position:absolute; right:-28px; bottom:-36px; width:120px; height:120px; border:10px solid rgba(255,255,255,.18); border-radius:34px; transform:rotate(18deg);}
+  .goal-card:hover{transform:translateY(-3px); box-shadow:0 10px 0 var(--ink-900); filter:brightness(1.05);}
+  .goal-card:active{transform:translateY(4px); box-shadow:0 2px 0 var(--ink-900);}
+  .goal-card[disabled]{cursor:not-allowed; filter:grayscale(.28) brightness(.9); opacity:.72;}
+  .goal-card[disabled]:hover{transform:none; box-shadow:0 7px 0 var(--ink-900);}
+  .goal-card .ic{width:52px;height:52px; border-radius:15px; background:rgba(255,255,255,.22); border:3px solid rgba(255,255,255,.6); display:grid; place-items:center; z-index:1;}
+  .goal-card h3{font-size:19px; line-height:1.12; margin:0; text-transform:uppercase; font-weight:900; z-index:1;}
+  .goal-card p{font-size:13px; line-height:1.25; margin:0; font-weight:800; opacity:.95; z-index:1;}
+  .goal-card .badge{z-index:1; display:inline-flex; align-items:center; min-height:26px; border-radius:999px; padding:4px 10px; font-size:11px; font-weight:900; letter-spacing:.05em; text-transform:uppercase; background:rgba(0,0,0,.22);}
+  .goal-card.ready .badge{background:#fff; color:var(--ink-900);}
+  .c-blue{background:linear-gradient(180deg,#2bb6e8,#0f86bd);}
+  .c-orange{background:linear-gradient(180deg,var(--or-500),var(--or-600));}
+  .c-purple{background:linear-gradient(180deg,#9d73e8,#7141bd);}
+  .c-green{background:linear-gradient(180deg,#4ac461,#219a35);}
+  .c-pink{background:linear-gradient(180deg,#f26aa5,#cf3679);}
+  .c-teal{background:linear-gradient(180deg,#28c4aa,#118a73);}
+  .c-gold{background:linear-gradient(180deg,#ffd968,#f1ad22); color:var(--ink-900);}
+  .c-red{background:linear-gradient(180deg,#ef6969,#c83a3a);}
+  .c-slate{background:linear-gradient(180deg,#6f8798,#415666);}
+  .c-gold .ic{background:rgba(0,0,0,.12); border-color:rgba(0,0,0,.25);}
+
+  .goal-shell{height:100%; display:none; flex-direction:column; gap:16px; min-height:0;}
+  body.in-goal .super-menu{display:none;}
+  body.in-goal .goal-shell{display:flex;}
+  .goal-strip{display:flex; justify-content:space-between; align-items:center; gap:16px; background:rgba(7,55,80,.38); border:3px solid rgba(255,255,255,.42); border-radius:18px; padding:10px 14px;}
+  .goal-strip strong{font-family:var(--font-display); font-size:28px; line-height:1; text-shadow:2px 2px 0 var(--ink-900);}
+  .goal-strip span{font-weight:900; opacity:.92;}
+
+  .scores{display:flex; gap:12px; align-items:stretch;}
+  .score{background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:18px; box-shadow:0 5px 0 var(--ink-900);
+    padding:8px 16px; text-align:center; min-width:78px;}
+  .score .n{font-family:var(--font-display); font-size:30px; line-height:1;}
+  .score .l{font-weight:800; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-500);}
+  .score.good .n{color:var(--green);} .score.bad .n{color:var(--red);}
+  .score.q{background:var(--ink-900); color:#fff;} .score.q .l{color:#9fb2c0;}
+  .streakbox{background:linear-gradient(180deg,#fff,#fff6e0); border:3px solid var(--ink-900); border-radius:18px; box-shadow:0 5px 0 var(--ink-900); padding:8px 14px; display:flex; align-items:center; gap:10px; transition:box-shadow .2s;}
+  .streak-ic{display:grid; place-items:center; width:30px; height:30px; color:var(--ink-500); transition:transform .2s, color .2s;}
+  .streak-ic svg{width:28px; height:28px;}
+  .streakbox.hot{box-shadow:0 5px 0 var(--ink-900), 0 0 0 3px rgba(242,138,46,.45);}
+  .streakbox.hot .streak-ic{color:var(--or-500); transform:scale(1.12);}
+  .streakbox .sn{font-family:var(--font-display); font-size:26px; color:var(--or-600); line-height:1;}
+  .streakbox .sl{font-weight:800; font-size:12px; text-transform:uppercase; color:var(--ink-500);}
+
+  .stage{flex:1; display:flex; flex-direction:column; gap:16px; min-height:0;}
+  .read{flex:1; background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:26px; box-shadow:0 10px 0 rgba(7,93,128,.55), 0 22px 40px rgba(7,40,60,.28);
+    padding:22px 30px 24px; position:relative; min-height:0; display:flex; flex-direction:column;}
+  .read .ribbon{position:absolute; top:-16px; left:28px; background:var(--purple); color:#fff; border:3px solid var(--ink-900); border-radius:12px;
+    padding:6px 16px; font-weight:900; text-transform:uppercase; letter-spacing:.06em; font-size:14px; box-shadow:0 4px 0 var(--ink-900);}
+  .read .prompt{margin:8px 0 12px; padding-top:6px; font-weight:800; color:var(--sky-700); font-size:16px; align-self:flex-end;}
+  .story{font-size:24px; line-height:1.7; margin:0; overflow:auto; text-wrap:pretty; padding-right:8px;}
+  .hzd-hl{background:linear-gradient(180deg, rgba(255,210,74,0) 52%, var(--gold) 52%); padding:0 4px; font-weight:900; box-decoration-break:clone; -webkit-box-decoration-break:clone; border-radius:3px; transition:all .2s;}
+  .hzd-hl.is-good{background:rgba(56,178,74,.2); box-shadow:inset 0 0 0 2.5px var(--green); border-radius:10px;}
+  .hzd-hl.is-bad{background:rgba(214,69,69,.16); box-shadow:inset 0 0 0 2.5px var(--red); border-radius:10px;}
+
+  .feedback{display:block; background:var(--ink-900); color:#fff; border:3px solid var(--ink-900); border-radius:16px; padding:13px 18px 13px 58px; font-size:17px; font-weight:700; line-height:1.4; box-shadow:0 6px 0 rgba(7,93,128,.5); position:relative; min-height:54px;}
+  .feedback::before{content:"?"; position:absolute; left:14px; top:50%; transform:translateY(-50%); width:30px; height:30px; border-radius:50%; display:grid; place-items:center; background:#fff; color:var(--ink-900); font-weight:900;}
+  .feedback.is-good{background:var(--green); border-color:var(--ink-900);} .feedback.is-good::before{content:"\2713"; color:var(--green);}
+  .feedback.is-bad{background:var(--red); border-color:var(--ink-900);} .feedback.is-bad::before{content:"\2715"; color:var(--red);}
+  .feedback.is-neutral{background:rgba(7,55,80,.55); border-color:rgba(255,255,255,.4); font-weight:800;}
+  .hzd-streakmsg{margin-left:6px; color:var(--gold); font-weight:900;}
+
+  .choices{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .choice{display:flex; align-items:center; gap:18px; border:3px solid var(--ink-900); border-radius:22px; cursor:pointer; color:#fff;
+    padding:18px 24px; box-shadow:0 8px 0 var(--ink-900); transition:transform .09s, box-shadow .09s, filter .12s; text-align:left;}
+  .choice .ic{flex:0 0 auto; width:64px; height:64px; border-radius:18px; background:rgba(255,255,255,.22); border:3px solid rgba(255,255,255,.6); display:grid; place-items:center;}
+  .choice .tx{display:flex; flex-direction:column;}
+  .choice .big{font-family:var(--font-display); font-size:34px; line-height:.95; letter-spacing:.5px;}
+  .choice .hint{font-weight:800; font-size:14px; opacity:.95;}
+  .choice .kbd{margin-left:auto; font-weight:900; font-size:13px; background:rgba(0,0,0,.2); padding:6px 12px; border-radius:10px; align-self:center;}
+  .choice.hz{background:linear-gradient(180deg,#2bb6e8,#0f86bd);}
+  .choice.dt{background:linear-gradient(180deg,var(--or-500),var(--or-600));}
+  .choice:not(:disabled):hover{transform:translateY(-3px); box-shadow:0 11px 0 var(--ink-900); filter:brightness(1.06);}
+  .choice:not(:disabled):active{transform:translateY(5px); box-shadow:0 3px 0 var(--ink-900);}
+  .choice.is-dim{filter:grayscale(.6) brightness(.85); opacity:.5;}
+  .choice.is-correct{box-shadow:0 8px 0 var(--ink-900), 0 0 0 5px rgba(56,178,74,.6); animation:pop .35s ease;}
+  .choice.is-wrong{box-shadow:0 8px 0 var(--ink-900), 0 0 0 5px rgba(214,69,69,.55); animation:shake .4s ease;}
+  @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.04)}100%{transform:scale(1)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}50%{transform:translateX(7px)}75%{transform:translateX(-4px)}}
+
+  .foot{display:flex; align-items:center; gap:14px;}
+  .pgwrap{flex:1; height:16px; background:rgba(255,255,255,.28); border:3px solid var(--ink-900); border-radius:999px; overflow:hidden; box-shadow:0 4px 0 rgba(7,93,128,.4);}
+  .pg{height:100%; width:0%; background:linear-gradient(90deg,var(--gold),#fff); transition:width .3s;}
+  .btn{font-family:var(--font-body); font-weight:900; font-size:16px; border:3px solid var(--ink-900); border-radius:999px; background:#fff; color:var(--ink-900); padding:12px 22px; cursor:pointer; box-shadow:0 5px 0 var(--ink-900); transition:transform .09s, box-shadow .09s; white-space:nowrap;}
+  .btn:hover{transform:translateY(-2px); box-shadow:0 7px 0 var(--ink-900);} .btn:active{transform:translateY(3px); box-shadow:0 2px 0 var(--ink-900);}
+  .btn.primary{background:var(--gold);} .btn.primary:disabled{background:rgba(255,255,255,.4); color:rgba(21,32,43,.4); box-shadow:0 5px 0 rgba(7,93,128,.3); cursor:default; transform:none;}
+  .sound{display:flex; align-items:center; gap:8px; font-weight:900; font-size:14px; color:#fff; cursor:pointer;}
+  .sw{width:50px;height:30px;border-radius:999px;background:rgba(255,255,255,.35);border:3px solid var(--ink-900);position:relative;transition:background .15s;}
+  .sw .kn{position:absolute;top:0;left:0;width:24px;height:24px;border-radius:50%;background:#fff;border:3px solid var(--ink-900);transition:left .15s;}
+  .sw.is-on, .sound.is-on .sw{background:var(--green);}
+  .sw.is-on .kn, .sound.is-on .sw .kn{left:20px;}
+
+  .overlay{position:absolute; inset:0; background:rgba(7,40,60,.6); backdrop-filter:blur(3px); display:grid; place-items:center; padding:24px; z-index:30;}
+  .panel{width:min(660px,100%); background:#fff; color:var(--ink-900); border:4px solid var(--ink-900); border-radius:28px; box-shadow:0 14px 0 rgba(7,93,128,.5), 0 28px 60px rgba(0,0,0,.35); padding:30px 34px; text-align:center;}
+  .panel h2{font-family:var(--font-display); font-size:46px; margin:0 0 8px; -webkit-text-stroke:1.5px var(--ink-900); text-shadow:3px 3px 0 var(--gold); color:#fff;}
+  .panel p{font-size:18px; color:var(--ink-700); margin:0 0 8px; line-height:1.5;}
+  .countrow{display:flex; gap:14px; margin:20px 0 8px;}
+  .count{flex:1; font-family:var(--font-display); font-size:34px; padding:18px 0; border:4px solid var(--ink-900); border-radius:20px; background:var(--sky-400); color:#fff; cursor:pointer; box-shadow:0 6px 0 var(--ink-900); transition:transform .09s, box-shadow .09s;
+    -webkit-text-stroke:1px var(--ink-900);}
+  .count:hover{transform:translateY(-3px); box-shadow:0 9px 0 var(--ink-900); background:var(--or-500);} .count:active{transform:translateY(4px); box-shadow:0 2px 0 var(--ink-900);}
+  .count small{display:block; -webkit-text-stroke:0; font-family:var(--font-body); font-weight:800; font-size:12px; color:rgba(255,255,255,.92);}
+  .endbig{font-family:var(--font-display); font-size:80px; line-height:1; color:var(--sky-600); -webkit-text-stroke:2px var(--ink-900); text-shadow:4px 4px 0 var(--gold);}
+  .endstars{display:flex; justify-content:center; gap:18px; margin:4px 0 14px;}
+  .estar{display:grid; place-items:center;}
+  .estar svg{width:62px; height:62px;}
+  .estar .st{fill:#e7ecef; stroke:var(--ink-900); stroke-width:1.5;}
+  .estar.on .st{fill:var(--gold);}
+  .estar.on{animation:starpop .45s cubic-bezier(.2,1.3,.5,1) backwards;}
+  @keyframes starpop{0%{transform:scale(0) rotate(-35deg); opacity:0;}70%{transform:scale(1.25) rotate(8deg);}100%{transform:scale(1) rotate(0); opacity:1;}}
+
+  .panel.menu{max-height:calc(100vh - 48px); overflow:auto;}
+  .menu-btns{display:flex; flex-direction:column; gap:14px; margin:22px 0 4px;}
+  .mbtn{display:flex; align-items:center; gap:16px; width:100%; text-align:left; border:4px solid var(--ink-900); border-radius:20px; padding:15px 20px; cursor:pointer; color:#fff; box-shadow:0 6px 0 var(--ink-900); transition:transform .09s, box-shadow .09s, filter .12s; font-family:var(--font-body);}
+  .mbtn:hover{transform:translateY(-3px); box-shadow:0 9px 0 var(--ink-900); filter:brightness(1.06);}
+  .mbtn:active{transform:translateY(4px); box-shadow:0 2px 0 var(--ink-900);}
+  .mbtn .mic{flex:0 0 auto; width:52px; height:52px; border-radius:15px; background:rgba(255,255,255,.22); border:3px solid rgba(255,255,255,.6); display:grid; place-items:center; color:#fff;}
+  .mbtn .mtx{display:flex; flex-direction:column; gap:2px; line-height:1.12; min-width:0;}
+  .mbtn .mbig{font-family:var(--font-body); font-weight:900; font-size:19px; letter-spacing:.2px; line-height:1.18; text-transform:uppercase;}
+  .mbtn.play .mbig{font-family:var(--font-display); font-size:24px; letter-spacing:.5px; line-height:1.05; text-transform:none;}
+  .mbtn .mhint{font-weight:800; font-size:13px; opacity:.95;}
+  .mbtn .mchev{margin-left:auto; font-weight:900; font-size:24px; transition:transform .2s;}
+  .mbtn.play{background:linear-gradient(180deg,#ffd968,#f6b932); color:var(--ink-900);}
+  .mbtn.play .mic{background:rgba(0,0,0,.12); border-color:rgba(0,0,0,.25); color:var(--ink-900);}
+  .mbtn.hz{background:linear-gradient(180deg,#2bb6e8,#0f86bd);}
+  .mbtn.dt{background:linear-gradient(180deg,var(--or-500),var(--or-600));}
+  .mbtn.is-open .mchev{transform:rotate(90deg);}
+  .explain{max-height:0; overflow:hidden; transition:max-height .32s ease;}
+  .explain.is-open{max-height:520px;}
+  .explain-inner{background:var(--cream-100); border:3px solid var(--ink-900); border-radius:16px; padding:16px 18px; margin-top:2px; text-align:left;}
+  .explain-inner p{font-size:16px; color:var(--ink-700); margin:0 0 10px; line-height:1.5;}
+  .explain-inner .extip{font-size:14px; color:var(--ink-500); font-weight:800; margin:10px 0 0;}
+  .example{background:#fff; border:3px solid var(--ink-900); border-radius:12px; padding:12px 14px; font-size:16px; line-height:1.7; color:var(--ink-900);}
+  .extag{display:inline-block; font-weight:900; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#fff; border:2px solid var(--ink-900); border-radius:8px; padding:2px 9px; margin-bottom:9px;}
+  .extag.hz{background:var(--sky-600);} .extag.dt{background:var(--or-600);}
+  .backbtn{background:none; border:none; color:var(--ink-500); font-family:var(--font-body); font-weight:900; font-size:15px; cursor:pointer; padding:8px 10px; margin-bottom:6px; border-radius:10px;}
+  .backbtn:hover{color:var(--ink-900); background:rgba(21,32,43,.06);}
+
+  @media (max-width:1100px){
+    .goal-grid{grid-template-columns:repeat(3,minmax(0,1fr)); overflow:auto; padding-bottom:8px;}
+    .intro h2{font-size:48px;}
+    .intro{align-items:flex-start; flex-direction:column;}
+  }
+  @media (max-width:760px){
+    body{overflow:auto;}
+    #app{min-height:100%; height:auto; padding:16px;}
+    .board,.goal-strip,.choices,.foot{flex-direction:column; align-items:stretch;}
+    .goal-grid{grid-template-columns:1fr;}
+    .scores,.countrow{display:grid; grid-template-columns:1fr 1fr;}
+    .choices{display:grid; grid-template-columns:1fr;}
+    .story{font-size:20px;}
+    .title h1{font-size:30px;}
+    .intro h2{font-size:42px;}
+    .legend{min-width:0;}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;}}
+</style>
+</head>
+<body>
+<div id="app" tabindex="0">
+  <div class="board">
+    <div class="title">
+      <img class="logo" src="Hoofdzaak%20vs%20Detail/assets/logo-meesterdanny.png" alt="Meester Danny" />
+      <div>
+        <h1>Begrijpend lezen</h1>
+        <div class="sub">Supertool voor leesdoelen</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="homebtn" data-home title="Terug naar doelen" aria-label="Terug naar doelen">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+        Doelen
+      </button>
+      <button class="fsbtn" id="fsBtn" title="Volledig scherm" aria-label="Volledig scherm">
+        <svg class="ic-open" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/></svg>
+        <svg class="ic-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M9 4v4a1 1 0 0 1-1 1H4M15 4v4a1 1 0 0 0 1 1h4M9 20v-4a1 1 0 0 0-1-1H4M15 20v-4a1 1 0 0 1 1-1h4"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <main class="screen">
+    <section class="super-menu" data-super-menu>
+      <div class="intro">
+        <div>
+          <h2>Kies je leesdoel</h2>
+          <p>Oefen steeds precies een onderdeel van begrijpend lezen. De eerste module staat klaar; de rest krijgt straks per doel een eigen spelvorm en uitleg.</p>
+        </div>
+        <div class="legend">
+          <strong>Nu beschikbaar</strong>
+          <span>1 doel</span>
+        </div>
+      </div>
+
+      <div class="goal-grid" aria-label="Leesdoelen">
+        <button class="goal-card ready c-blue" data-open-goal="hzd">
+          <span class="badge">Speelbaar</span>
+          <span class="ic"><svg width="34" height="34" viewBox="0 0 46 46" fill="none"><circle cx="23" cy="23" r="12" fill="#fff"/><circle cx="23" cy="23" r="20" stroke="#fff" stroke-width="3" stroke-dasharray="4 6"/></svg></span>
+          <div><h3>Hoofdzaak of detail</h3><p>Zie je de kern of juist extra informatie?</p></div>
+        </button>
+        <button class="goal-card c-purple" disabled>
+          <span class="badge">Later</span><span class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M8 14c-1.4-1-2-2.6-2-4a6 6 0 1 1 12 0c0 1.4-.6 3-2 4-.8.6-1 1.2-1 2H9c0-.8-.2-1.4-1-2z"/></svg></span>
+          <div><h3>Tekstdoel herkennen</h3><p>Wil de tekst informeren, overtuigen of vermaken?</p></div>
+        </button>
+        <button class="goal-card c-orange" disabled>
+          <span class="badge">Later</span><span class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/><path d="M8 5v14"/></svg></span>
+          <div><h3>Tekstsoort kiezen</h3><p>Herken verhaal, nieuwsbericht, uitleg of betoog.</p></div>
+        </button>
+        <button class="goal-card c-green" disabled>
+          <span class="badge">Later</span><span class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/><path d="M14 6h6v6"/></svg></span>
+          <div><h3>Feit of mening</h3><p>Wat kun je controleren en wat vindt iemand?</p></div>
+        </button>
+        <button class="goal-card c-pink" disabled>
+          <span class="badge">Later</span><span class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="M14 6l6 6-6 6"/><path d="M4 6h6"/><path d="M4 18h6"/></svg></span>
+          <div><h3>Signaalwoorden</h3><p>Vind woorden die verbanden laten zien.</p></div>
+        </button>
+        <button class="goal-card c-teal" disabled>
+          <span class="badge">Later</span><span class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10H7z"/><path d="M4 4l3 3"/><path d="M20 20l-3-3"/><path d="M20 4l-3 3"/><path d="M4 20l3-3"/></svg></span>
+          <div><h3>Verwijswoorden</h3><p>Ontdek waar hij, ze, die of dat naar verwijst.</p></div>
+        </button>
+        <button class="goal-card c-gold" disabled>
+          <span class="badge">Later</span><span class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h10"/><path d="M4 18h16"/></svg></span>
+          <div><h3>Titel of tussenkop</h3><p>Kies de kop die het beste past.</p></div>
+        </button>
+        <button class="goal-card c-red" disabled>
+          <span class="badge">Later</span><span class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14v16H5z"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg></span>
+          <div><h3>Samenvatting kiezen</h3><p>Welke korte tekst bewaart de kern?</p></div>
+        </button>
+        <button class="goal-card c-slate" disabled>
+          <span class="badge">Later</span><span class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19c4-8 12-8 16-14"/><path d="M14 5h6v6"/><path d="M4 19h6"/></svg></span>
+          <div><h3>Conclusie trekken</h3><p>Lees tussen de regels door.</p></div>
+        </button>
+        <button class="goal-card c-purple" disabled>
+          <span class="badge">Later</span><span class="ic"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg></span>
+          <div><h3>Mixmodus</h3><p>Alles door elkaar als je klaar bent voor uitdaging.</p></div>
+        </button>
+      </div>
+    </section>
+
+    <section class="goal-shell" data-goal-shell>
+      <div class="goal-strip">
+        <div><strong>Hoofdzaak of detail</strong><span> De gemarkeerde zin staat centraal.</span></div>
+        <div class="scores">
+          <div class="streakbox" id="streakbox">
+            <span class="streak-ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c0 3-4 4.5-4 8a4 4 0 0 0 1.2 2.9C9 11.5 10.5 10 10.5 10c0 2 .5 2.6 1.5 3.8 1 1.2 1.5 2 1.5 3.2a3.5 3.5 0 0 1-7 .2C6.5 19.7 8 21.5 12 22c4.5 0 8-3 8-7 0-5-3-6-4-8-1 1.5-2 2-2.5 1C12.8 6.7 13 4.5 12 2z"/></svg></span>
+            <div><div class="sn"><span data-hzd-streak>0</span></div><div class="sl">reeks</div></div>
+          </div>
+          <div class="score good"><div class="n" data-hzd-good>0</div><div class="l">goed</div></div>
+          <div class="score bad"><div class="n" data-hzd-bad>0</div><div class="l">fout</div></div>
+          <div class="score q"><div class="n"><span data-hzd-qnow>0</span>/<span data-hzd-qtot>0</span></div><div class="l">vraag</div></div>
+        </div>
+      </div>
+
+      <div class="stage" data-hzd-game style="display:none;">
+        <div class="read">
+          <span class="ribbon" data-hzd-topic>Onderwerp</span>
+          <div class="prompt">Welke rol heeft de gemarkeerde zin?</div>
+          <p class="story" data-hzd-story></p>
+        </div>
+        <div class="feedback is-neutral" data-hzd-feedback aria-live="polite">Lees de tekst en kies hieronder.</div>
+        <div class="choices">
+          <button class="choice hz" data-hzd-choice="hoofdzaak">
+            <span class="ic"><svg width="36" height="36" viewBox="0 0 46 46" fill="none"><circle cx="23" cy="23" r="12" fill="#fff"/><circle cx="23" cy="23" r="20" stroke="#fff" stroke-width="3" stroke-dasharray="4 6"/></svg></span>
+            <span class="tx"><span class="big">HOOFDZAAK</span><span class="hint">de belangrijkste gedachte</span></span>
+            <span class="kbd">links</span>
+          </button>
+          <button class="choice dt" data-hzd-choice="detail">
+            <span class="ic"><svg width="36" height="36" viewBox="0 0 46 46" fill="none"><circle cx="20" cy="20" r="11" stroke="#fff" stroke-width="3.5"/><line x1="28" y1="28" x2="39" y2="39" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg></span>
+            <span class="tx"><span class="big">DETAIL</span><span class="hint">extra info, voorbeeld of getal</span></span>
+            <span class="kbd">rechts</span>
+          </button>
+        </div>
+        <div class="foot">
+          <div class="sound" data-hzd-sound role="switch" aria-checked="false" tabindex="0"><span>Geluid</span><span class="sw"><span class="kn"></span></span></div>
+          <div class="pgwrap"><div class="pg" data-hzd-progress></div></div>
+          <button class="btn" data-hzd-reset>Opnieuw</button>
+          <button class="btn primary" data-hzd-next disabled>Volgende</button>
+        </div>
+      </div>
+
+      <div class="overlay" data-menu>
+        <div class="panel menu">
+          <h2>Hoofdzaak of detail?</h2>
+          <p>Lees straks een kort stukje tekst en kijk goed naar de <strong>gele zin</strong>. Is dat de hoofdzaak of een detail? Lees de uitleg als je het verschil nog wilt oefenen.</p>
+          <div class="menu-btns">
+            <button class="mbtn play" data-menu-start>
+              <span class="mic"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+              <span class="mtx"><span class="mbig">SPELEN</span><span class="mhint">kies daarna hoeveel vragen</span></span>
+              <span class="mchev">></span>
+            </button>
+            <button class="mbtn hz" data-explain="hz" aria-expanded="false">
+              <span class="mic"><svg width="28" height="28" viewBox="0 0 46 46" fill="none"><circle cx="23" cy="23" r="12" fill="#fff"/><circle cx="23" cy="23" r="20" stroke="#fff" stroke-width="3" stroke-dasharray="4 6"/></svg></span>
+              <span class="mtx"><span class="mbig">WAT IS EEN HOOFDZAAK?</span><span class="mhint">de belangrijkste gedachte</span></span>
+              <span class="mchev">></span>
+            </button>
+            <div class="explain" data-panel="hz">
+              <div class="explain-inner">
+                <p>De <strong>hoofdzaak</strong> is waar het hele stukje echt over gaat. Het is de belangrijkste gedachte. Zou je in een zin vertellen waar de tekst over ging? Dan noem je de hoofdzaak.</p>
+                <div class="example"><span class="extag hz">Hoofdzaak</span><div><mark class="hzd-hl">Een hond is een fijne vriend voor de mens.</mark> Honden kunnen heel goed ruiken. Een speurhond vindt zelfs een verstopte koffer terug. Daarom werken sommige honden bij de politie.</div></div>
+                <p class="extip">Tip: de hoofdzaak staat vaak vooraan of juist helemaal achteraan.</p>
+              </div>
+            </div>
+            <button class="mbtn dt" data-explain="dt" aria-expanded="false">
+              <span class="mic"><svg width="28" height="28" viewBox="0 0 46 46" fill="none"><circle cx="20" cy="20" r="11" stroke="#fff" stroke-width="3.5"/><line x1="28" y1="28" x2="39" y2="39" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg></span>
+              <span class="mtx"><span class="mbig">WAT IS EEN DETAIL?</span><span class="mhint">extra info, voorbeeld of getal</span></span>
+              <span class="mchev">></span>
+            </button>
+            <div class="explain" data-panel="dt">
+              <div class="explain-inner">
+                <p>Een <strong>detail</strong> is extra informatie in de tekst: een voorbeeld, een naam, een getal of iets wat een keer gebeurt. Leuk of handig om te weten, maar je hebt het niet nodig om te snappen waar het stukje over gaat.</p>
+                <div class="example"><span class="extag dt">Detail</span><div>Een hond is een fijne vriend voor de mens. Honden kunnen heel goed ruiken. <mark class="hzd-hl">Een speurhond vindt zelfs een verstopte koffer terug.</mark> Daarom werken sommige honden bij de politie.</div></div>
+                <p class="extip">Tip: een detail herken je vaak aan een naam, een getal of een voorbeeld.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="overlay" data-hzd-start style="display:none;">
+        <div class="panel">
+          <button class="backbtn" data-menu-back>Terug naar uitleg</button>
+          <h2>Hoofdzaak of detail?</h2>
+          <p>Lees de tekst op het bord. Bekijk de <strong>gele gemarkeerde zin</strong>. Druk samen: is het de <strong>hoofdzaak</strong> of een <strong>detail</strong>?</p>
+          <p style="color:var(--or-600); font-weight:800;">Hoe meer goed op rij, hoe meer sterren je verdient!</p>
+          <div class="countrow">
+            <button class="count" data-hzd-count data-count="5">5<small>kort</small></button>
+            <button class="count" data-hzd-count data-count="10">10<small>standaard</small></button>
+            <button class="count" data-hzd-count data-count="15">15<small>lang</small></button>
+            <button class="count" data-hzd-count data-count="20">20<small>marathon</small></button>
+          </div>
+          <p style="font-size:14px;color:var(--ink-500);margin-top:14px;">Pijltjes links/rechts kiezen. Enter gaat verder.</p>
+        </div>
+      </div>
+
+      <div class="overlay" data-hzd-end style="display:none;">
+        <div class="panel">
+          <h2>Goed gespeeld!</h2>
+          <div class="endstars" id="endStars"></div>
+          <div class="endbig"><span data-hzd-endscore>0</span>/<span data-hzd-endtotal>0</span></div>
+          <p style="font-family:var(--font-display); font-size:28px; color:var(--or-600); margin:6px 0;"><span data-hzd-endpct>0%</span> goed</p>
+          <p data-hzd-endmsg></p>
+          <button class="btn primary" data-hzd-replay style="margin-top:12px;">Nog een keer spelen</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="Hoofdzaak%20vs%20Detail/items.js"></script>
+<script src="Hoofdzaak%20vs%20Detail/engine.js"></script>
+<script>
+  const STAR = '<svg viewBox="0 0 24 24"><path class="st" d="M12 2l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 18.9 6.1 22l1.2-6.5L2.5 8.9 9.1 8z"/></svg>';
+  const endStarsEl = document.getElementById("endStars");
+  const streakboxEl = document.getElementById("streakbox");
+  const menuOverlay = document.querySelector("[data-menu]");
+  const countOverlay = document.querySelector("[data-hzd-start]");
+  const gameStage = document.querySelector("[data-hzd-game]");
+  const endOverlay = document.querySelector("[data-hzd-end]");
+
+  function starsForPct(pct){ return pct>=90 ? 3 : pct>=70 ? 2 : pct>=50 ? 1 : 0; }
+  function renderEndStars(pct){
+    const earned = starsForPct(pct);
+    endStarsEl.innerHTML = "";
+    for(let i=0;i<3;i++){
+      const s = document.createElement("span");
+      s.className = "estar" + (i < earned ? " on" : "");
+      s.style.animationDelay = (0.15 + i*0.18) + "s";
+      s.innerHTML = STAR;
+      endStarsEl.appendChild(s);
+    }
+  }
+
+  const game = initHZD(document.getElementById("app"), {
+    captureGlobalKeys:true,
+    onAnswer:(correct, item, st)=>{
+      streakboxEl.classList.toggle("hot", st.streak >= 3);
+    },
+    onFinish:(res)=>{ renderEndStars(res.pct); }
+  });
+
+  document.querySelectorAll("[data-hzd-count],[data-hzd-replay]").forEach(b=>b.addEventListener("click",()=>{
+    streakboxEl.classList.remove("hot");
+  }));
+
+  document.querySelector('[data-open-goal="hzd"]').addEventListener("click", ()=>{
+    document.body.classList.add("in-goal");
+    menuOverlay.style.display = "";
+    countOverlay.style.display = "none";
+    endOverlay.style.display = "none";
+    gameStage.style.display = "none";
+  });
+
+  document.querySelector("[data-home]").addEventListener("click", ()=>{
+    game.backToStart();
+    document.body.classList.remove("in-goal");
+    menuOverlay.style.display = "";
+    countOverlay.style.display = "none";
+    endOverlay.style.display = "none";
+    gameStage.style.display = "none";
+  });
+
+  const explainBtns = document.querySelectorAll("[data-explain]");
+  const explainPanels = document.querySelectorAll("[data-panel]");
+  function closeExplains(except){
+    explainBtns.forEach(b=>{
+      if (b.getAttribute("data-explain") === except) return;
+      b.classList.remove("is-open"); b.setAttribute("aria-expanded","false");
+    });
+    explainPanels.forEach(p=>{ if (p.getAttribute("data-panel") !== except) p.classList.remove("is-open"); });
+  }
+  explainBtns.forEach(btn=>{
+    const key = btn.getAttribute("data-explain");
+    const panel = document.querySelector('[data-panel="'+key+'"]');
+    btn.addEventListener("click", ()=>{
+      const open = btn.classList.toggle("is-open");
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      panel.classList.toggle("is-open", open);
+      if (open) closeExplains(key);
+    });
+  });
+  document.querySelector("[data-menu-start]").addEventListener("click", ()=>{
+    menuOverlay.style.display = "none";
+    countOverlay.style.display = "";
+  });
+  document.querySelector("[data-menu-back]").addEventListener("click", ()=>{
+    countOverlay.style.display = "none";
+    closeExplains(null);
+    menuOverlay.style.display = "";
+  });
+
+  const fsBtn = document.getElementById("fsBtn");
+  const fsTarget = document.documentElement;
+  function fsElement(){ return document.fullscreenElement || document.webkitFullscreenElement || null; }
+  function enterFS(){
+    const r = fsTarget.requestFullscreen || fsTarget.webkitRequestFullscreen || fsTarget.webkitRequestFullScreen;
+    if (r) { try { const p = r.call(fsTarget); if (p && p.catch) p.catch(()=>{}); } catch(e){} }
+  }
+  function exitFS(){
+    const x = document.exitFullscreen || document.webkitExitFullscreen;
+    if (x) { try { const p = x.call(document); if (p && p.catch) p.catch(()=>{}); } catch(e){} }
+  }
+  fsBtn.addEventListener("click", ()=>{ fsElement() ? exitFS() : enterFS(); });
+  function syncFS(){
+    const on = !!fsElement();
+    fsBtn.querySelector(".ic-open").style.display = on ? "none" : "";
+    fsBtn.querySelector(".ic-close").style.display = on ? "" : "none";
+    fsBtn.title = on ? "Sluit volledig scherm (Esc)" : "Volledig scherm";
+  }
+  document.addEventListener("fullscreenchange", syncFS);
+  document.addEventListener("webkitfullscreenchange", syncFS);
+  document.addEventListener("keydown", (e)=>{ if ((e.key === "f" || e.key === "F") && !e.metaKey && !e.ctrlKey){ fsElement() ? exitFS() : enterFS(); } });
+</script>
+</body>
+</html>
