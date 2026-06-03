@@ -142,7 +142,7 @@
     function renderQuestion() {
       answered = false;
       const item = pool[idx];
-      el.type.textContent = item.label;
+      el.type.textContent = item.badge || "Tekst";
       renderBlocks(item);
       el.choices.innerHTML = "";
 

@@ -71,7 +71,7 @@ window.TSK_ITEMS = [
       { kind: "paragraph", text: "Noor bleef als laatste op het plein achter. De bel was al gegaan, maar onder het klimrek glinsterde iets tussen de houtsnippers. Ze bukte en veegde met haar mouw het zand weg." },
       { kind: "paragraph", text: "Het was een sleutel, klein en koperkleurig, met een label eraan. Op het label stond geen naam, alleen een tekening van een maan. Noor voelde meteen dat dit geen gewone sleutel was." },
       { kind: "paragraph", text: "Uit het lege fietsenhok klonk zacht geritsel. Noor stopte de sleutel in haar jaszak en liep erheen. Net toen ze de deur wilde openen, schoof er aan de binnenkant iets over de vloer." },
-      { kind: "quote", text: "\"Wie daar?\", fluisterde Noor." },
+      { kind: "quote", text: "\"Wie is daar?\" fluisterde Noor." },
       { kind: "paragraph", text: "Er kwam geen antwoord. Wel gleed er een briefje onder de deur door. Noor pakte het op met trillende vingers. Op het papier stond: breng de sleutel terug voordat de maan opkomt." },
       { kind: "paragraph", text: "Noor keek naar de lucht. Boven het dak van de school werd het al donkerblauw." }
     ],
@@ -134,7 +134,7 @@ window.TSK_ITEMS = [
     label: "Interview",
     options: ["interview", "nieuwsbericht", "recensie", "informatieve_tekst"],
     blocks: [
-      { kind: "headline", text: "Interview met kinderboekenschrijver Lotte Vermeer" },
+      { kind: "headline", text: "In gesprek met kinderboekenschrijver Lotte Vermeer" },
       { kind: "meta", text: "Door de redactie van de schoolkrant" },
       { kind: "qa", q: "Wanneer wist u dat u schrijver wilde worden?", a: "Toen ik in groep 7 zat. Ik schreef toen al korte verhalen achter in mijn rekenschrift. Mijn meester zei dat ik ze moest bewaren." },
       { kind: "qa", q: "Waar haalt u ideeen vandaan?", a: "Vaak uit gewone situaties. Een vergeten jas, een rare buurman of een geluid op zolder kan het begin van een verhaal worden." },
@@ -150,8 +150,8 @@ window.TSK_ITEMS = [
     label: "Recensie",
     options: ["recensie", "reclame", "verhaal", "dagboek_blog"],
     blocks: [
-      { kind: "headline", text: "Recensie: De Nachtbus naar Nergens" },
-      { kind: "meta", text: "Boekbespreking door Yara, groep 8 - Beoordeling: 4 van de 5 sterren" },
+      { kind: "headline", text: "De Nachtbus naar Nergens" },
+      { kind: "meta", text: "Yara, groep 8 - Beoordeling: 4 van de 5 sterren" },
       { kind: "paragraph", text: "De Nachtbus naar Nergens is een spannend jeugdboek over Finn, die per ongeluk in een bus stapt die niet op de kaart staat. Vanaf de eerste bladzijde wil je weten waar de bus heen gaat." },
       { kind: "paragraph", text: "Het sterkste aan het boek is de sfeer. De schrijver beschrijft de mistige haltes en vreemde passagiers zo duidelijk dat je het bijna voor je ziet. Ook Finn voelt echt: hij is bang, maar blijft toch nadenken." },
       { kind: "paragraph", text: "Soms gaat het verhaal wel erg snel. Een paar raadsels worden binnen twee bladzijden opgelost, terwijl ik daar graag langer over had gelezen. Toch blijft het boek spannend genoeg om door te lezen." },
@@ -166,7 +166,7 @@ window.TSK_ITEMS = [
     options: ["dagboek_blog", "verhaal", "brief_email", "recensie"],
     blocks: [
       { kind: "headline", text: "Mijn eerste dag als brugklasser voor een dag" },
-      { kind: "meta", text: "Blog van Amir - Woensdag 3 juni 2026" },
+      { kind: "meta", text: "Amir - Woensdag 3 juni 2026" },
       { kind: "paragraph", text: "Vandaag mochten we met groep 8 een ochtend meelopen op de middelbare school. Ik deed alsof ik heel rustig was, maar in mijn buik voelde het alsof er een blender aanstond." },
       { kind: "paragraph", text: "Bij binnenkomst kreeg ik meteen een rooster. Drie lokalen, twee pauzes en zelfs een lokaalnummer met een verdieping erbij. Op onze basisschool kun je bijna niet verdwalen, maar hier leek alles op elkaar." },
       { kind: "paragraph", text: "De eerste les was biologie. We bekeken een ui onder een microscoop. Ik vond het grappig dat iets wat je normaal in de pan gooit er ineens uitzag als een soort tegelvloer." },
