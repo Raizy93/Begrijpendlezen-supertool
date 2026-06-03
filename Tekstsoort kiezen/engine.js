@@ -187,7 +187,7 @@
       } else {
         bad++;
         streak = 0;
-        setFeedback("bad", "<strong>Net niet.</strong> Dit is een <strong>" + TYPE_META[item.type].big.toLowerCase() + "</strong>. " + item.uitleg);
+        setFeedback("bad", "<strong>Net niet.</strong> " + item.uitleg);
       }
 
       el.next.disabled = false;
