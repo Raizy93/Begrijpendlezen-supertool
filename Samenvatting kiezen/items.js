@@ -21,11 +21,11 @@ window.SAM_ITEMS = [
         "Die willen ze gebruiken voor een kleine proeverij op school."
       ]
     ],
-    correct: "Groep 8 maakt van een kaal stuk plein een schooltuin. De leerlingen verzorgen de planten en leren ondertussen hoe planten en insecten samenleven.",
+    correct: "Groep 8 verandert een kaal plein in een schooltuin en leert door de planten te verzorgen.",
     opties: [
-      { tekst: "Groep 8 maakt van een kaal stuk plein een schooltuin. De leerlingen verzorgen de planten en leren ondertussen hoe planten en insecten samenleven.", type: "goed", uitleg: "Deze samenvatting noemt de hoofdzaak en laat kleine details, zoals het schrift en de proeverij, weg." },
-      { tekst: "De leerlingen schrijven in een schrift wat er groeit en hopen later aardbeien te eten tijdens een proeverij.", type: "te smal", uitleg: "Deze samenvatting noemt details, maar mist de hoofdzaak: het maken en gebruiken van de schooltuin." },
-      { tekst: "De school bouwt een grote boerderij waar kinderen elke dag dieren verzorgen en groenten verkopen.", type: "onjuist", uitleg: "Dit klopt niet met de tekst. Er is een schooltuin, geen boerderij met dieren en verkoop." },
+      { tekst: "Groep 8 verandert een kaal plein in een schooltuin en leert door de planten te verzorgen.", type: "goed", uitleg: "Deze samenvatting noemt de hoofdzaak en laat kleine details, zoals het schrift en de proeverij, weg." },
+      { tekst: "De leerlingen houden in een schrift bij wat er groeit, geven water, zoeken naar slakken en hopen later aardbeien en kruiden te gebruiken bij een kleine proeverij op school.", type: "te gedetailleerd", uitleg: "Deze samenvatting noemt veel details, maar verliest de hoofdzaak uit het oog." },
+      { tekst: "De school bouwt achter het plein een grote boerderij met dieren, groentekramen en een vaste winkel waar leerlingen hun oogst aan ouders verkopen.", type: "onjuist", uitleg: "Dit klopt niet met de tekst. Er is een schooltuin, geen boerderij met dieren en verkoop." },
       { tekst: "De schooltuin maakt het plein groener.", type: "belangrijk punt mist", uitleg: "Dit klopt wel, maar het mist dat leerlingen de tuin verzorgen en ervan leren." }
     ]
   },
@@ -51,11 +51,11 @@ window.SAM_ITEMS = [
         "Toen hij de sleutel in het slot naast de deur stak, stopte de bus voor zijn eigen straat."
       ]
     ],
-    correct: "Finn stapt in een mysterieuze bus en krijgt een sleutel. Als hij die gebruikt, kan hij uiteindelijk terug naar zijn eigen straat.",
+    correct: "Finn komt met een mysterieuze sleutel weer thuis uit een vreemde bus.",
     opties: [
-      { tekst: "Finn stapt in een mysterieuze bus en krijgt een sleutel. Als hij die gebruikt, kan hij uiteindelijk terug naar zijn eigen straat.", type: "goed", uitleg: "Deze samenvatting noemt de belangrijkste gebeurtenissen in de juiste volgorde." },
-      { tekst: "Finn ziet een chauffeur met een donkerblauwe pet en kaartjes met een maan op de stoelen.", type: "te gedetailleerd", uitleg: "Dit zijn losse details. De belangrijkste ontwikkeling van het verhaal ontbreekt." },
-      { tekst: "Finn mist de bus naar school en vraagt een meisje om hem naar huis te brengen.", type: "onjuist", uitleg: "Dit gebeurt niet in de tekst. Finn komt door de sleutel terug, niet door het meisje." },
+      { tekst: "Finn komt met een mysterieuze sleutel weer thuis uit een vreemde bus.", type: "goed", uitleg: "Deze samenvatting noemt de belangrijkste gebeurtenissen kort en duidelijk." },
+      { tekst: "Finn ziet een zwijgende chauffeur met een donkerblauwe pet, mistige velden buiten het raam, kaartjes met een maan erop en knipperende lichten bij een lege halte.", type: "te gedetailleerd", uitleg: "Dit zijn losse details. De belangrijkste ontwikkeling van het verhaal ontbreekt." },
+      { tekst: "Finn mist de bus naar school, verdwaalt in een gewone stadsbus en vraagt een onbekend meisje om hem langs de normale route naar huis te brengen.", type: "onjuist", uitleg: "Dit gebeurt niet in de tekst. Finn komt door de sleutel terug, niet door het meisje." },
       { tekst: "Finn maakt een gewone busrit door zijn eigen straat.", type: "verkeerde nadruk", uitleg: "Deze samenvatting maakt de busrit gewoon, terwijl de tekst juist draait om de mysterieuze bus." }
     ]
   },
@@ -81,11 +81,11 @@ window.SAM_ITEMS = [
         "Veel mensen planten daarom bloemen in tuinen en bermen."
       ]
     ],
-    correct: "Bijen helpen planten door stuifmeel te verspreiden en hebben verschillende taken in hun volk. Genoeg bloemen zijn belangrijk omdat bijen daar voedsel vinden.",
+    correct: "Bijen helpen planten en hebben bloemen nodig om genoeg voedsel te vinden.",
     opties: [
-      { tekst: "Bijen helpen planten door stuifmeel te verspreiden en hebben verschillende taken in hun volk. Genoeg bloemen zijn belangrijk omdat bijen daar voedsel vinden.", type: "goed", uitleg: "Deze samenvatting noemt de hoofdpunten: bestuiving, taken in het volk en het belang van bloemen." },
-      { tekst: "De koningin legt eitjes en sommige bijen bewaken de ingang van de kast.", type: "te smal", uitleg: "Dit gaat alleen over taken in het volk en mist de rol van bijen bij planten." },
-      { tekst: "Bijen eten zaden en zorgen ervoor dat bloemen minder goed groeien.", type: "onjuist", uitleg: "Dit is onjuist. Bijen helpen planten juist om vruchten en zaden te maken." },
+      { tekst: "Bijen helpen planten en hebben bloemen nodig om genoeg voedsel te vinden.", type: "goed", uitleg: "Deze samenvatting noemt de hoofdpunten: bijen helpen planten en bloemen zijn belangrijk voor bijen." },
+      { tekst: "De koningin legt eitjes, werkbijen zoeken voedsel en sommige bijen bewaken de ingang van de kast waarin het volk leeft.", type: "te smal", uitleg: "Dit gaat vooral over taken in het volk en mist de rol van bijen bij planten." },
+      { tekst: "Bijen eten zaden, maken bloemen zwakker en zorgen ervoor dat planten minder vruchten krijgen wanneer ze van bloem naar bloem vliegen.", type: "onjuist", uitleg: "Dit is onjuist. Bijen helpen planten juist om vruchten en zaden te maken." },
       { tekst: "Bijen zijn dieren die in een kast wonen.", type: "belangrijk punt mist", uitleg: "Dit is veel te beperkt en mist bijna alle belangrijke informatie uit de tekst." }
     ]
   },
@@ -111,11 +111,11 @@ window.SAM_ITEMS = [
         "Later op de dag werd het plein weer vrijgegeven."
       ]
     ],
-    correct: "Een storm zorgt in de wijk voor schade aan bomen, een bord en een schuurtje. De gemeente ruimt op en controleert de veiligheid.",
+    correct: "Na een storm ruimt de gemeente schade in de wijk op en controleert ze de veiligheid.",
     opties: [
-      { tekst: "Een storm zorgt in de wijk voor schade aan bomen, een bord en een schuurtje. De gemeente ruimt op en controleert de veiligheid.", type: "goed", uitleg: "Deze samenvatting noemt de schade en wat er daarna aan veiligheid wordt gedaan." },
-      { tekst: "De kinderen blijven tijdens de ochtendpauze binnen omdat het plein tijdelijk niet veilig is.", type: "te smal", uitleg: "Dit klopt, maar het gaat maar over een klein deel van de tekst." },
-      { tekst: "De storm verwoest de hele school en de wijk moet dagenlang dicht blijven.", type: "te breed", uitleg: "Dit maakt de gebeurtenis veel groter dan in de tekst staat." },
+      { tekst: "Na een storm ruimt de gemeente schade in de wijk op en controleert ze de veiligheid.", type: "goed", uitleg: "Deze samenvatting noemt de schade en wat er daarna aan veiligheid wordt gedaan." },
+      { tekst: "De kinderen blijven tijdens de ochtendpauze binnen omdat het plein tijdelijk niet veilig is en later op de dag weer wordt vrijgegeven.", type: "te smal", uitleg: "Dit klopt, maar het gaat maar over een klein deel van de tekst." },
+      { tekst: "De storm verwoest de school, maakt meerdere straten dagenlang onbruikbaar en zorgt ervoor dat alle bewoners de wijk moeten verlaten.", type: "te breed", uitleg: "Dit maakt de gebeurtenis veel groter dan in de tekst staat." },
       { tekst: "De gemeente plant nieuwe bomen omdat er te weinig schaduw op het plein is.", type: "onjuist", uitleg: "Dit staat niet in de tekst. De gemeente ruimt op en controleert bomen." }
     ]
   },
@@ -141,11 +141,11 @@ window.SAM_ITEMS = [
         "Het team eindigde uiteindelijk op de tweede plaats."
       ]
     ],
-    correct: "Een team leerlingen bouwt een robot voor een wedstrijd waarin bekers gestapeld moeten worden. Na aanpassingen presteert de robot goed en wordt het team tweede.",
+    correct: "Leerlingen verbeteren hun bekerrobot en eindigen tweede bij een wedstrijd.",
     opties: [
-      { tekst: "Een team leerlingen bouwt een robot voor een wedstrijd waarin bekers gestapeld moeten worden. Na aanpassingen presteert de robot goed en wordt het team tweede.", type: "goed", uitleg: "Deze samenvatting noemt het doel, het probleem en de afloop." },
-      { tekst: "De robot reed in de eerste ronde tegen de tafelrand en kreeg strafpunten.", type: "te smal", uitleg: "Dit is maar één probleem uit de tekst, niet de samenvatting van het geheel." },
-      { tekst: "De leerlingen bouwen een robot die zelfstandig de klas schoonmaakt.", type: "onjuist", uitleg: "De robot stapelt bekers; hij maakt de klas niet schoon." },
+      { tekst: "Leerlingen verbeteren hun bekerrobot en eindigen tweede bij een wedstrijd.", type: "goed", uitleg: "Deze samenvatting noemt het doel, de verbetering en de afloop." },
+      { tekst: "De robot reed in de eerste ronde tegen de tafelrand, kreeg strafpunten voor omgevallen bekers en werd daarna aangepast aan de wielen en grijparm.", type: "te gedetailleerd", uitleg: "Dit noemt vooral details over de problemen en aanpassingen." },
+      { tekst: "De leerlingen bouwen een robot die zelfstandig de klas schoonmaakt, tafels rechtzet en na schooltijd het technieklokaal opruimt.", type: "onjuist", uitleg: "De robot stapelt bekers; hij maakt de klas niet schoon." },
       { tekst: "Een groep leerlingen doet mee aan een wedstrijd.", type: "belangrijk punt mist", uitleg: "Dit is te vaag. De robot, de bekers en de verbetering ontbreken." }
     ]
   },
@@ -171,11 +171,11 @@ window.SAM_ITEMS = [
         "Daarom is schoon rivierwater belangrijk."
       ]
     ],
-    correct: "Rivieren groeien onderweg, nemen materiaal mee en veranderen het landschap. Mensen gebruiken rivieren, maar moeten het water ook veilig en schoon houden.",
+    correct: "Rivieren veranderen het landschap en zijn belangrijk voor mensen.",
     opties: [
-      { tekst: "Rivieren groeien onderweg, nemen materiaal mee en veranderen het landschap. Mensen gebruiken rivieren, maar moeten het water ook veilig en schoon houden.", type: "goed", uitleg: "Deze samenvatting noemt zowel hoe rivieren werken als waarom ze belangrijk zijn voor mensen." },
-      { tekst: "Bij bochten stroomt water aan de buitenkant sneller dan aan de binnenkant.", type: "te gedetailleerd", uitleg: "Dit is een detail uit de tekst, geen samenvatting van alle hoofdpunten." },
-      { tekst: "Rivieren ontstaan alleen door drinkwater van mensen.", type: "onjuist", uitleg: "Dit klopt niet. Rivieren krijgen water uit regen, beken en smeltende sneeuw." },
+      { tekst: "Rivieren veranderen het landschap en zijn belangrijk voor mensen.", type: "goed", uitleg: "Deze samenvatting noemt kort de twee grote lijnen van de tekst." },
+      { tekst: "Bij bochten stroomt water aan de buitenkant sneller dan aan de binnenkant, waardoor oevers aan de ene kant afbrokkelen en aan de andere kant groeien.", type: "te gedetailleerd", uitleg: "Dit is een detail uit de tekst, geen samenvatting van alle hoofdpunten." },
+      { tekst: "Rivieren ontstaan alleen door drinkwater van mensen en worden vooral gebruikt om zand, stenen en takken uit steden weg te spoelen.", type: "onjuist", uitleg: "Dit klopt niet. Rivieren krijgen water uit regen, beken en smeltende sneeuw." },
       { tekst: "Rivieren zijn handig voor vervoer.", type: "belangrijk punt mist", uitleg: "Dit noemt maar één gebruik en mist hoe rivieren ontstaan en het landschap veranderen." }
     ]
   },
@@ -201,12 +201,12 @@ window.SAM_ITEMS = [
         "De jongen bood zijn excuses aan en beloofde het voortaan eerst te vragen."
       ]
     ],
-    correct: "Mila denkt na de training dat haar fiets weg is, maar hij blijkt verplaatst te zijn. Ze is opgelucht en de jongen die dat deed biedt zijn excuses aan.",
+    correct: "Mila's fiets lijkt verdwenen, maar blijkt alleen verplaatst te zijn.",
     opties: [
-      { tekst: "Mila denkt na de training dat haar fiets weg is, maar hij blijkt verplaatst te zijn. Ze is opgelucht en de jongen die dat deed biedt zijn excuses aan.", type: "goed", uitleg: "Deze samenvatting noemt het probleem, de oplossing en de reactie van Mila." },
-      { tekst: "Mila vindt een los kettingslot bij het hek van de sporthal.", type: "te smal", uitleg: "Dit is alleen een detail uit het begin van het verhaal." },
-      { tekst: "Mila's fiets wordt gestolen en nooit meer teruggevonden.", type: "onjuist", uitleg: "Dat klopt niet. De fiets staat bij de andere ingang." },
-      { tekst: "Trainer Sam wint een wedstrijd in de sporthal.", type: "verkeerde nadruk", uitleg: "Trainer Sam helpt wel, maar hij is niet de hoofdzaak van het verhaal." }
+      { tekst: "Mila's fiets lijkt verdwenen, maar blijkt alleen verplaatst te zijn.", type: "goed", uitleg: "Deze samenvatting noemt het probleem en de oplossing." },
+      { tekst: "Mila vindt een los kettingslot bij het hek van de sporthal en loopt daarna met trainer Sam naar de andere ingang.", type: "te smal", uitleg: "Dit noemt vooral details uit het midden van het verhaal." },
+      { tekst: "Mila's fiets wordt gestolen door iemand uit haar team en wordt na de training nooit meer teruggevonden.", type: "onjuist", uitleg: "Dat klopt niet. De fiets staat bij de andere ingang." },
+      { tekst: "Trainer Sam lost een probleem bij de sporthal op en zorgt dat een vrachtwagen veilig langs de ingang kan rijden.", type: "verkeerde nadruk", uitleg: "Trainer Sam helpt wel, maar hij is niet de hoofdzaak van het verhaal." }
     ]
   },
   {
@@ -231,11 +231,11 @@ window.SAM_ITEMS = [
         "Daardoor spelen eb en vloed zich steeds opnieuw af."
       ]
     ],
-    correct: "De maan draait om de aarde, weerkaatst zonlicht en lijkt daardoor steeds anders van vorm. De maan heeft ook invloed op eb en vloed.",
+    correct: "De maan draait om de aarde en lijkt vanaf hier steeds anders.",
     opties: [
-      { tekst: "De maan draait om de aarde, weerkaatst zonlicht en lijkt daardoor steeds anders van vorm. De maan heeft ook invloed op eb en vloed.", type: "goed", uitleg: "Deze samenvatting noemt de belangrijkste informatie uit alle alinea's." },
-      { tekst: "Soms zien we een volle maan en soms een smalle sikkel.", type: "te smal", uitleg: "Dit gaat alleen over de vormen van de maan en mist de rest." },
-      { tekst: "De maan geeft zelf fel licht en draait om de zon.", type: "onjuist", uitleg: "Dit klopt niet. De maan geeft zelf geen licht en draait om de aarde." },
+      { tekst: "De maan draait om de aarde en lijkt vanaf hier steeds anders.", type: "goed", uitleg: "Deze samenvatting noemt kort de belangrijkste informatie uit de tekst." },
+      { tekst: "Soms zien we een volle maan, soms een smalle sikkel en die schijngestalten komen steeds in een vaste volgorde terug.", type: "te smal", uitleg: "Dit gaat alleen over de vormen van de maan en mist de rest." },
+      { tekst: "De maan geeft zelf fel licht, draait om de zon en verandert echt van vorm terwijl hij langs de aarde beweegt.", type: "onjuist", uitleg: "Dit klopt niet. De maan geeft zelf geen licht en draait om de aarde." },
       { tekst: "De maan zorgt alleen voor eb en vloed.", type: "belangrijk punt mist", uitleg: "Eb en vloed worden genoemd, maar de tekst gaat ook over licht, draaien en schijngestalten." }
     ]
   },
@@ -261,11 +261,11 @@ window.SAM_ITEMS = [
         "Ze besloten de volgende keer laarzen aan te trekken."
       ]
     ],
-    correct: "Noah en Linde proberen een onbekend bospad naar het meer. Het pad brengt hen inderdaad sneller bij het water, maar ze worden wel erg modderig.",
+    correct: "Noah en Linde vinden via een modderig bospad een kortere route naar het meer.",
     opties: [
-      { tekst: "Noah en Linde proberen een onbekend bospad naar het meer. Het pad brengt hen inderdaad sneller bij het water, maar ze worden wel erg modderig.", type: "goed", uitleg: "Deze samenvatting noemt de keuze, de uitkomst en het nadeel." },
-      { tekst: "Noah ziet voetstappen in de modder en hoort later water ruisen.", type: "te gedetailleerd", uitleg: "Dit zijn details uit het verhaal, maar niet de kern." },
-      { tekst: "Noah en Linde verdwalen in het bos en vinden het meer niet.", type: "onjuist", uitleg: "Ze vinden het meer juist wel." },
+      { tekst: "Noah en Linde vinden via een modderig bospad een kortere route naar het meer.", type: "goed", uitleg: "Deze samenvatting noemt de route, de uitkomst en het nadeel kort." },
+      { tekst: "Noah ziet voetstappen in de modder, Linde twijfelt of ze moeten omkeren en na tien minuten horen ze water ruisen.", type: "te gedetailleerd", uitleg: "Dit zijn details uit het verhaal, maar niet de kern." },
+      { tekst: "Noah en Linde verdwalen in het bos, vinden het meer niet en moeten door campinggasten worden teruggebracht.", type: "onjuist", uitleg: "Ze vinden het meer juist wel." },
       { tekst: "Noah en Linde gaan kamperen bij een meer.", type: "te breed", uitleg: "De camping wordt genoemd, maar het verhaal gaat vooral over het onbekende bospad." }
     ]
   },
@@ -291,11 +291,11 @@ window.SAM_ITEMS = [
         "Daarom bewaren musea ze zorgvuldig."
       ]
     ],
-    correct: "Fossielen zijn oude resten of sporen die door bedekking en verstening bewaard kunnen blijven. Onderzoekers gebruiken ze om meer te leren over het leven van vroeger.",
+    correct: "Fossielen laten onderzoekers zien welk leven er vroeger was.",
     opties: [
-      { tekst: "Fossielen zijn oude resten of sporen die door bedekking en verstening bewaard kunnen blijven. Onderzoekers gebruiken ze om meer te leren over het leven van vroeger.", type: "goed", uitleg: "Deze samenvatting noemt wat fossielen zijn, hoe ze kunnen ontstaan en waarom ze belangrijk zijn." },
-      { tekst: "Een pootafdruk kan ook een fossiel zijn.", type: "te smal", uitleg: "Dit klopt, maar is slechts één voorbeeld uit de tekst." },
-      { tekst: "Fossielen zijn nieuwe dieren die in musea worden geboren.", type: "onjuist", uitleg: "Dat klopt niet. Fossielen zijn resten of sporen van heel lang geleden." },
+      { tekst: "Fossielen laten onderzoekers zien welk leven er vroeger was.", type: "goed", uitleg: "Deze samenvatting noemt kort waarom fossielen belangrijk zijn." },
+      { tekst: "Een pootafdruk kan ook een fossiel zijn, net als een versteend bot dat in een laag gesteente gevonden wordt.", type: "te smal", uitleg: "Dit klopt, maar zijn vooral voorbeelden uit de tekst." },
+      { tekst: "Fossielen zijn nieuwe dieren die in musea worden geboren en daarna in zand of modder worden verstopt.", type: "onjuist", uitleg: "Dat klopt niet. Fossielen zijn resten of sporen van heel lang geleden." },
       { tekst: "Musea bewaren fossielen zorgvuldig.", type: "belangrijk punt mist", uitleg: "Dit staat in de tekst, maar mist de uitleg over ontstaan en onderzoek." }
     ]
   }
