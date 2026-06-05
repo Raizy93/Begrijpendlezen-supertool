@@ -67,6 +67,128 @@
     host.appendChild(p);
   }
 
+  function isWordChar(char) {
+    return !!char && /[A-Za-zÀ-ÖØ-öø-ÿ0-9]/.test(char);
+  }
+
+  function findPhrase(text, phrase) {
+    text = clean(text);
+    phrase = clean(phrase);
+    let start = 0;
+    while (start <= text.length) {
+      const pos = text.indexOf(phrase, start);
+      if (pos < 0) return -1;
+      const before = text.charAt(pos - 1);
+      const after = text.charAt(pos + phrase.length);
+      if (!isWordChar(before) && !isWordChar(after)) return pos;
+      start = pos + Math.max(phrase.length, 1);
+    }
+    return -1;
+  }
+
+  function appendVwMarkedText(container, text, cls, attr) {
+    const mark = document.createElement("mark");
+    mark.className = cls;
+    mark.setAttribute(attr, "");
+    mark.textContent = text;
+    container.appendChild(mark);
+  }
+
+  function appendVwSentence(container, sentence, vraag) {
+    let chunks = [{ text: sentence, type: "text" }];
+
+    function splitFirst(list, phrase, type) {
+      const next = [];
+      let used = false;
+      list.forEach((chunk) => {
+        if (used || chunk.type !== "text") {
+          next.push(chunk);
+          return;
+        }
+        const pos = findPhrase(chunk.text, phrase);
+        if (pos < 0) {
+          next.push(chunk);
+          return;
+        }
+        if (pos > 0) next.push({ text: chunk.text.slice(0, pos), type: "text" });
+        next.push({ text: phrase, type });
+        const after = chunk.text.slice(pos + phrase.length);
+        if (after) next.push({ text: after, type: "text" });
+        used = true;
+      });
+      return next;
+    }
+
+    chunks = splitFirst(chunks, vraag.verwijstNaar, "ref");
+    if (sentence === vraag.zin) chunks = splitFirst(chunks, vraag.mark, "mark");
+
+    chunks.forEach((chunk) => {
+      if (chunk.type === "mark") appendVwMarkedText(container, chunk.text, "vw-hl", "data-mix-vw-mark");
+      else if (chunk.type === "ref") appendVwMarkedText(container, chunk.text, "vw-ref is-hidden", "data-mix-vw-ref");
+      else container.appendChild(document.createTextNode(chunk.text));
+    });
+    container.appendChild(document.createTextNode(" "));
+  }
+
+  function renderVwStory(host, text, vraag) {
+    host.innerHTML = '<svg class="vw-arrow" data-mix-vw-arrow aria-hidden="true"></svg>';
+    text.alineas.forEach((alinea) => {
+      const p = document.createElement("p");
+      alinea.forEach((sentence) => appendVwSentence(p, sentence, vraag));
+      host.appendChild(p);
+    });
+  }
+
+  function drawVwArrow(story) {
+    const arrow = story.querySelector("[data-mix-vw-arrow]");
+    const mark = story.querySelector("[data-mix-vw-mark]");
+    const ref = story.querySelector("[data-mix-vw-ref]");
+    if (!arrow || !mark || !ref) return;
+    const wrap = story.getBoundingClientRect();
+    const a = mark.getBoundingClientRect();
+    const b = ref.getBoundingClientRect();
+    const width = Math.max(story.scrollWidth, story.clientWidth);
+    const height = Math.max(story.scrollHeight, story.clientHeight);
+    const sx = a.left - wrap.left + a.width / 2 + story.scrollLeft;
+    const sy = a.top - wrap.top + a.height / 2 + story.scrollTop;
+    const ex = b.left - wrap.left + b.width / 2 + story.scrollLeft;
+    const ey = b.top - wrap.top + b.height / 2 + story.scrollTop;
+    const curve = Math.max(32, Math.min(130, Math.abs(sy - ey) + 36));
+    const c1x = sx;
+    const c1y = sy - curve;
+    const c2x = ex;
+    const c2y = ey - curve;
+    const angle = Math.atan2(ey - c2y, ex - c2x);
+    const ux = Math.cos(angle);
+    const uy = Math.sin(angle);
+    const px = -uy;
+    const py = ux;
+    const headLength = 16;
+    const headWidth = 9;
+    const baseX = ex - ux * headLength;
+    const baseY = ey - uy * headLength;
+    const leftX = baseX + px * headWidth;
+    const leftY = baseY + py * headWidth;
+    const rightX = baseX - px * headWidth;
+    const rightY = baseY - py * headWidth;
+    arrow.setAttribute("width", width);
+    arrow.setAttribute("height", height);
+    arrow.setAttribute("viewBox", "0 0 " + width + " " + height);
+    arrow.innerHTML = '<path d="M' + sx + " " + sy + " C " + c1x + " " + c1y + ", " + c2x + " " + c2y + ", " + baseX + " " + baseY + '" fill="none" stroke="#f28a2e" stroke-width="4" stroke-linecap="round"/><polygon points="' + ex + "," + ey + " " + leftX + "," + leftY + " " + rightX + "," + rightY + '" fill="#f28a2e"/>';
+    arrow.style.display = "block";
+  }
+
+  function showVwReference(story, correct) {
+    const ref = story.querySelector("[data-mix-vw-ref]");
+    const mark = story.querySelector("[data-mix-vw-mark]");
+    if (ref) {
+      ref.classList.remove("is-hidden");
+      ref.classList.add("is-answer");
+    }
+    if (mark) mark.classList.add(correct ? "is-good" : "is-bad");
+    window.setTimeout(() => drawVwArrow(story), 80);
+  }
+
   function renderAlineas(host, alineas, markedSentence, mark) {
     host.innerHTML = "";
     (alineas || []).forEach((alinea) => {
@@ -227,7 +349,9 @@
           goal: "vw",
           topic: item.onderwerp,
           question: "Waar verwijst het gemarkeerde woord naar?",
-          render: (host) => renderAlineas(host, item.alineas, vraag.zin, vraag.mark),
+          render: (host) => renderVwStory(host, item, vraag),
+          onAnswer: (correct, host) => showVwReference(host, correct),
+          redraw: (host) => drawVwArrow(host),
           options: vraag.options.map((o) => makeOption(o, o === vraag.antwoord, vraag.uitleg, "verwijzing"))
         });
       });
@@ -412,6 +536,7 @@
         streak++;
         setFeedback("good", "Mooi! " + (option.uitleg || "Je koos het beste antwoord."));
       }
+      if (queue[idx].onAnswer) queue[idx].onAnswer(option.correct, el.story);
       el.next.disabled = false;
       updateStats();
     }
@@ -464,6 +589,14 @@
     el.reset.addEventListener("click", start);
     el.replay.addEventListener("click", () => show("menu"));
     el.next.addEventListener("click", next);
+    el.story.addEventListener("scroll", () => {
+      const item = queue[idx];
+      if (answered && item && item.redraw) item.redraw(el.story);
+    });
+    window.addEventListener("resize", () => {
+      const item = queue[idx];
+      if (answered && item && item.redraw) item.redraw(el.story);
+    });
   }
 
   window.initMIX = initMIX;
