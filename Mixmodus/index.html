@@ -60,17 +60,19 @@
   .startbtn{width:100%; min-height:58px; background:var(--orange); color:#fff; font-size:20px;}
   .warning{min-height:24px; color:#b13b00; font-weight:900; margin-top:10px;}
   .game{height:100%; display:flex; flex-direction:column; gap:10px;}
-  .card{flex:1 1 auto; min-height:0; display:grid; grid-template-columns:minmax(180px,max-content) minmax(0,1fr); grid-template-rows:auto minmax(0,1fr); column-gap:16px; row-gap:12px; background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:20px; box-shadow:0 4px 0 var(--ink-900); padding:16px 20px 18px; overflow:hidden;}
-  .tag{grid-column:1; align-self:start; justify-self:start; max-width:100%; min-height:31px; padding:6px 18px; border:3px solid var(--ink-900); border-radius:10px; box-shadow:0 3px 0 var(--ink-900); background:var(--purple); color:#fff; text-transform:uppercase; font-weight:900; font-size:13px; white-space:normal;}
-  .question{grid-column:2; align-self:center; justify-self:end; max-width:100%; color:#0080b0; font-weight:900; font-size:14px; text-align:right; line-height:1.18;}
-  .story{grid-column:1/-1; min-height:0; overflow:auto; padding:4px 4px 0 0; font-size:17px; line-height:1.55; max-width:none;}
+  .card{position:relative; flex:1 1 auto; min-height:0; display:grid; grid-template-columns:minmax(180px,max-content) minmax(0,1fr); grid-template-rows:auto minmax(0,1fr); column-gap:16px; row-gap:12px; background:linear-gradient(180deg,#fff8e6 0,#ffffff 92px); color:var(--ink-900); border:3px solid var(--ink-900); border-radius:20px; box-shadow:0 4px 0 var(--ink-900); padding:16px 20px 18px; overflow:hidden;}
+  .card::before{content:""; position:absolute; inset:0 0 auto; height:54px; background:linear-gradient(90deg,rgba(244,123,32,.22),rgba(141,95,211,.18),rgba(37,183,232,.18)); border-bottom:2px solid rgba(21,32,43,.1); pointer-events:none;}
+  .card::after{content:""; position:absolute; right:-34px; top:28px; width:132px; height:132px; border:12px solid rgba(21,32,43,.06); border-radius:28px; transform:rotate(17deg); pointer-events:none;}
+  .tag{position:relative; z-index:1; grid-column:1; align-self:start; justify-self:start; max-width:100%; min-height:31px; padding:6px 18px; border:3px solid var(--ink-900); border-radius:10px; box-shadow:0 3px 0 var(--ink-900); background:var(--purple); color:#fff; text-transform:uppercase; font-weight:900; font-size:13px; white-space:normal;}
+  .question{position:relative; z-index:1; grid-column:2; align-self:center; justify-self:end; max-width:100%; color:#006f9a; font-weight:900; font-size:14px; text-align:right; line-height:1.18;}
+  .story{position:relative; z-index:1; grid-column:1/-1; min-height:0; overflow:auto; padding:14px 16px 0; font-size:17px; line-height:1.55; max-width:none; background:rgba(255,255,255,.72); border:2px solid rgba(21,32,43,.08); border-radius:14px;}
   .story p{margin:0 0 12px;}
   .story h3{font-size:24px; margin:0 0 8px;}
   .story .meta{font-weight:900; color:var(--ink-500); border-bottom:1px solid #d7e0e8; padding-bottom:6px; margin-bottom:10px;}
   .story ul,.story ol{margin:8px 0 12px 22px; padding:0;}
   .mark{display:inline; background:#fff2b8; border:3px solid var(--orange); border-radius:8px; padding:0 4px; font-weight:900;}
   .blank{display:inline-block; min-width:120px; border-bottom:4px solid var(--orange); color:transparent;}
-  .feedback{min-height:48px; border:3px solid var(--ink-900); border-radius:14px; padding:11px 14px; font-weight:900; background:rgba(255,255,255,.18);}
+  .feedback{min-height:48px; border:3px solid var(--ink-900); border-radius:14px; padding:11px 14px; font-weight:900; background:rgba(255,255,255,.2);}
   .feedback.good{background:var(--green);}
   .feedback.bad{background:var(--red);}
   .choices{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px;}
@@ -83,7 +85,7 @@
   .choice.wrong{background:linear-gradient(180deg,#ef6969,#c83a3a);}
   .choice.dim{opacity:.42;}
   .choice .icon{width:44px; height:44px; flex:0 0 auto; display:grid; place-items:center; border:3px solid rgba(255,255,255,.68); border-radius:12px; background:rgba(255,255,255,.16);}
-  .choice .big{display:block; font-size:18px; line-height:1.12; font-weight:900; text-transform:uppercase;}
+  .choice .big{display:block; font-size:18px; line-height:1.16; font-weight:900; text-transform:none;}
   .choice .hint{display:block; font-size:12px; line-height:1.1; font-weight:900; opacity:.92; margin-top:2px;}
   .bottom{display:flex; align-items:center; gap:10px;}
   .bar{height:14px; flex:1; background:rgba(255,255,255,.45); border:2px solid var(--ink-900); border-radius:999px; overflow:hidden;}
