@@ -86,6 +86,23 @@
     function appendSentence(container, sentence, vraag) {
       let chunks = [{ text: sentence, type: "text" }];
 
+      function isWordChar(char) {
+        return !!char && /[A-Za-zÀ-ÖØ-öø-ÿ0-9]/.test(char);
+      }
+
+      function findPhrase(text, phrase) {
+        let start = 0;
+        while (start <= text.length) {
+          const pos = text.indexOf(phrase, start);
+          if (pos < 0) return -1;
+          const before = text.charAt(pos - 1);
+          const after = text.charAt(pos + phrase.length);
+          if (!isWordChar(before) && !isWordChar(after)) return pos;
+          start = pos + Math.max(phrase.length, 1);
+        }
+        return -1;
+      }
+
       function splitFirst(list, phrase, type) {
         const next = [];
         let used = false;
@@ -94,7 +111,7 @@
             next.push(chunk);
             return;
           }
-          const pos = chunk.text.indexOf(phrase);
+          const pos = findPhrase(chunk.text, phrase);
           if (pos < 0) {
             next.push(chunk);
             return;
@@ -156,10 +173,23 @@
       const c1y = sy - curve;
       const c2x = ex;
       const c2y = ey - curve;
+      const angle = Math.atan2(ey - c2y, ex - c2x);
+      const ux = Math.cos(angle);
+      const uy = Math.sin(angle);
+      const px = -uy;
+      const py = ux;
+      const headLength = 16;
+      const headWidth = 9;
+      const baseX = ex - ux * headLength;
+      const baseY = ey - uy * headLength;
+      const leftX = baseX + px * headWidth;
+      const leftY = baseY + py * headWidth;
+      const rightX = baseX - px * headWidth;
+      const rightY = baseY - py * headWidth;
       el.arrow.setAttribute("width", width);
       el.arrow.setAttribute("height", height);
       el.arrow.setAttribute("viewBox", "0 0 " + width + " " + height);
-      el.arrow.innerHTML = '<defs><marker id="vwArrowHead" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#f28a2e"/></marker></defs><path d="M' + sx + " " + sy + " C " + c1x + " " + c1y + ", " + c2x + " " + c2y + ", " + ex + " " + ey + '" fill="none" stroke="#f28a2e" stroke-width="4" stroke-linecap="round" marker-end="url(#vwArrowHead)"/>';
+      el.arrow.innerHTML = '<path d="M' + sx + " " + sy + " C " + c1x + " " + c1y + ", " + c2x + " " + c2y + ", " + baseX + " " + baseY + '" fill="none" stroke="#f28a2e" stroke-width="4" stroke-linecap="round"/><polygon points="' + ex + "," + ey + " " + leftX + "," + leftY + " " + rightX + "," + rightY + '" fill="#f28a2e"/>';
       el.arrow.style.display = "block";
     }
 
