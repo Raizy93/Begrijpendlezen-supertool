@@ -46,15 +46,15 @@
       streakbox: $("#tkStreakbox")
     };
 
-    let queue = [], idx = 0, total = 15, good = 0, bad = 0, streak = 0, bestStreak = 0, answered = false;
+    let queue = [], idx = 0, total = 10, good = 0, bad = 0, streak = 0, bestStreak = 0, answered = false;
 
     function buildQueue(limit) {
-      const grouped = shuffle(texts).map((text) => ({ text, vragen: shuffle(text.vragen) }));
       const result = [];
-      grouped.forEach((group) => {
-        group.vragen.forEach((vraag) => {
-          if (result.length < limit) result.push({ text: group.text, vraag });
-        });
+      shuffle(texts).forEach((text) => {
+        const vragen = shuffle(text.vragen || []);
+        if (vragen.length && result.length < limit) {
+          result.push({ text, vraag: vragen[0] });
+        }
       });
       return result;
     }
@@ -201,7 +201,7 @@
 
     function start() {
       const selected = $("[data-tk-count].is-selected") || $("[data-tk-count]");
-      const requested = parseInt(selected.getAttribute("data-count"), 10) || 15;
+      const requested = parseInt(selected.getAttribute("data-count"), 10) || 10;
       queue = buildQueue(requested);
       total = queue.length;
       idx = 0;
