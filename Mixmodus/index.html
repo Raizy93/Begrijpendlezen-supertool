@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Mixmodus - Begrijpend lezen Supertool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --sky-400:#5dd0f2; --sky-500:#25b7e8; --sky-600:#0f9ad1; --sky-700:#0a7aa8;
+    --ink-900:#15202b; --ink-700:#2c3e50; --ink-500:#526374;
+    --gold:#ffd24a; --green:#35b852; --red:#df4b4b; --orange:#f47b20; --purple:#8c5fd3;
+    --font-display:'Luckiest Guy',cursive; --font-body:'Nunito',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0; min-height:100%;}
+  body{
+    min-height:100vh; font-family:var(--font-body); color:#fff; overflow:hidden;
+    background:radial-gradient(140% 120% at 50% -20%, var(--sky-400) 0%, var(--sky-500) 38%, var(--sky-600) 72%, var(--sky-700) 100%);
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{content:""; position:fixed; inset:0; pointer-events:none; opacity:.48; background-image:radial-gradient(rgba(255,255,255,.16) 2px, transparent 2px); background-size:34px 34px;}
+  button{font-family:inherit;}
+  #app{height:100vh; display:flex; flex-direction:column; padding:10px 14px 12px; gap:10px; position:relative; z-index:1;}
+  .top{display:flex; align-items:center; justify-content:space-between; gap:12px; flex:0 0 auto;}
+  .brand{display:flex; align-items:center; gap:10px; min-width:0;}
+  .logo{width:48px; height:48px; border-radius:50%; border:3px solid var(--ink-900); box-shadow:0 3px 0 var(--ink-900); background:#fff; object-fit:cover;}
+  h1{font-family:var(--font-display); font-size:32px; line-height:.92; margin:0; letter-spacing:0; -webkit-text-stroke:1.4px var(--ink-900); text-shadow:3px 3px 0 var(--ink-900);}
+  .sub{font-size:14px; font-weight:900; margin-top:2px;}
+  .nav{display:flex; gap:9px;}
+  .navbtn{display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:46px; padding:0 14px; color:var(--ink-900); background:#fff; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); font-weight:900; text-decoration:none; cursor:pointer;}
+  .navbtn:hover{background:var(--gold);}
+  .hud{display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:72px; padding:8px 10px; border:2px solid rgba(255,255,255,.38); border-radius:14px; background:rgba(13,118,158,.55); box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);}
+  .hud-title{display:flex; align-items:baseline; gap:8px; min-width:0;}
+  .hud-title strong{font-family:var(--font-display); font-size:25px; line-height:1; -webkit-text-stroke:1px var(--ink-900); text-shadow:2px 2px 0 var(--ink-900);}
+  .hud-title span{font-weight:900; font-size:14px;}
+  .stats{display:flex; gap:8px; align-items:center;}
+  .stat{min-width:76px; min-height:54px; display:grid; place-items:center; padding:5px 8px; color:var(--ink-900); background:#fff; border:3px solid var(--ink-900); border-radius:14px; box-shadow:0 4px 0 var(--ink-900); font-weight:900;}
+  .stat b{font-size:23px; line-height:1;}
+  .stat small{font-size:10px; text-transform:uppercase; color:var(--ink-500);}
+  .stat.dark{background:var(--ink-900); color:#fff;}
+  .stat.dark small{color:rgba(255,255,255,.72);}
+  .screen{min-height:0; flex:1 1 auto;}
+  .menu{height:100%; display:grid; grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr); gap:12px;}
+  .panel{min-height:0; background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:20px; box-shadow:0 5px 0 var(--ink-900); padding:18px; overflow:auto;}
+  .panel h2{font-family:var(--font-display); font-size:34px; line-height:1; margin:0 0 8px; color:#fff; -webkit-text-stroke:1.2px var(--ink-900); text-shadow:2px 2px 0 var(--ink-900);}
+  .panel p{font-size:17px; line-height:1.45; font-weight:800; margin:0 0 12px;}
+  details{border:2px solid rgba(21,32,43,.16); border-radius:12px; padding:10px 12px; margin-top:12px; background:#f7fafc;}
+  summary{font-weight:900; cursor:pointer;}
+  .goal-list{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:12px;}
+  .goal-check{display:flex; align-items:center; gap:8px; min-height:44px; padding:9px; border:2px solid rgba(21,32,43,.18); border-radius:12px; background:#fff; font-weight:900; cursor:pointer;}
+  .goal-check input{width:20px; height:20px; accent-color:var(--orange);}
+  .goal-actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+  .smallbtn,.startbtn,.countbtn{border:3px solid var(--ink-900); border-radius:14px; box-shadow:0 4px 0 var(--ink-900); background:#fff; color:var(--ink-900); font-weight:900; cursor:pointer;}
+  .smallbtn{padding:8px 12px;}
+  .count-row{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:10px 0 16px;}
+  .countbtn{min-height:50px; font-size:18px;}
+  .countbtn.active{background:var(--gold);}
+  .startbtn{width:100%; min-height:58px; background:var(--orange); color:#fff; font-size:20px;}
+  .warning{min-height:24px; color:#b13b00; font-weight:900; margin-top:10px;}
+  .game{height:100%; display:flex; flex-direction:column; gap:10px;}
+  .card{position:relative; flex:1 1 auto; min-height:0; background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:20px; box-shadow:0 4px 0 var(--ink-900); padding:54px 24px 20px; overflow:auto;}
+  .tag{position:absolute; top:-14px; left:22px; min-height:31px; padding:6px 18px; border:3px solid var(--ink-900); border-radius:10px; box-shadow:0 3px 0 var(--ink-900); background:var(--purple); color:#fff; text-transform:uppercase; font-weight:900; font-size:13px;}
+  .question{position:absolute; top:36px; right:22px; color:#0080b0; font-weight:900; font-size:14px; text-align:right;}
+  .story{font-size:17px; line-height:1.55; max-width:1120px;}
+  .story p{margin:0 0 12px;}
+  .story h3{font-size:24px; margin:0 0 8px;}
+  .story .meta{font-weight:900; color:var(--ink-500); border-bottom:1px solid #d7e0e8; padding-bottom:6px; margin-bottom:10px;}
+  .story ul,.story ol{margin:8px 0 12px 22px; padding:0;}
+  .mark{display:inline; background:#fff2b8; border:3px solid var(--orange); border-radius:8px; padding:0 4px; font-weight:900;}
+  .blank{display:inline-block; min-width:120px; border-bottom:4px solid var(--orange); color:transparent;}
+  .feedback{min-height:48px; border:3px solid var(--ink-900); border-radius:14px; padding:11px 14px; font-weight:900; background:rgba(255,255,255,.18);}
+  .feedback.good{background:var(--green);}
+  .feedback.bad{background:var(--red);}
+  .choices{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px;}
+  .choice{min-height:74px; display:flex; align-items:center; gap:13px; text-align:left; padding:13px 16px; color:#fff; border:3px solid var(--ink-900); border-radius:18px; box-shadow:0 5px 0 var(--ink-900); background:linear-gradient(180deg,#9d73e8,#7141bd); cursor:pointer;}
+  .choice:nth-child(2){background:linear-gradient(180deg,#f28a2e,#e06a11);}
+  .choice:nth-child(3){background:linear-gradient(180deg,#2bb6e8,#0f86bd);}
+  .choice:nth-child(4){background:linear-gradient(180deg,#e85291,#cf3679);}
+  .choice:disabled{cursor:default;}
+  .choice.correct{background:linear-gradient(180deg,#42c75a,#229b38);}
+  .choice.wrong{background:linear-gradient(180deg,#ef6969,#c83a3a);}
+  .choice.dim{opacity:.42;}
+  .choice .icon{width:44px; height:44px; flex:0 0 auto; display:grid; place-items:center; border:3px solid rgba(255,255,255,.68); border-radius:12px; background:rgba(255,255,255,.16);}
+  .choice .big{display:block; font-size:18px; line-height:1.12; font-weight:900; text-transform:uppercase;}
+  .choice .hint{display:block; font-size:12px; line-height:1.1; font-weight:900; opacity:.92; margin-top:2px;}
+  .bottom{display:flex; align-items:center; gap:10px;}
+  .bar{height:14px; flex:1; background:rgba(255,255,255,.45); border:2px solid var(--ink-900); border-radius:999px; overflow:hidden;}
+  .fill{height:100%; width:0%; background:var(--gold);}
+  .next{min-width:104px; min-height:48px; border:3px solid var(--ink-900); border-radius:18px; box-shadow:0 4px 0 var(--ink-900); background:var(--gold); color:var(--ink-900); font-weight:900; cursor:pointer;}
+  .next:disabled{opacity:.55; cursor:not-allowed; background:#b8d9e8;}
+  .end{height:100%; display:grid; place-items:center;}
+  .endbox{max-width:600px; width:100%; background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:22px; box-shadow:0 7px 0 var(--ink-900); padding:24px; text-align:center;}
+  .endbox h2{font-family:var(--font-display); font-size:42px; line-height:1; margin:0 0 10px; color:#fff; -webkit-text-stroke:1.3px var(--ink-900); text-shadow:3px 3px 0 var(--ink-900);}
+  .hidden{display:none!important;}
+  @media (max-width:900px){
+    body{overflow:auto;}
+    #app{height:auto; min-height:100vh;}
+    .menu{grid-template-columns:1fr;}
+    .choices{grid-template-columns:1fr;}
+    .goal-list{grid-template-columns:1fr;}
+    .hud{align-items:flex-start; flex-direction:column;}
+    .stats{width:100%; overflow:auto;}
+    h1{font-size:27px;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="brand">
+      <img class="logo" src="../Hoofdzaak%20vs%20Detail/assets/logo-meesterdanny.png" alt="Meester Danny" />
+      <div>
+        <h1>Mixmodus</h1>
+        <div class="sub">Begrijpend lezen - Supertool</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <a class="navbtn" href="../index.html" title="Terug naar doelen">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+        Doelen
+      </a>
+      <button class="navbtn" id="fsBtn" title="Volledig scherm" aria-label="Volledig scherm">
+        <svg class="ic-open" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <section class="hud">
+    <div class="hud-title"><strong>Mixmodus</strong><span data-mix-subtitle>Kies doelen en aantal vragen.</span></div>
+    <div class="stats">
+      <div class="stat"><b data-mix-streak>0</b><small>reeks</small></div>
+      <div class="stat"><b data-mix-good>0</b><small>goed</small></div>
+      <div class="stat"><b data-mix-bad>0</b><small>fout</small></div>
+      <div class="stat dark"><b><span data-mix-qnow>0</span>/<span data-mix-qtot>0</span></b><small>vraag</small></div>
+    </div>
+  </section>
+
+  <main class="screen">
+    <section class="menu" data-mix-menu>
+      <div class="panel">
+        <h2>Alles door elkaar</h2>
+        <p>Kies welke leesdoelen meedoen. De vragen worden daarna willekeurig gemixt, zodat kinderen moeten herkennen welk soort denkstap nodig is.</p>
+        <details open>
+          <summary>Hoe werkt deze modus?</summary>
+          <p>Elke vraag laat duidelijk zien welk doel je oefent. Je leest de tekst of het stukje, kiest een antwoord en krijgt meteen uitleg. De oefening gebruikt de bestaande opdrachten uit alle losse onderdelen.</p>
+        </details>
+        <details>
+          <summary>Welke doelen kunnen meedoen?</summary>
+          <p>Hoofdzaak of detail, tekstdoel herkennen, tekstsoort kiezen, feit of mening, signaalwoorden, verwijswoorden, titel of tussenkop, samenvatting kiezen en conclusie trekken.</p>
+        </details>
+      </div>
+
+      <div class="panel">
+        <p><strong>Aantal vragen</strong></p>
+        <div class="count-row">
+          <button class="countbtn active" data-mix-count="10">10</button>
+          <button class="countbtn" data-mix-count="15">15</button>
+          <button class="countbtn" data-mix-count="20">20</button>
+          <button class="countbtn" data-mix-count="30">30</button>
+        </div>
+        <p><strong>Doelen</strong></p>
+        <div class="goal-actions">
+          <button class="smallbtn" data-mix-all>Alle doelen</button>
+          <button class="smallbtn" data-mix-none>Geen</button>
+        </div>
+        <div class="goal-list" data-mix-goals></div>
+        <div class="warning" data-mix-warning></div>
+        <button class="startbtn" data-mix-start>Start mixmodus</button>
+      </div>
+    </section>
+
+    <section class="game hidden" data-mix-game>
+      <article class="card">
+        <div class="tag" data-mix-goal>Doel</div>
+        <div class="question" data-mix-question>Vraag</div>
+        <div class="story" data-mix-story></div>
+      </article>
+      <div class="feedback" data-mix-feedback>Kies een antwoord.</div>
+      <div class="choices" data-mix-choices></div>
+      <div class="bottom">
+        <div class="bar"><div class="fill" data-mix-progress></div></div>
+        <button class="next" data-mix-reset>Opnieuw</button>
+        <button class="next" data-mix-next disabled>Volgende</button>
+      </div>
+    </section>
+
+    <section class="end hidden" data-mix-end>
+      <div class="endbox">
+        <h2>Klaar!</h2>
+        <p><strong><span data-mix-endscore>0</span> van de <span data-mix-endtotal>0</span> goed</strong></p>
+        <p data-mix-endmsg>Mooi geoefend.</p>
+        <button class="startbtn" data-mix-replay>Nog een keer</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script src="../Hoofdzaak%20vs%20Detail/items.js"></script>
+<script src="../Tekstdoel%20herkennen/items.js"></script>
+<script src="../Tekstsoort%20kiezen/items.js"></script>
+<script src="../Feit%20of%20mening/items.js"></script>
+<script src="../Signaalwoorden/items.js"></script>
+<script src="../Verwijswoorden/items.js"></script>
+<script src="../Titel%20of%20tussenkop/items.js"></script>
+<script src="../Samenvatting%20kiezen/items.js"></script>
+<script src="../Conclusie%20trekken/items.js"></script>
+<script src="engine.js"></script>
+<script>
+  initMIX(document.getElementById("app"));
+  const fsBtn = document.getElementById("fsBtn");
+  const fsTarget = document.documentElement;
+  function fsElement(){ return document.fullscreenElement || document.webkitFullscreenElement || null; }
+  function enterFS(){ const r = fsTarget.requestFullscreen || fsTarget.webkitRequestFullscreen || fsTarget.webkitRequestFullScreen; if (r) { try { const p = r.call(fsTarget); if (p && p.catch) p.catch(()=>{}); } catch(e){} } }
+  function exitFS(){ const x = document.exitFullscreen || document.webkitExitFullscreen; if (x) { try { const p = x.call(document); if (p && p.catch) p.catch(()=>{}); } catch(e){} } }
+  fsBtn.addEventListener("click", function(){ fsElement() ? exitFS() : enterFS(); });
+</script>
+</body>
+</html>
