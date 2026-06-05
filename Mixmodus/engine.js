@@ -460,13 +460,26 @@
     }
 
     function makeQueue(limit) {
-      const allowed = selectedGoals();
-      const pool = allItems.filter((item) => allowed.includes(item.goal));
+      const allowed = selectedGoals().filter((goal) => allItems.some((item) => item.goal === goal));
       const picked = [];
-      while (picked.length < limit && pool.length) {
-        picked.push.apply(picked, shuffle(pool).slice(0, limit - picked.length));
-      }
-      return picked;
+      if (!allowed.length) return picked;
+
+      const goals = shuffle(allowed);
+      const base = Math.floor(limit / goals.length);
+      let extra = limit % goals.length;
+
+      goals.forEach((goal) => {
+        const quota = base + (extra > 0 ? 1 : 0);
+        if (extra > 0) extra--;
+        const source = allItems.filter((item) => item.goal === goal);
+        let bag = shuffle(source);
+        for (let i = 0; i < quota; i++) {
+          if (!bag.length) bag = shuffle(source);
+          if (bag.length) picked.push(bag.pop());
+        }
+      });
+
+      return shuffle(picked).slice(0, limit);
     }
 
     function updateStats() {
