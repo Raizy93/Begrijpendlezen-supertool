@@ -425,7 +425,26 @@
     };
 
     const allItems = buildItems();
+    const taskMode = new URLSearchParams(window.location.search).get("assignment") === "1";
+    const taskContext = readTaskContext();
     let total = 10, queue = [], idx = 0, good = 0, bad = 0, streak = 0, answered = false;
+    let answers = [];
+
+    function readJson(key) {
+      try {
+        return JSON.parse(sessionStorage.getItem(key) || "null");
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function readTaskContext() {
+      if (!taskMode) return null;
+      const student = readJson("supertool_student");
+      const assignment = readJson("supertool_assignment");
+      if (!student || !assignment) return null;
+      return { student, assignment };
+    }
 
     function renderGoalChecks() {
       el.goals.innerHTML = "";
@@ -445,6 +464,9 @@
     }
 
     function selectedGoals() {
+      if (taskContext && taskContext.assignment && Array.isArray(taskContext.assignment.goals)) {
+        return taskContext.assignment.goals.slice();
+      }
       return $$("[data-mix-goal-check]").filter((box) => box.checked).map((box) => box.value);
     }
 
@@ -489,6 +511,38 @@
       el.qnow.textContent = queue.length ? Math.min(idx + 1, total) : 0;
       el.qtot.textContent = total;
       el.progress.style.width = total ? Math.round((idx / total) * 100) + "%" : "0%";
+    }
+
+    function goalSummary() {
+      const summary = {};
+      answers.forEach((answer) => {
+        if (!summary[answer.goal]) summary[answer.goal] = { good: 0, total: 0 };
+        summary[answer.goal].total++;
+        if (answer.correct) summary[answer.goal].good++;
+      });
+      return summary;
+    }
+
+    async function submitTaskResult() {
+      if (!taskContext || !window.createSupertoolClient) return { saved: false, error: null };
+      const assignmentId = taskContext.assignment.assignment_id || taskContext.assignment.id;
+      if (!assignmentId) return { saved: false, error: "Taak-id ontbreekt." };
+      try {
+        const client = window.createSupertoolClient();
+        const { error } = await client.rpc("submit_student_attempt", {
+          p_student_id: taskContext.student.studentId,
+          p_login_code: taskContext.student.loginCode,
+          p_assignment_id: assignmentId,
+          p_score: good,
+          p_total: total,
+          p_goal_summary: goalSummary(),
+          p_details: answers
+        });
+        if (error) return { saved: false, error: error.message };
+        return { saved: true, error: null };
+      } catch (error) {
+        return { saved: false, error: error.message || String(error) };
+      }
     }
 
     function setFeedback(kind, text) {
@@ -549,6 +603,14 @@
         streak++;
         setFeedback("good", "Mooi! " + (option.uitleg || "Je koos het beste antwoord."));
       }
+      answers.push({
+        goal: queue[idx].goal,
+        topic: queue[idx].topic || "",
+        question: queue[idx].question || "",
+        chosen: option.label,
+        correctAnswer: correctOption ? correctOption.label : "",
+        correct: !!option.correct
+      });
       if (queue[idx].onAnswer) queue[idx].onAnswer(option.correct, el.story);
       el.next.disabled = false;
       updateStats();
@@ -563,23 +625,42 @@
     function start() {
       syncWarning();
       if (!selectedGoals().length) return;
+      if (taskContext && taskContext.assignment) {
+        total = Number(taskContext.assignment.question_count) || total;
+      }
       queue = makeQueue(total);
       idx = 0;
       good = 0;
       bad = 0;
       streak = 0;
+      answers = [];
       show("game");
       renderQuestion();
     }
 
+    async function finish() {
+      el.progress.style.width = "100%";
+      el.endScore.textContent = good;
+      el.endTotal.textContent = total;
+      const pct = Math.round((good / total) * 100);
+      el.endMsg.textContent = pct >= 80 ? "Sterk gewerkt. Je schakelt goed tussen verschillende leesdoelen." : pct >= 60 ? "Goed geoefend. Kijk vooral naar de uitleg bij de lastige doelen." : "Prima oefenronde. Probeer straks minder snel te kiezen en eerst het doel te herkennen.";
+      show("end");
+      if (taskContext) {
+        el.endMsg.textContent = "Resultaat wordt opgeslagen...";
+        const result = await submitTaskResult();
+        if (result.saved) {
+          el.endMsg.textContent = "Je resultaat is opgeslagen. Goed gewerkt!";
+          el.replay.textContent = "Terug naar taken";
+        } else {
+          el.endMsg.textContent = "Je oefening is klaar, maar opslaan lukte niet: " + (result.error || "onbekende fout");
+          el.replay.textContent = "Terug naar taken";
+        }
+      }
+    }
+
     function next() {
       if (idx + 1 >= total) {
-        el.progress.style.width = "100%";
-        el.endScore.textContent = good;
-        el.endTotal.textContent = total;
-        const pct = Math.round((good / total) * 100);
-        el.endMsg.textContent = pct >= 80 ? "Sterk gewerkt. Je schakelt goed tussen verschillende leesdoelen." : pct >= 60 ? "Goed geoefend. Kijk vooral naar de uitleg bij de lastige doelen." : "Prima oefenronde. Probeer straks minder snel te kiezen en eerst het doel te herkennen.";
-        show("end");
+        finish();
         return;
       }
       idx++;
@@ -588,6 +669,17 @@
 
     renderGoalChecks();
     syncWarning();
+    if (taskContext && taskContext.assignment) {
+      el.subtitle.textContent = taskContext.assignment.title || "Taak oefenen";
+      if (taskContext.student && taskContext.student.displayName) {
+        el.subtitle.textContent += " - " + taskContext.student.displayName;
+      }
+      el.menu.classList.add("hidden");
+      start();
+    } else if (taskMode) {
+      el.warning.textContent = "Taakgegevens ontbreken. Ga terug naar de leerlingpagina en start de taak opnieuw.";
+      el.start.disabled = true;
+    }
     $$("[data-mix-count]").forEach((btn) => {
       btn.addEventListener("click", () => {
         $$("[data-mix-count]").forEach((b) => b.classList.remove("active"));
@@ -600,7 +692,13 @@
     el.none.addEventListener("click", () => setAll(false));
     el.start.addEventListener("click", start);
     el.reset.addEventListener("click", start);
-    el.replay.addEventListener("click", () => show("menu"));
+    el.replay.addEventListener("click", () => {
+      if (taskContext) {
+        window.location.href = "../leerling/index.html";
+        return;
+      }
+      show("menu");
+    });
     el.next.addEventListener("click", next);
     el.story.addEventListener("scroll", () => {
       const item = queue[idx];
