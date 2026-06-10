@@ -10,7 +10,7 @@
   :root{
     --sky-400:#5dd0f2; --sky-500:#25b7e8; --sky-600:#0f9ad1; --sky-700:#0a7aa8;
     --ink-900:#15202b; --ink-700:#2c3e50; --ink-500:#526374;
-    --gold:#ffd24a; --orange:#f47b20; --green:#35b852;
+    --gold:#ffd24a; --orange:#f47b20; --green:#35b852; --red:#df4b4b;
     --font-display:'Luckiest Guy',cursive; --font-body:'Nunito',system-ui,sans-serif;
   }
   *{box-sizing:border-box;}
@@ -34,6 +34,25 @@
   .panel{background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:22px; box-shadow:0 6px 0 var(--ink-900); padding:20px; min-height:260px;}
   .panel h2{font-family:var(--font-display); font-size:34px; line-height:1; margin:0 0 10px; color:#fff; -webkit-text-stroke:1.2px var(--ink-900); text-shadow:2px 2px 0 var(--ink-900);}
   .panel p{font-size:16px; line-height:1.45; font-weight:800; color:var(--ink-700);}
+  .class-form{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; align-items:end; margin:14px 0 16px;}
+  label{display:block; font-weight:900; margin:0 0 6px; color:var(--ink-700);}
+  input{width:100%; min-height:48px; border:3px solid var(--ink-900); border-radius:14px; padding:10px 12px; font:800 17px var(--font-body); color:var(--ink-900); background:#f8fbfd;}
+  input:focus{outline:4px solid rgba(255,210,74,.65);}
+  .formbtn{min-height:48px; border:3px solid var(--ink-900); border-radius:14px; box-shadow:0 4px 0 var(--ink-900); background:var(--orange); color:#fff; font-weight:900; padding:0 14px; cursor:pointer;}
+  .formbtn:disabled{opacity:.62; cursor:not-allowed;}
+  .class-list{display:grid; gap:10px; margin-top:12px;}
+  .class-card{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; align-items:center; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); padding:12px; background:linear-gradient(180deg,#fff,#f7fbfd);}
+  .class-card strong{display:block; font-size:20px; line-height:1.1;}
+  .class-meta{display:flex; flex-wrap:wrap; gap:8px; margin-top:7px; align-items:center;}
+  .code{display:inline-flex; align-items:center; min-height:30px; padding:4px 10px; border:2px solid var(--ink-900); border-radius:999px; background:var(--gold); font-weight:900; letter-spacing:.04em;}
+  .muted{color:var(--ink-500); font-weight:900; font-size:13px;}
+  .mini-actions{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;}
+  .smallbtn{min-height:38px; border:2px solid var(--ink-900); border-radius:12px; box-shadow:0 3px 0 var(--ink-900); background:#fff; color:var(--ink-900); font-weight:900; padding:0 10px; cursor:pointer;}
+  .smallbtn:hover{background:var(--gold);}
+  .smallbtn.danger:hover{background:rgba(223,75,75,.15);}
+  .msg{min-height:42px; border:2px solid rgba(21,32,43,.14); border-radius:14px; padding:10px 12px; background:#f7fafc; color:var(--ink-700); font-weight:900;}
+  .msg.good{background:rgba(53,184,82,.14); color:#196d2c;}
+  .msg.bad{background:rgba(223,75,75,.12); color:#9d2525;}
   .empty{display:grid; place-items:center; min-height:160px; border:2px dashed rgba(21,32,43,.25); border-radius:16px; background:#f7fafc; text-align:center; padding:18px;}
   .status{font-weight:900; color:var(--ink-500);}
   .hidden{display:none!important;}
@@ -42,6 +61,8 @@
     .top{align-items:flex-start; flex-direction:column;}
     .actions{justify-content:flex-start;}
     .grid{grid-template-columns:1fr;}
+    .class-form,.class-card{grid-template-columns:1fr;}
+    .mini-actions{justify-content:flex-start;}
     h1{font-size:28px;}
   }
 </style>
@@ -66,10 +87,19 @@
     <section class="panel">
       <h2>Klassen</h2>
       <p id="welcome">Welkom.</p>
-      <div class="empty">
+      <form class="class-form" id="classForm">
         <div>
-          <strong>Volgende stap</strong>
-          <p>Hier bouwen we straks: klas aanmaken, klascode tonen en leerlingen met voornaam/pseudoniem toevoegen.</p>
+          <label for="className">Nieuwe klas</label>
+          <input id="className" name="className" type="text" maxlength="60" placeholder="Bijvoorbeeld: Groep 8A" required />
+        </div>
+        <button class="formbtn" id="createClassBtn" type="submit">Klas maken</button>
+      </form>
+      <div class="msg" id="classMessage" aria-live="polite">Maak een klas aan. De klascode wordt automatisch gemaakt.</div>
+      <div class="class-list" id="classList"></div>
+      <div class="empty hidden" id="classEmpty">
+        <div>
+          <strong>Nog geen klassen</strong>
+          <p>Maak je eerste klas aan. Gebruik alleen een klasnaam, geen leerlinggegevens.</p>
         </div>
       </div>
     </section>
@@ -100,6 +130,27 @@
   const loading = document.getElementById("loading");
   const welcome = document.getElementById("welcome");
   const logoutBtn = document.getElementById("logoutBtn");
+  const classForm = document.getElementById("classForm");
+  const className = document.getElementById("className");
+  const createClassBtn = document.getElementById("createClassBtn");
+  const classList = document.getElementById("classList");
+  const classEmpty = document.getElementById("classEmpty");
+  const classMessage = document.getElementById("classMessage");
+  let currentUser = null;
+
+  const CODE_WORDS = ["BOEK", "ZON", "STER", "TAAL", "LEES", "PEN", "VLAM", "BRUG", "GOUD", "KERN", "WOLK", "MAAN"];
+
+  function setClassMessage(text, kind) {
+    classMessage.textContent = text;
+    classMessage.classList.remove("good", "bad");
+    if (kind) classMessage.classList.add(kind);
+  }
+
+  function makeClassCode() {
+    const word = CODE_WORDS[(Math.random() * CODE_WORDS.length) | 0];
+    const number = String(100 + ((Math.random() * 900) | 0));
+    return word + "-" + number;
+  }
 
   async function ensureProfile(user) {
     await client.from("teacher_profiles").upsert({
@@ -108,17 +159,131 @@
     });
   }
 
+  function renderClasses(classes) {
+    classList.innerHTML = "";
+    classEmpty.classList.toggle("hidden", classes.length > 0);
+    classes.forEach((klass) => {
+      const card = document.createElement("article");
+      card.className = "class-card";
+      const info = document.createElement("div");
+      const title = document.createElement("strong");
+      title.textContent = klass.name;
+      const meta = document.createElement("div");
+      meta.className = "class-meta";
+      const code = document.createElement("span");
+      code.className = "code";
+      code.textContent = klass.class_code;
+      const muted = document.createElement("span");
+      muted.className = "muted";
+      muted.textContent = "Aangemaakt op " + new Date(klass.created_at).toLocaleDateString("nl-NL");
+      meta.append(code, muted);
+      info.append(title, meta);
+
+      const actions = document.createElement("div");
+      actions.className = "mini-actions";
+      const copy = document.createElement("button");
+      copy.className = "smallbtn";
+      copy.type = "button";
+      copy.textContent = "Kopieer code";
+      copy.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(klass.class_code);
+          setClassMessage("Klascode " + klass.class_code + " gekopieerd.", "good");
+        } catch (error) {
+          setClassMessage("Klascode: " + klass.class_code, "good");
+        }
+      });
+      const archive = document.createElement("button");
+      archive.className = "smallbtn danger";
+      archive.type = "button";
+      archive.textContent = "Archiveer";
+      archive.addEventListener("click", () => archiveClass(klass));
+      actions.append(copy, archive);
+
+      card.append(info, actions);
+      classList.appendChild(card);
+    });
+  }
+
+  async function loadClasses() {
+    const { data, error } = await client
+      .from("classes")
+      .select("id,name,class_code,created_at,archived_at")
+      .is("archived_at", null)
+      .order("created_at", { ascending: false });
+    if (error) {
+      setClassMessage("Klassen laden lukte niet: " + error.message, "bad");
+      return;
+    }
+    renderClasses(data || []);
+    if ((data || []).length === 0) setClassMessage("Maak een klas aan. De klascode wordt automatisch gemaakt.", "");
+  }
+
+  async function createClass(name) {
+    if (!currentUser) return;
+    createClassBtn.disabled = true;
+    setClassMessage("Klas wordt aangemaakt...", "");
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const { error } = await client.from("classes").insert({
+        teacher_id: currentUser.id,
+        name,
+        class_code: makeClassCode()
+      });
+      if (!error) {
+        className.value = "";
+        setClassMessage("Klas aangemaakt.", "good");
+        await loadClasses();
+        createClassBtn.disabled = false;
+        return;
+      }
+      if (!String(error.message || "").toLowerCase().includes("duplicate")) {
+        setClassMessage("Klas aanmaken lukte niet: " + error.message, "bad");
+        createClassBtn.disabled = false;
+        return;
+      }
+    }
+    setClassMessage("Klascode botste te vaak. Probeer nog een keer.", "bad");
+    createClassBtn.disabled = false;
+  }
+
+  async function archiveClass(klass) {
+    const ok = window.confirm("Wil je " + klass.name + " archiveren? De klas verdwijnt uit deze lijst, maar wordt niet hard verwijderd.");
+    if (!ok) return;
+    const { error } = await client
+      .from("classes")
+      .update({ archived_at: new Date().toISOString() })
+      .eq("id", klass.id);
+    if (error) {
+      setClassMessage("Archiveren lukte niet: " + error.message, "bad");
+      return;
+    }
+    setClassMessage("Klas gearchiveerd.", "good");
+    await loadClasses();
+  }
+
   async function init() {
     const { data } = await client.auth.getSession();
     if (!data.session) {
       window.location.href = "../auth/login.html";
       return;
     }
-    await ensureProfile(data.session.user);
-    welcome.textContent = "Welkom, " + (data.session.user.email || "leerkracht") + ".";
+    currentUser = data.session.user;
+    await ensureProfile(currentUser);
+    welcome.textContent = "Welkom, " + (currentUser.email || "leerkracht") + ".";
+    await loadClasses();
     loading.classList.add("hidden");
     dashboard.classList.remove("hidden");
   }
+
+  classForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const name = className.value.trim();
+    if (!name) {
+      setClassMessage("Vul een klasnaam in.", "bad");
+      return;
+    }
+    await createClass(name);
+  });
 
   logoutBtn.addEventListener("click", async () => {
     await client.auth.signOut();
