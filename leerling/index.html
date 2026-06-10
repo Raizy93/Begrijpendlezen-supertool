@@ -48,8 +48,10 @@
   .student-btn.active{background:linear-gradient(180deg,#ffd968,#f1ad22); color:var(--ink-900);}
   .task-list{display:grid; gap:10px; margin-top:14px;}
   .task{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; align-items:center; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); padding:12px; background:#f8fbfd;}
+  .task.done{background:linear-gradient(180deg,#effcf3,#ddf6e5); border-color:#176b2a;}
   .task strong{display:block; font-size:20px;}
   .pill{display:inline-flex; min-height:28px; align-items:center; padding:3px 9px; border:2px solid var(--ink-900); border-radius:999px; background:var(--gold); font-weight:900; margin:7px 6px 0 0;}
+  .pill.done{background:#c9f2d4; color:#176b2a;}
   .empty{display:grid; place-items:center; min-height:150px; border:2px dashed rgba(21,32,43,.25); border-radius:16px; background:#f7fafc; text-align:center; padding:18px; margin-top:14px;}
   .hidden{display:none!important;}
   @media (max-width:760px){
@@ -297,6 +299,7 @@
     tasks.forEach((task) => {
       const card = document.createElement("article");
       card.className = "task";
+      if (task.completed) card.classList.add("done");
       const info = document.createElement("div");
       const title = document.createElement("strong");
       title.textContent = task.title;
@@ -309,7 +312,7 @@
       info.append(title, mode, count);
       if (task.completed) {
         const done = document.createElement("span");
-        done.className = "pill";
+        done.className = "pill done";
         done.textContent = "Afgerond: " + task.last_score + "/" + task.last_total;
         info.appendChild(done);
       }

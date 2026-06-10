@@ -83,6 +83,10 @@
   .result-list{grid-column:1/-1; display:grid; gap:7px; border-top:2px solid rgba(21,32,43,.12); padding-top:10px; margin-top:4px;}
   .result-row{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; padding:8px 10px; border:2px solid rgba(21,32,43,.14); border-radius:12px; background:#fff;}
   .score{font-weight:900; color:#176b2a;}
+  .goal-results{display:flex; flex-wrap:wrap; gap:6px; margin-top:7px;}
+  .goal-score{display:inline-flex; align-items:center; min-height:26px; padding:3px 8px; border:2px solid rgba(21,32,43,.55); border-radius:999px; background:#f7fbfd; color:var(--ink-700); font-weight:900; font-size:12px;}
+  .goal-score.perfect{background:#e8fbef; color:#176b2a;}
+  .goal-score.miss{background:#fff5df; color:#8a4d00;}
   .result-empty{grid-column:1/-1; color:var(--ink-500); font-weight:900; padding:8px 10px; border:2px dashed rgba(21,32,43,.2); border-radius:12px; background:#f7fafc;}
   .empty{display:grid; place-items:center; min-height:160px; border:2px dashed rgba(21,32,43,.25); border-radius:16px; background:#f7fafc; text-align:center; padding:18px;}
   .status{font-weight:900; color:var(--ink-500);}
@@ -517,6 +521,24 @@
     return "Onbekende leerling";
   }
 
+  function goalLabel(goalId) {
+    const found = MIX_GOALS.find((goal) => goal.id === goalId);
+    return found ? found.label : goalId;
+  }
+
+  function normalizedSummary(summary) {
+    if (!summary || typeof summary !== "object") return [];
+    return Object.keys(summary).map((goalId) => {
+      const value = summary[goalId] || {};
+      return {
+        goalId,
+        label: goalLabel(goalId),
+        good: Number(value.good || 0),
+        total: Number(value.total || 0)
+      };
+    }).filter((item) => item.total > 0);
+  }
+
   function renderTasks(tasks) {
     taskList.innerHTML = "";
     taskEmpty.classList.toggle("hidden", tasks.length > 0);
@@ -567,6 +589,15 @@
           row.className = "result-row";
           const who = document.createElement("div");
           who.innerHTML = "<strong>" + studentName(attempt.student_id) + "</strong><br><span class=\"muted\">" + new Date(attempt.finished_at).toLocaleString("nl-NL") + "</span>";
+          const goalResults = document.createElement("div");
+          goalResults.className = "goal-results";
+          normalizedSummary(attempt.goal_summary).forEach((item) => {
+            const chip = document.createElement("span");
+            chip.className = "goal-score " + (item.good === item.total ? "perfect" : "miss");
+            chip.textContent = item.label + ": " + item.good + "/" + item.total;
+            goalResults.appendChild(chip);
+          });
+          if (goalResults.children.length) who.appendChild(goalResults);
           const score = document.createElement("div");
           score.className = "score";
           score.textContent = attempt.score + "/" + attempt.total;
