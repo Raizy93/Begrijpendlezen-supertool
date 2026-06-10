@@ -313,7 +313,7 @@
       btn.textContent = "Start";
       btn.addEventListener("click", () => {
         sessionStorage.setItem("supertool_assignment", JSON.stringify(task));
-        setMessage("Taak starten bouwen we in de volgende stap.", "good");
+        window.location.href = "../Mixmodus/index.html?assignment=1";
       });
       card.append(info, btn);
       els.taskList.appendChild(card);
