@@ -80,6 +80,10 @@
   .pill{display:inline-flex; min-height:28px; align-items:center; padding:3px 9px; border:2px solid var(--ink-900); border-radius:999px; background:#eef8ff; color:var(--ink-700); font-weight:900; font-size:13px;}
   .pill.on{background:#e8fbef; color:#176b2a;}
   .pill.off{background:#f4f0f0; color:#7a2b2b;}
+  .result-list{grid-column:1/-1; display:grid; gap:7px; border-top:2px solid rgba(21,32,43,.12); padding-top:10px; margin-top:4px;}
+  .result-row{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; padding:8px 10px; border:2px solid rgba(21,32,43,.14); border-radius:12px; background:#fff;}
+  .score{font-weight:900; color:#176b2a;}
+  .result-empty{grid-column:1/-1; color:var(--ink-500); font-weight:900; padding:8px 10px; border:2px dashed rgba(21,32,43,.2); border-radius:12px; background:#f7fafc;}
   .empty{display:grid; place-items:center; min-height:160px; border:2px dashed rgba(21,32,43,.25); border-radius:16px; background:#f7fafc; text-align:center; padding:18px;}
   .status{font-weight:900; color:var(--ink-500);}
   .hidden{display:none!important;}
@@ -88,7 +92,7 @@
     .top{align-items:flex-start; flex-direction:column;}
     .actions{justify-content:flex-start;}
     .grid{grid-template-columns:1fr;}
-    .class-form,.class-card,.student-form,.student-row,.task-card{grid-template-columns:1fr;}
+    .class-form,.class-card,.student-form,.student-row,.task-card,.result-row{grid-template-columns:1fr;}
     .goal-checks{grid-template-columns:1fr;}
     .mini-actions,.student-actions{justify-content:flex-start;}
     h1{font-size:28px;}
@@ -207,6 +211,7 @@
   let currentUser = null;
   let currentClasses = [];
   let currentTasks = [];
+  let currentAttempts = [];
 
   const CODE_WORDS = ["BOEK", "ZON", "STER", "TAAL", "LEES", "PEN", "VLAM", "BRUG", "GOUD", "KERN", "WOLK", "MAAN"];
   const MIX_GOALS = [
@@ -487,7 +492,29 @@
       return;
     }
     currentTasks = data || [];
+    await loadAttempts();
     renderTasks(currentTasks);
+  }
+
+  async function loadAttempts() {
+    const { data, error } = await client
+      .from("attempts")
+      .select("id,assignment_id,student_id,finished_at,score,total,goal_summary")
+      .order("finished_at", { ascending: false });
+    if (error) {
+      setTaskMessage("Resultaten laden lukte niet: " + error.message, "bad");
+      currentAttempts = [];
+      return;
+    }
+    currentAttempts = data || [];
+  }
+
+  function studentName(studentId) {
+    for (const klass of currentClasses) {
+      const found = (klass.students || []).find((student) => student.id === studentId);
+      if (found) return found.display_name;
+    }
+    return "Onbekende leerling";
   }
 
   function renderTasks(tasks) {
@@ -526,6 +553,28 @@
       toggle.addEventListener("click", () => toggleTask(task));
       actions.appendChild(toggle);
       card.append(info, actions);
+      const results = currentAttempts.filter((attempt) => attempt.assignment_id === task.id);
+      const resultList = document.createElement("div");
+      resultList.className = "result-list";
+      if (!results.length) {
+        const empty = document.createElement("div");
+        empty.className = "result-empty";
+        empty.textContent = "Nog geen resultaten voor deze taak.";
+        resultList.appendChild(empty);
+      } else {
+        results.forEach((attempt) => {
+          const row = document.createElement("div");
+          row.className = "result-row";
+          const who = document.createElement("div");
+          who.innerHTML = "<strong>" + studentName(attempt.student_id) + "</strong><br><span class=\"muted\">" + new Date(attempt.finished_at).toLocaleString("nl-NL") + "</span>";
+          const score = document.createElement("div");
+          score.className = "score";
+          score.textContent = attempt.score + "/" + attempt.total;
+          row.append(who, score);
+          resultList.appendChild(row);
+        });
+      }
+      card.appendChild(resultList);
       taskList.appendChild(card);
     });
   }
