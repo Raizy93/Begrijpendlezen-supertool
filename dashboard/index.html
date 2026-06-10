@@ -50,6 +50,17 @@
   .smallbtn{min-height:38px; border:2px solid var(--ink-900); border-radius:12px; box-shadow:0 3px 0 var(--ink-900); background:#fff; color:var(--ink-900); font-weight:900; padding:0 10px; cursor:pointer;}
   .smallbtn:hover{background:var(--gold);}
   .smallbtn.danger:hover{background:rgba(223,75,75,.15);}
+  .students-panel{grid-column:1/-1; border-top:2px solid rgba(21,32,43,.12); padding-top:12px; margin-top:2px;}
+  .student-form{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:end; margin-bottom:10px;}
+  .student-form input{min-height:42px; border-width:2px; font-size:15px;}
+  .student-form .formbtn{min-height:42px; border-width:2px; box-shadow:0 3px 0 var(--ink-900); background:var(--green);}
+  .student-list{display:grid; gap:8px;}
+  .student-row{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; padding:9px 10px; border:2px solid rgba(21,32,43,.18); border-radius:12px; background:#fff;}
+  .student-name{font-weight:900; font-size:17px;}
+  .student-login{display:flex; flex-wrap:wrap; gap:7px; align-items:center; margin-top:4px;}
+  .student-code{display:inline-flex; align-items:center; min-height:26px; padding:3px 9px; border:2px solid var(--ink-900); border-radius:999px; background:#e8fbef; color:#176b2a; font-weight:900;}
+  .student-actions{display:flex; gap:7px; flex-wrap:wrap; justify-content:flex-end;}
+  .student-empty{padding:10px; border:2px dashed rgba(21,32,43,.22); border-radius:12px; background:#f7fafc; color:var(--ink-500); font-weight:900; text-align:center;}
   .msg{min-height:42px; border:2px solid rgba(21,32,43,.14); border-radius:14px; padding:10px 12px; background:#f7fafc; color:var(--ink-700); font-weight:900;}
   .msg.good{background:rgba(53,184,82,.14); color:#196d2c;}
   .msg.bad{background:rgba(223,75,75,.12); color:#9d2525;}
@@ -61,8 +72,8 @@
     .top{align-items:flex-start; flex-direction:column;}
     .actions{justify-content:flex-start;}
     .grid{grid-template-columns:1fr;}
-    .class-form,.class-card{grid-template-columns:1fr;}
-    .mini-actions{justify-content:flex-start;}
+    .class-form,.class-card,.student-form,.student-row{grid-template-columns:1fr;}
+    .mini-actions,.student-actions{justify-content:flex-start;}
     h1{font-size:28px;}
   }
 </style>
@@ -152,6 +163,10 @@
     return word + "-" + number;
   }
 
+  function makeStudentCode() {
+    return String(100 + ((Math.random() * 900) | 0));
+  }
+
   async function ensureProfile(user) {
     await client.from("teacher_profiles").upsert({
       id: user.id,
@@ -200,9 +215,120 @@
       archive.addEventListener("click", () => archiveClass(klass));
       actions.append(copy, archive);
 
+      const studentsPanel = renderStudentsPanel(klass);
       card.append(info, actions);
+      card.appendChild(studentsPanel);
       classList.appendChild(card);
     });
+  }
+
+  function renderStudentsPanel(klass) {
+    const panel = document.createElement("div");
+    panel.className = "students-panel";
+
+    const form = document.createElement("form");
+    form.className = "student-form";
+    const field = document.createElement("div");
+    const label = document.createElement("label");
+    label.textContent = "Leerling toevoegen";
+    const input = document.createElement("input");
+    input.type = "text";
+    input.maxLength = 40;
+    input.placeholder = "Voornaam of pseudoniem";
+    input.required = true;
+    field.append(label, input);
+    const submit = document.createElement("button");
+    submit.className = "formbtn";
+    submit.type = "submit";
+    submit.textContent = "Toevoegen";
+    form.append(field, submit);
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const name = input.value.trim();
+      if (!name) return;
+      submit.disabled = true;
+      await createStudent(klass, name);
+      submit.disabled = false;
+    });
+
+    const list = document.createElement("div");
+    list.className = "student-list";
+    const students = klass.students || [];
+    if (!students.length) {
+      const empty = document.createElement("div");
+      empty.className = "student-empty";
+      empty.textContent = "Nog geen leerlingen. Voeg alleen voornamen of pseudoniemen toe.";
+      list.appendChild(empty);
+    } else {
+      students.forEach((student) => list.appendChild(renderStudentRow(klass, student)));
+    }
+
+    panel.append(form, list);
+    return panel;
+  }
+
+  function renderStudentRow(klass, student) {
+    const row = document.createElement("div");
+    row.className = "student-row";
+
+    const info = document.createElement("div");
+    const name = document.createElement("div");
+    name.className = "student-name";
+    name.textContent = student.display_name;
+    const login = document.createElement("div");
+    login.className = "student-login";
+    const code = document.createElement("span");
+    code.className = "student-code";
+    code.textContent = "Code " + student.login_code;
+    const hint = document.createElement("span");
+    hint.className = "muted";
+    hint.textContent = "Login: " + klass.class_code + " + naam + code";
+    login.append(code, hint);
+    info.append(name, login);
+
+    const actions = document.createElement("div");
+    actions.className = "student-actions";
+    const copy = document.createElement("button");
+    copy.className = "smallbtn";
+    copy.type = "button";
+    copy.textContent = "Kopieer login";
+    copy.addEventListener("click", async () => {
+      const text = klass.name + "\nKlascode: " + klass.class_code + "\nNaam: " + student.display_name + "\nCode: " + student.login_code;
+      try {
+        await navigator.clipboard.writeText(text);
+        setClassMessage("Login voor " + student.display_name + " gekopieerd.", "good");
+      } catch (error) {
+        setClassMessage("Login: " + klass.class_code + " / " + student.display_name + " / " + student.login_code, "good");
+      }
+    });
+    const remove = document.createElement("button");
+    remove.className = "smallbtn danger";
+    remove.type = "button";
+    remove.textContent = "Deactiveer";
+    remove.addEventListener("click", () => deactivateStudent(klass, student));
+    actions.append(copy, remove);
+
+    row.append(info, actions);
+    return row;
+  }
+
+  async function loadStudentsForClasses(classes) {
+    if (!classes.length) return classes;
+    const ids = classes.map((klass) => klass.id);
+    const { data, error } = await client
+      .from("students")
+      .select("id,class_id,display_name,login_code,created_at,active")
+      .in("class_id", ids)
+      .eq("active", true)
+      .order("display_name", { ascending: true });
+    if (error) {
+      setClassMessage("Leerlingen laden lukte niet: " + error.message, "bad");
+      return classes.map((klass) => ({ ...klass, students: [] }));
+    }
+    return classes.map((klass) => ({
+      ...klass,
+      students: (data || []).filter((student) => student.class_id === klass.id)
+    }));
   }
 
   async function loadClasses() {
@@ -215,7 +341,8 @@
       setClassMessage("Klassen laden lukte niet: " + error.message, "bad");
       return;
     }
-    renderClasses(data || []);
+    const withStudents = await loadStudentsForClasses(data || []);
+    renderClasses(withStudents);
     if ((data || []).length === 0) setClassMessage("Maak een klas aan. De klascode wordt automatisch gemaakt.", "");
   }
 
@@ -258,6 +385,47 @@
       return;
     }
     setClassMessage("Klas gearchiveerd.", "good");
+    await loadClasses();
+  }
+
+  async function createStudent(klass, displayName) {
+    setClassMessage("Leerling wordt toegevoegd...", "");
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const { error } = await client.from("students").insert({
+        class_id: klass.id,
+        display_name: displayName,
+        login_code: makeStudentCode()
+      });
+      if (!error) {
+        setClassMessage(displayName + " toegevoegd aan " + klass.name + ".", "good");
+        await loadClasses();
+        return;
+      }
+      const msg = String(error.message || "").toLowerCase();
+      if (msg.includes("duplicate") && msg.includes("display_name")) {
+        setClassMessage("Deze naam staat al in deze klas. Gebruik bijvoorbeeld een initiaal of pseudoniem.", "bad");
+        return;
+      }
+      if (!msg.includes("duplicate")) {
+        setClassMessage("Leerling toevoegen lukte niet: " + error.message, "bad");
+        return;
+      }
+    }
+    setClassMessage("Leerlingcode botste te vaak. Probeer nog een keer.", "bad");
+  }
+
+  async function deactivateStudent(klass, student) {
+    const ok = window.confirm("Wil je " + student.display_name + " deactiveren in " + klass.name + "?");
+    if (!ok) return;
+    const { error } = await client
+      .from("students")
+      .update({ active: false })
+      .eq("id", student.id);
+    if (error) {
+      setClassMessage("Deactiveren lukte niet: " + error.message, "bad");
+      return;
+    }
+    setClassMessage(student.display_name + " gedeactiveerd.", "good");
     await loadClasses();
   }
 
