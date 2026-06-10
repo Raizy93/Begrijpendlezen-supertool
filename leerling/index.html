@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Leerling - Begrijpend lezen Supertool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --sky-400:#5dd0f2; --sky-500:#25b7e8; --sky-600:#0f9ad1; --sky-700:#0a7aa8;
+    --ink-900:#15202b; --ink-700:#2c3e50; --ink-500:#526374;
+    --gold:#ffd24a; --orange:#f47b20; --green:#35b852; --red:#df4b4b; --purple:#8c5fd3;
+    --font-display:'Luckiest Guy',cursive; --font-body:'Nunito',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0; min-height:100%;}
+  body{
+    min-height:100vh; font-family:var(--font-body); color:#fff;
+    background:radial-gradient(140% 120% at 50% -20%, var(--sky-400) 0%, var(--sky-500) 38%, var(--sky-600) 72%, var(--sky-700) 100%);
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{content:""; position:fixed; inset:0; pointer-events:none; opacity:.48; background-image:radial-gradient(rgba(255,255,255,.16) 2px, transparent 2px); background-size:34px 34px;}
+  #app{min-height:100vh; display:grid; grid-template-rows:auto 1fr; gap:18px; padding:22px; position:relative; z-index:1;}
+  .top{display:flex; align-items:center; justify-content:space-between; gap:14px;}
+  .brand{display:flex; align-items:center; gap:12px; min-width:0;}
+  .logo{width:54px; height:54px; border-radius:50%; border:3px solid var(--ink-900); box-shadow:0 4px 0 var(--ink-900); background:#fff; object-fit:cover;}
+  h1{font-family:var(--font-display); font-size:34px; line-height:.95; margin:0; letter-spacing:0; -webkit-text-stroke:1.4px var(--ink-900); text-shadow:3px 3px 0 var(--ink-900);}
+  .sub{font-weight:900; margin-top:3px;}
+  .home{display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:48px; padding:0 14px; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); background:#fff; color:var(--ink-900); text-decoration:none; font-weight:900;}
+  .wrap{display:grid; place-items:center;}
+  .card{width:min(760px,100%); background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:22px; box-shadow:0 7px 0 var(--ink-900); padding:24px;}
+  .card h2{font-family:var(--font-display); font-size:40px; line-height:1; margin:0 0 8px; color:#fff; -webkit-text-stroke:1.3px var(--ink-900); text-shadow:3px 3px 0 var(--ink-900);}
+  .card p{font-size:16px; line-height:1.45; font-weight:800; margin:0 0 16px; color:var(--ink-700);}
+  label{display:block; font-weight:900; margin:12px 0 6px;}
+  input{width:100%; min-height:52px; border:3px solid var(--ink-900); border-radius:14px; padding:10px 12px; font:900 20px var(--font-body); color:var(--ink-900); background:#f8fbfd; text-transform:uppercase;}
+  input.name-input{text-transform:none;}
+  input:focus{outline:4px solid rgba(255,210,74,.65);}
+  .row{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; align-items:end;}
+  .btn{min-height:52px; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 5px 0 var(--ink-900); background:var(--orange); color:#fff; font-size:17px; font-weight:900; padding:0 16px; cursor:pointer;}
+  .btn.secondary{background:#fff; color:var(--ink-900);}
+  .btn:disabled{opacity:.62; cursor:not-allowed;}
+  .msg{min-height:46px; margin-top:14px; padding:12px 14px; border:2px solid rgba(21,32,43,.14); border-radius:14px; background:#f7fafc; color:var(--ink-700); font-weight:900;}
+  .msg.good{background:rgba(53,184,82,.14); color:#196d2c;}
+  .msg.bad{background:rgba(223,75,75,.12); color:#9d2525;}
+  .students{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:14px;}
+  .student-btn{min-height:64px; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); background:linear-gradient(180deg,#9d73e8,#7141bd); color:#fff; font-size:18px; font-weight:900; cursor:pointer;}
+  .student-btn.active{background:linear-gradient(180deg,#ffd968,#f1ad22); color:var(--ink-900);}
+  .task-list{display:grid; gap:10px; margin-top:14px;}
+  .task{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; align-items:center; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); padding:12px; background:#f8fbfd;}
+  .task strong{display:block; font-size:20px;}
+  .pill{display:inline-flex; min-height:28px; align-items:center; padding:3px 9px; border:2px solid var(--ink-900); border-radius:999px; background:var(--gold); font-weight:900; margin:7px 6px 0 0;}
+  .empty{display:grid; place-items:center; min-height:150px; border:2px dashed rgba(21,32,43,.25); border-radius:16px; background:#f7fafc; text-align:center; padding:18px; margin-top:14px;}
+  .hidden{display:none!important;}
+  @media (max-width:760px){
+    #app{padding:16px;}
+    .top{align-items:flex-start;}
+    h1{font-size:28px;}
+    .card{padding:18px;}
+    .row,.task{grid-template-columns:1fr;}
+    .students{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="brand">
+      <img class="logo" src="../Hoofdzaak%20vs%20Detail/assets/logo-meesterdanny.png" alt="Meester Danny" />
+      <div>
+        <h1>Leerling</h1>
+        <div class="sub">Begrijpend lezen - Supertool</div>
+      </div>
+    </div>
+    <a class="home" href="../index.html">Doelen</a>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <div id="stepClass">
+        <h2>Klascode</h2>
+        <p>Vul de klascode in die je van je leerkracht hebt gekregen.</p>
+        <form id="classForm" class="row">
+          <div>
+            <label for="classCode">Klascode</label>
+            <input id="classCode" autocomplete="off" placeholder="BIJVOORBEELD VLAM-865" required />
+          </div>
+          <button class="btn" id="classBtn" type="submit">Zoek klas</button>
+        </form>
+      </div>
+
+      <div id="stepStudent" class="hidden">
+        <h2 id="classTitle">Kies je naam</h2>
+        <p>Klik op je eigen naam. Staat je naam er niet bij? Vraag het aan je leerkracht.</p>
+        <div class="students" id="students"></div>
+        <button class="btn secondary" id="backToCode" type="button">Andere klascode</button>
+      </div>
+
+      <div id="stepCode" class="hidden">
+        <h2 id="studentTitle">Jouw code</h2>
+        <p>Vul je korte leerlingcode in. Zo weet de tool zeker dat jij het bent.</p>
+        <form id="loginForm" class="row">
+          <div>
+            <label for="studentCode">Leerlingcode</label>
+            <input id="studentCode" autocomplete="off" placeholder="BIJVOORBEELD 482" required />
+          </div>
+          <button class="btn" id="loginBtn" type="submit">Inloggen</button>
+        </form>
+        <button class="btn secondary" id="backToNames" type="button">Andere naam</button>
+      </div>
+
+      <div id="stepTasks" class="hidden">
+        <h2>Taken</h2>
+        <p id="taskIntro">Hier staan je klaargezette taken.</p>
+        <div id="taskList" class="task-list"></div>
+        <div id="taskEmpty" class="empty hidden">
+          <div>
+            <strong>Nog geen taken</strong>
+            <p>Je leerkracht heeft nog geen taak klaargezet voor deze klas.</p>
+          </div>
+        </div>
+        <button class="btn secondary" id="studentLogout" type="button">Uitloggen</button>
+      </div>
+
+      <div class="msg" id="message" aria-live="polite">We bewaren alleen wat nodig is voor je taak en voortgang.</div>
+    </section>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../supabase-config.js"></script>
+<script src="../auth/supabase-client.js"></script>
+<script>
+  const client = window.createSupertoolClient();
+  const state = {
+    classCode: "",
+    classId: "",
+    className: "",
+    students: [],
+    selectedStudent: null,
+    loginCode: ""
+  };
+
+  const els = {
+    stepClass: document.getElementById("stepClass"),
+    stepStudent: document.getElementById("stepStudent"),
+    stepCode: document.getElementById("stepCode"),
+    stepTasks: document.getElementById("stepTasks"),
+    classForm: document.getElementById("classForm"),
+    classCode: document.getElementById("classCode"),
+    classBtn: document.getElementById("classBtn"),
+    classTitle: document.getElementById("classTitle"),
+    students: document.getElementById("students"),
+    backToCode: document.getElementById("backToCode"),
+    studentTitle: document.getElementById("studentTitle"),
+    loginForm: document.getElementById("loginForm"),
+    studentCode: document.getElementById("studentCode"),
+    loginBtn: document.getElementById("loginBtn"),
+    backToNames: document.getElementById("backToNames"),
+    taskIntro: document.getElementById("taskIntro"),
+    taskList: document.getElementById("taskList"),
+    taskEmpty: document.getElementById("taskEmpty"),
+    studentLogout: document.getElementById("studentLogout"),
+    message: document.getElementById("message")
+  };
+
+  function show(step) {
+    els.stepClass.classList.toggle("hidden", step !== "class");
+    els.stepStudent.classList.toggle("hidden", step !== "student");
+    els.stepCode.classList.toggle("hidden", step !== "code");
+    els.stepTasks.classList.toggle("hidden", step !== "tasks");
+  }
+
+  function setMessage(text, kind) {
+    els.message.textContent = text;
+    els.message.classList.remove("good", "bad");
+    if (kind) els.message.classList.add(kind);
+  }
+
+  function normalizeCode(value) {
+    return String(value || "").trim().toUpperCase();
+  }
+
+  function saveStudentSession(student, loginCode) {
+    const payload = {
+      studentId: student.student_id,
+      displayName: student.display_name,
+      classId: student.class_id,
+      className: student.class_name,
+      classCode: state.classCode,
+      loginCode
+    };
+    sessionStorage.setItem("supertool_student", JSON.stringify(payload));
+  }
+
+  function readStudentSession() {
+    try {
+      return JSON.parse(sessionStorage.getItem("supertool_student") || "null");
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function clearStudentSession() {
+    sessionStorage.removeItem("supertool_student");
+  }
+
+  function renderStudents() {
+    els.students.innerHTML = "";
+    state.students.forEach((student) => {
+      const btn = document.createElement("button");
+      btn.className = "student-btn";
+      btn.type = "button";
+      btn.textContent = student.display_name;
+      btn.addEventListener("click", () => {
+        state.selectedStudent = student;
+        els.studentTitle.textContent = "Code van " + student.display_name;
+        els.studentCode.value = "";
+        setMessage("Vul je leerlingcode in.", "");
+        show("code");
+        els.studentCode.focus();
+      });
+      els.students.appendChild(btn);
+    });
+  }
+
+  async function findClass(classCode) {
+    els.classBtn.disabled = true;
+    setMessage("Klas wordt gezocht...", "");
+    const { data, error } = await client.rpc("class_students_by_code", { p_class_code: classCode });
+    els.classBtn.disabled = false;
+    if (error) {
+      setMessage("Klas zoeken lukte niet: " + error.message, "bad");
+      return;
+    }
+    if (!data || !data.length) {
+      setMessage("Geen actieve leerlingen gevonden bij deze klascode.", "bad");
+      return;
+    }
+    state.classCode = classCode;
+    state.classId = data[0].class_id;
+    state.className = data[0].class_name;
+    state.students = data;
+    els.classTitle.textContent = state.className;
+    renderStudents();
+    setMessage("Kies je naam in " + state.className + ".", "good");
+    show("student");
+  }
+
+  async function loginStudent() {
+    if (!state.selectedStudent) return;
+    const loginCode = normalizeCode(els.studentCode.value);
+    if (!loginCode) {
+      setMessage("Vul je leerlingcode in.", "bad");
+      return;
+    }
+    els.loginBtn.disabled = true;
+    setMessage("We controleren je code...", "");
+    const { data, error } = await client.rpc("student_login", {
+      p_class_code: state.classCode,
+      p_display_name: state.selectedStudent.display_name,
+      p_login_code: loginCode
+    });
+    els.loginBtn.disabled = false;
+    if (error) {
+      setMessage("Inloggen lukte niet: " + error.message, "bad");
+      return;
+    }
+    if (!data || !data.length) {
+      setMessage("Deze code klopt niet bij deze naam.", "bad");
+      return;
+    }
+    state.loginCode = loginCode;
+    saveStudentSession(data[0], loginCode);
+    await loadTasks(data[0].student_id, loginCode, data[0].display_name, data[0].class_name);
+  }
+
+  async function loadTasks(studentId, loginCode, displayName, className) {
+    setMessage("Taken worden geladen...", "");
+    const { data, error } = await client.rpc("student_assignments", {
+      p_student_id: studentId,
+      p_login_code: loginCode
+    });
+    if (error) {
+      setMessage("Taken laden lukte niet: " + error.message, "bad");
+      return;
+    }
+    els.taskIntro.textContent = "Welkom " + displayName + " uit " + className + ".";
+    renderTasks(data || []);
+    setMessage("Je bent ingelogd.", "good");
+    show("tasks");
+  }
+
+  function renderTasks(tasks) {
+    els.taskList.innerHTML = "";
+    els.taskEmpty.classList.toggle("hidden", tasks.length > 0);
+    tasks.forEach((task) => {
+      const card = document.createElement("article");
+      card.className = "task";
+      const info = document.createElement("div");
+      const title = document.createElement("strong");
+      title.textContent = task.title;
+      const mode = document.createElement("span");
+      mode.className = "pill";
+      mode.textContent = task.mode === "mix" ? "Mixmodus" : task.mode;
+      const count = document.createElement("span");
+      count.className = "pill";
+      count.textContent = task.question_count + " vragen";
+      info.append(title, mode, count);
+      const btn = document.createElement("button");
+      btn.className = "btn";
+      btn.type = "button";
+      btn.textContent = "Start";
+      btn.addEventListener("click", () => {
+        sessionStorage.setItem("supertool_assignment", JSON.stringify(task));
+        setMessage("Taak starten bouwen we in de volgende stap.", "good");
+      });
+      card.append(info, btn);
+      els.taskList.appendChild(card);
+    });
+  }
+
+  els.classForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const code = normalizeCode(els.classCode.value);
+    if (!code) {
+      setMessage("Vul een klascode in.", "bad");
+      return;
+    }
+    findClass(code);
+  });
+
+  els.loginForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    loginStudent();
+  });
+
+  els.backToCode.addEventListener("click", () => {
+    setMessage("Vul een klascode in.", "");
+    show("class");
+  });
+
+  els.backToNames.addEventListener("click", () => {
+    setMessage("Kies je naam in " + state.className + ".", "");
+    show("student");
+  });
+
+  els.studentLogout.addEventListener("click", () => {
+    clearStudentSession();
+    state.selectedStudent = null;
+    state.loginCode = "";
+    setMessage("Je bent uitgelogd.", "good");
+    show("class");
+  });
+
+  const existing = readStudentSession();
+  if (existing && existing.studentId && existing.loginCode) {
+    loadTasks(existing.studentId, existing.loginCode, existing.displayName, existing.className);
+  } else {
+    show("class");
+  }
+</script>
+</body>
+</html>
