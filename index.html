@@ -27,7 +27,10 @@
   .logo{width:56px; height:56px; border-radius:50%; border:3px solid var(--ink-900); box-shadow:0 4px 0 var(--ink-900); background:#fff; object-fit:cover;}
   h1{font-family:var(--font-display); font-size:38px; margin:0; line-height:.95; letter-spacing:.5px; -webkit-text-stroke:1.5px var(--ink-900); text-shadow:3px 3px 0 var(--ink-900);}
   .sub{font-weight:900; color:rgba(255,255,255,.9); margin-top:3px;}
+  .top-actions{display:flex; gap:10px; align-items:center;}
+  .teacherbtn{display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:54px; background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:18px; box-shadow:0 5px 0 var(--ink-900); padding:0 14px; cursor:pointer; transition:transform .09s, box-shadow .09s, background .12s; font-weight:900; text-decoration:none;}
   .fsbtn{display:grid; place-items:center; min-width:54px; min-height:54px; background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:18px; box-shadow:0 5px 0 var(--ink-900); padding:0 14px; cursor:pointer; transition:transform .09s, box-shadow .09s, background .12s;}
+  .teacherbtn:hover,
   .fsbtn:hover{transform:translateY(-2px); box-shadow:0 7px 0 var(--ink-900); background:var(--gold);}
   .hero{display:flex; justify-content:space-between; align-items:flex-end; gap:24px;}
   .hero h2{font-family:var(--font-display); font-size:58px; line-height:.95; margin:4px 0 8px; -webkit-text-stroke:1.5px var(--ink-900); text-shadow:4px 4px 0 var(--ink-900);}
@@ -81,10 +84,16 @@
         <div class="sub">Supertool voor leesdoelen</div>
       </div>
     </div>
-    <button class="fsbtn" id="fsBtn" title="Volledig scherm" aria-label="Volledig scherm">
-      <svg class="ic-open" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/></svg>
-      <svg class="ic-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M9 4v4a1 1 0 0 1-1 1H4M15 4v4a1 1 0 0 0 1 1h4M9 20v-4a1 1 0 0 0-1-1H4M15 20v-4a1 1 0 0 1 1-1h4"/></svg>
-    </button>
+    <div class="top-actions">
+      <a class="teacherbtn" href="auth/login.html">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-8 0v2"/><circle cx="12" cy="7" r="4"/><path d="M20 8v6"/><path d="M23 11h-6"/></svg>
+        Leerkracht
+      </a>
+      <button class="fsbtn" id="fsBtn" title="Volledig scherm" aria-label="Volledig scherm">
+        <svg class="ic-open" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/></svg>
+        <svg class="ic-close" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M9 4v4a1 1 0 0 1-1 1H4M15 4v4a1 1 0 0 0 1 1h4M9 20v-4a1 1 0 0 0-1-1H4M15 20v-4a1 1 0 0 1 1-1h4"/></svg>
+      </button>
+    </div>
   </header>
 
   <section class="hero">

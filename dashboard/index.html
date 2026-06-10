@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Dashboard - Begrijpend lezen Supertool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --sky-400:#5dd0f2; --sky-500:#25b7e8; --sky-600:#0f9ad1; --sky-700:#0a7aa8;
+    --ink-900:#15202b; --ink-700:#2c3e50; --ink-500:#526374;
+    --gold:#ffd24a; --orange:#f47b20; --green:#35b852;
+    --font-display:'Luckiest Guy',cursive; --font-body:'Nunito',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0; min-height:100%;}
+  body{
+    min-height:100vh; font-family:var(--font-body); color:#fff;
+    background:radial-gradient(140% 120% at 50% -20%, var(--sky-400) 0%, var(--sky-500) 38%, var(--sky-600) 72%, var(--sky-700) 100%);
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{content:""; position:fixed; inset:0; pointer-events:none; opacity:.48; background-image:radial-gradient(rgba(255,255,255,.16) 2px, transparent 2px); background-size:34px 34px;}
+  #app{min-height:100vh; display:grid; grid-template-rows:auto 1fr; gap:18px; padding:22px; position:relative; z-index:1;}
+  .top{display:flex; align-items:center; justify-content:space-between; gap:14px;}
+  .brand{display:flex; align-items:center; gap:12px; min-width:0;}
+  .logo{width:54px; height:54px; border-radius:50%; border:3px solid var(--ink-900); box-shadow:0 4px 0 var(--ink-900); background:#fff; object-fit:cover;}
+  h1{font-family:var(--font-display); font-size:34px; line-height:.95; margin:0; letter-spacing:0; -webkit-text-stroke:1.4px var(--ink-900); text-shadow:3px 3px 0 var(--ink-900);}
+  .sub{font-weight:900; margin-top:3px;}
+  .actions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;}
+  .btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:48px; padding:0 14px; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); background:#fff; color:var(--ink-900); text-decoration:none; font-weight:900; cursor:pointer;}
+  .btn.primary{background:var(--gold);}
+  .grid{display:grid; grid-template-columns:1.1fr .9fr; gap:14px; min-height:0;}
+  .panel{background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:22px; box-shadow:0 6px 0 var(--ink-900); padding:20px; min-height:260px;}
+  .panel h2{font-family:var(--font-display); font-size:34px; line-height:1; margin:0 0 10px; color:#fff; -webkit-text-stroke:1.2px var(--ink-900); text-shadow:2px 2px 0 var(--ink-900);}
+  .panel p{font-size:16px; line-height:1.45; font-weight:800; color:var(--ink-700);}
+  .empty{display:grid; place-items:center; min-height:160px; border:2px dashed rgba(21,32,43,.25); border-radius:16px; background:#f7fafc; text-align:center; padding:18px;}
+  .status{font-weight:900; color:var(--ink-500);}
+  .hidden{display:none!important;}
+  @media (max-width:900px){
+    #app{padding:16px;}
+    .top{align-items:flex-start; flex-direction:column;}
+    .actions{justify-content:flex-start;}
+    .grid{grid-template-columns:1fr;}
+    h1{font-size:28px;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="brand">
+      <img class="logo" src="../Hoofdzaak%20vs%20Detail/assets/logo-meesterdanny.png" alt="Meester Danny" />
+      <div>
+        <h1>Dashboard</h1>
+        <div class="sub">Leerkrachtomgeving</div>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="btn" href="../index.html">Doelen</a>
+      <button class="btn primary" id="logoutBtn" type="button">Uitloggen</button>
+    </div>
+  </header>
+
+  <main class="grid hidden" id="dashboard">
+    <section class="panel">
+      <h2>Klassen</h2>
+      <p id="welcome">Welkom.</p>
+      <div class="empty">
+        <div>
+          <strong>Volgende stap</strong>
+          <p>Hier bouwen we straks: klas aanmaken, klascode tonen en leerlingen met voornaam/pseudoniem toevoegen.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Taken</h2>
+      <div class="empty">
+        <div>
+          <strong>Nog geen taken</strong>
+          <p>In de MVP starten we met taken voor Mixmodus. Daarna kunnen losse doelen erbij.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <main class="panel" id="loading">
+    <h2>Even laden</h2>
+    <p class="status">We controleren of je bent ingelogd.</p>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../supabase-config.js"></script>
+<script src="../auth/supabase-client.js"></script>
+<script>
+  const client = window.createSupertoolClient();
+  const dashboard = document.getElementById("dashboard");
+  const loading = document.getElementById("loading");
+  const welcome = document.getElementById("welcome");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  async function ensureProfile(user) {
+    await client.from("teacher_profiles").upsert({
+      id: user.id,
+      display_name: user.email ? user.email.split("@")[0] : "Leerkracht"
+    });
+  }
+
+  async function init() {
+    const { data } = await client.auth.getSession();
+    if (!data.session) {
+      window.location.href = "../auth/login.html";
+      return;
+    }
+    await ensureProfile(data.session.user);
+    welcome.textContent = "Welkom, " + (data.session.user.email || "leerkracht") + ".";
+    loading.classList.add("hidden");
+    dashboard.classList.remove("hidden");
+  }
+
+  logoutBtn.addEventListener("click", async () => {
+    await client.auth.signOut();
+    window.location.href = "../auth/login.html";
+  });
+
+  init();
+</script>
+</body>
+</html>

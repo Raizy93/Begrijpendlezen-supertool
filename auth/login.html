@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Leerkracht login - Begrijpend lezen Supertool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --sky-400:#5dd0f2; --sky-500:#25b7e8; --sky-600:#0f9ad1; --sky-700:#0a7aa8;
+    --ink-900:#15202b; --ink-700:#2c3e50; --ink-500:#526374;
+    --gold:#ffd24a; --orange:#f47b20; --green:#35b852; --red:#df4b4b;
+    --font-display:'Luckiest Guy',cursive; --font-body:'Nunito',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0; min-height:100%;}
+  body{
+    min-height:100vh; font-family:var(--font-body); color:#fff;
+    background:radial-gradient(140% 120% at 50% -20%, var(--sky-400) 0%, var(--sky-500) 38%, var(--sky-600) 72%, var(--sky-700) 100%);
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{content:""; position:fixed; inset:0; pointer-events:none; opacity:.48; background-image:radial-gradient(rgba(255,255,255,.16) 2px, transparent 2px); background-size:34px 34px;}
+  #app{min-height:100vh; display:grid; grid-template-rows:auto 1fr; gap:22px; padding:22px; position:relative; z-index:1;}
+  .top{display:flex; align-items:center; justify-content:space-between; gap:14px;}
+  .brand{display:flex; align-items:center; gap:12px; min-width:0;}
+  .logo{width:54px; height:54px; border-radius:50%; border:3px solid var(--ink-900); box-shadow:0 4px 0 var(--ink-900); background:#fff; object-fit:cover;}
+  h1{font-family:var(--font-display); font-size:34px; line-height:.95; margin:0; letter-spacing:0; -webkit-text-stroke:1.4px var(--ink-900); text-shadow:3px 3px 0 var(--ink-900);}
+  .sub{font-weight:900; margin-top:3px;}
+  .home{display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:48px; padding:0 14px; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); background:#fff; color:var(--ink-900); text-decoration:none; font-weight:900;}
+  .wrap{display:grid; place-items:center;}
+  .card{width:min(560px,100%); background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:22px; box-shadow:0 7px 0 var(--ink-900); padding:24px;}
+  .card h2{font-family:var(--font-display); font-size:40px; line-height:1; margin:0 0 8px; color:#fff; -webkit-text-stroke:1.3px var(--ink-900); text-shadow:3px 3px 0 var(--ink-900);}
+  .card p{font-size:16px; line-height:1.45; font-weight:800; margin:0 0 16px; color:var(--ink-700);}
+  .tabs{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px;}
+  .tab{min-height:44px; border:3px solid var(--ink-900); border-radius:14px; box-shadow:0 4px 0 var(--ink-900); background:#fff; color:var(--ink-900); font-weight:900; cursor:pointer;}
+  .tab.active{background:var(--gold);}
+  label{display:block; font-weight:900; margin:12px 0 6px;}
+  input{width:100%; min-height:50px; border:3px solid var(--ink-900); border-radius:14px; padding:10px 12px; font:800 17px var(--font-body); color:var(--ink-900); background:#f8fbfd;}
+  input:focus{outline:4px solid rgba(255,210,74,.65);}
+  .submit{width:100%; min-height:56px; margin-top:18px; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 5px 0 var(--ink-900); background:var(--orange); color:#fff; font-size:18px; font-weight:900; cursor:pointer;}
+  .submit:disabled{opacity:.62; cursor:not-allowed;}
+  .msg{min-height:48px; margin-top:14px; padding:12px 14px; border:2px solid rgba(21,32,43,.14); border-radius:14px; background:#f7fafc; color:var(--ink-700); font-weight:900;}
+  .msg.good{background:rgba(53,184,82,.14); color:#196d2c;}
+  .msg.bad{background:rgba(223,75,75,.12); color:#9d2525;}
+  .privacy{font-size:13px!important; color:var(--ink-500)!important; margin-top:16px!important;}
+  @media (max-width:620px){
+    #app{padding:16px;}
+    .top{align-items:flex-start;}
+    h1{font-size:28px;}
+    .card{padding:18px;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="brand">
+      <img class="logo" src="../Hoofdzaak%20vs%20Detail/assets/logo-meesterdanny.png" alt="Meester Danny" />
+      <div>
+        <h1>Leerkracht</h1>
+        <div class="sub">Begrijpend lezen - Supertool</div>
+      </div>
+    </div>
+    <a class="home" href="../index.html">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+      Doelen
+    </a>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <h2>Inloggen</h2>
+      <p>Log in als leerkracht. Leerlingen krijgen later alleen een klascode, voornaam en korte code.</p>
+
+      <div class="tabs" role="tablist" aria-label="Login keuze">
+        <button class="tab active" type="button" data-mode="login">Inloggen</button>
+        <button class="tab" type="button" data-mode="signup">Account maken</button>
+      </div>
+
+      <form id="authForm">
+        <label for="email">E-mailadres</label>
+        <input id="email" name="email" type="email" autocomplete="email" required />
+
+        <label for="password">Wachtwoord</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" minlength="6" required />
+
+        <button class="submit" id="submitBtn" type="submit">Inloggen</button>
+      </form>
+
+      <div class="msg" id="message" aria-live="polite">Gebruik je leerkrachtaccount om klassen en taken te beheren.</div>
+      <p class="privacy">AVG-keuze: leerlingen krijgen geen eigen e-mailaccount. We bewaren straks alleen wat nodig is voor de taak en voortgang.</p>
+    </section>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../supabase-config.js"></script>
+<script src="supabase-client.js"></script>
+<script>
+  const client = window.createSupertoolClient();
+  const form = document.getElementById("authForm");
+  const submitBtn = document.getElementById("submitBtn");
+  const message = document.getElementById("message");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  let mode = "login";
+
+  function setMessage(text, kind) {
+    message.textContent = text;
+    message.classList.remove("good", "bad");
+    if (kind) message.classList.add(kind);
+  }
+
+  function setBusy(busy) {
+    submitBtn.disabled = busy;
+    submitBtn.textContent = busy ? "Even bezig..." : (mode === "login" ? "Inloggen" : "Account maken");
+  }
+
+  async function ensureProfile(user) {
+    if (!user || !user.id) return;
+    await client.from("teacher_profiles").upsert({
+      id: user.id,
+      display_name: user.email ? user.email.split("@")[0] : "Leerkracht"
+    });
+  }
+
+  document.querySelectorAll("[data-mode]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      mode = btn.getAttribute("data-mode");
+      document.querySelectorAll("[data-mode]").forEach((b) => b.classList.toggle("active", b === btn));
+      submitBtn.textContent = mode === "login" ? "Inloggen" : "Account maken";
+      passwordInput.setAttribute("autocomplete", mode === "login" ? "current-password" : "new-password");
+      setMessage(mode === "login" ? "Log in met je bestaande leerkrachtaccount." : "Maak een leerkrachtaccount aan met e-mail en wachtwoord.", "");
+    });
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    setBusy(true);
+    setMessage("We maken verbinding met Supabase...", "");
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    try {
+      if (mode === "login") {
+        const { data, error } = await client.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        await ensureProfile(data.user);
+        setMessage("Je bent ingelogd. We openen het dashboard.", "good");
+        window.location.href = "../dashboard/index.html";
+        return;
+      }
+
+      const { data, error } = await client.auth.signUp({ email, password });
+      if (error) throw error;
+      if (data.session && data.user) {
+        await ensureProfile(data.user);
+        setMessage("Account aangemaakt. We openen het dashboard.", "good");
+        window.location.href = "../dashboard/index.html";
+      } else {
+        setMessage("Account aangemaakt. Controleer je e-mail om je account te bevestigen en log daarna in.", "good");
+      }
+    } catch (error) {
+      setMessage(error.message || "Inloggen is niet gelukt. Controleer je gegevens.", "bad");
+    } finally {
+      setBusy(false);
+    }
+  });
+
+  client.auth.getSession().then(({ data }) => {
+    if (data.session) window.location.href = "../dashboard/index.html";
+  });
+</script>
+</body>
+</html>
