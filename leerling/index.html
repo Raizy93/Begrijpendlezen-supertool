@@ -277,7 +277,7 @@
 
   async function loadTasks(studentId, loginCode, displayName, className) {
     setMessage("Taken worden geladen...", "");
-    const { data, error } = await client.rpc("student_assignments", {
+    const { data, error } = await client.rpc("student_assignments_status", {
       p_student_id: studentId,
       p_login_code: loginCode
     });
@@ -307,11 +307,19 @@
       count.className = "pill";
       count.textContent = task.question_count + " vragen";
       info.append(title, mode, count);
+      if (task.completed) {
+        const done = document.createElement("span");
+        done.className = "pill";
+        done.textContent = "Afgerond: " + task.last_score + "/" + task.last_total;
+        info.appendChild(done);
+      }
       const btn = document.createElement("button");
       btn.className = "btn";
       btn.type = "button";
-      btn.textContent = "Start";
+      btn.textContent = task.completed ? "Afgerond" : "Start";
+      btn.disabled = !!task.completed;
       btn.addEventListener("click", () => {
+        if (task.completed) return;
         sessionStorage.setItem("supertool_assignment", JSON.stringify(task));
         window.location.href = "../Mixmodus/index.html?assignment=1";
       });
