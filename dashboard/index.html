@@ -40,8 +40,10 @@
   input:focus{outline:4px solid rgba(255,210,74,.65);}
   .formbtn{min-height:48px; border:3px solid var(--ink-900); border-radius:14px; box-shadow:0 4px 0 var(--ink-900); background:var(--orange); color:#fff; font-weight:900; padding:0 14px; cursor:pointer;}
   .formbtn:disabled{opacity:.62; cursor:not-allowed;}
+  .task-toggle{width:100%; margin:10px 0 12px; background:var(--gold); color:var(--ink-900);}
   .class-list{display:grid; gap:10px; margin-top:12px;}
   .class-card{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; align-items:center; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); padding:12px; background:linear-gradient(180deg,#fff,#f7fbfd);}
+  .class-card.is-open{background:linear-gradient(180deg,#fff,#f2fbff);}
   .class-card strong{display:block; font-size:20px; line-height:1.1;}
   .class-meta{display:flex; flex-wrap:wrap; gap:8px; margin-top:7px; align-items:center;}
   .code{display:inline-flex; align-items:center; min-height:30px; padding:4px 10px; border:2px solid var(--ink-900); border-radius:999px; background:var(--gold); font-weight:900; letter-spacing:.04em;}
@@ -142,7 +144,8 @@
 
     <section class="panel">
       <h2>Taken</h2>
-      <form class="task-form" id="taskForm">
+      <button class="formbtn task-toggle" id="taskFormToggle" type="button">Nieuwe taak maken</button>
+      <form class="task-form hidden" id="taskForm">
         <div>
           <label for="taskClass">Klas</label>
           <select id="taskClass" required></select>
@@ -202,6 +205,7 @@
   const classList = document.getElementById("classList");
   const classEmpty = document.getElementById("classEmpty");
   const classMessage = document.getElementById("classMessage");
+  const taskFormToggle = document.getElementById("taskFormToggle");
   const taskForm = document.getElementById("taskForm");
   const taskClass = document.getElementById("taskClass");
   const taskTitle = document.getElementById("taskTitle");
@@ -216,6 +220,8 @@
   let currentClasses = [];
   let currentTasks = [];
   let currentAttempts = [];
+  let taskFormOpen = false;
+  const openClassIds = new Set();
 
   const CODE_WORDS = ["BOEK", "ZON", "STER", "TAAL", "LEES", "PEN", "VLAM", "BRUG", "GOUD", "KERN", "WOLK", "MAAN"];
   const MIX_GOALS = [
@@ -240,6 +246,12 @@
     taskMessage.textContent = text;
     taskMessage.classList.remove("good", "bad");
     if (kind) taskMessage.classList.add(kind);
+  }
+
+  function setTaskFormOpen(open) {
+    taskFormOpen = open;
+    taskForm.classList.toggle("hidden", !open);
+    taskFormToggle.textContent = open ? "Taakformulier verbergen" : "Nieuwe taak maken";
   }
 
   function makeClassCode() {
@@ -295,8 +307,10 @@
     classList.innerHTML = "";
     classEmpty.classList.toggle("hidden", classes.length > 0);
     classes.forEach((klass) => {
+      const isOpen = openClassIds.has(klass.id);
       const card = document.createElement("article");
       card.className = "class-card";
+      card.classList.toggle("is-open", isOpen);
       const info = document.createElement("div");
       const title = document.createElement("strong");
       title.textContent = klass.name;
@@ -313,6 +327,18 @@
 
       const actions = document.createElement("div");
       actions.className = "mini-actions";
+      const toggleStudents = document.createElement("button");
+      toggleStudents.className = "smallbtn";
+      toggleStudents.type = "button";
+      toggleStudents.textContent = isOpen ? "Leerlingen verbergen" : "Leerlingen tonen";
+      toggleStudents.addEventListener("click", () => {
+        if (openClassIds.has(klass.id)) {
+          openClassIds.delete(klass.id);
+        } else {
+          openClassIds.add(klass.id);
+        }
+        renderClasses(currentClasses);
+      });
       const copy = document.createElement("button");
       copy.className = "smallbtn";
       copy.type = "button";
@@ -330,9 +356,10 @@
       archive.type = "button";
       archive.textContent = "Archiveer";
       archive.addEventListener("click", () => archiveClass(klass));
-      actions.append(copy, archive);
+      actions.append(toggleStudents, copy, archive);
 
       const studentsPanel = renderStudentsPanel(klass);
+      studentsPanel.classList.toggle("hidden", !isOpen);
       card.append(info, actions);
       card.appendChild(studentsPanel);
       classList.appendChild(card);
@@ -662,6 +689,7 @@
       });
       if (!error) {
         setClassMessage(displayName + " toegevoegd aan " + klass.name + ".", "good");
+        openClassIds.add(klass.id);
         await loadClasses();
         return;
       }
@@ -714,6 +742,7 @@
     }
     taskTitle.value = "";
     setTaskMessage("Taak klaargezet.", "good");
+    setTaskFormOpen(false);
     await loadTasks();
   }
 
@@ -777,6 +806,7 @@
 
   allGoalsBtn.addEventListener("click", () => setAllGoals(true));
   noGoalsBtn.addEventListener("click", () => setAllGoals(false));
+  taskFormToggle.addEventListener("click", () => setTaskFormOpen(!taskFormOpen));
 
   logoutBtn.addEventListener("click", async () => {
     await client.auth.signOut();
@@ -784,6 +814,7 @@
   });
 
   renderGoalChecks();
+  setTaskFormOpen(false);
   init();
 </script>
 </body>
