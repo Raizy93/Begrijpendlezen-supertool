@@ -36,7 +36,7 @@
   .panel p{font-size:16px; line-height:1.45; font-weight:800; color:var(--ink-700);}
   .class-form{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; align-items:end; margin:14px 0 16px;}
   label{display:block; font-weight:900; margin:0 0 6px; color:var(--ink-700);}
-  input{width:100%; min-height:48px; border:3px solid var(--ink-900); border-radius:14px; padding:10px 12px; font:800 17px var(--font-body); color:var(--ink-900); background:#f8fbfd;}
+  input,select{width:100%; min-height:48px; border:3px solid var(--ink-900); border-radius:14px; padding:10px 12px; font:800 17px var(--font-body); color:var(--ink-900); background:#f8fbfd;}
   input:focus{outline:4px solid rgba(255,210,74,.65);}
   .formbtn{min-height:48px; border:3px solid var(--ink-900); border-radius:14px; box-shadow:0 4px 0 var(--ink-900); background:var(--orange); color:#fff; font-weight:900; padding:0 14px; cursor:pointer;}
   .formbtn:disabled{opacity:.62; cursor:not-allowed;}
@@ -64,6 +64,22 @@
   .msg{min-height:42px; border:2px solid rgba(21,32,43,.14); border-radius:14px; padding:10px 12px; background:#f7fafc; color:var(--ink-700); font-weight:900;}
   .msg.good{background:rgba(53,184,82,.14); color:#196d2c;}
   .msg.bad{background:rgba(223,75,75,.12); color:#9d2525;}
+  .task-form{display:grid; gap:10px; margin:12px 0 14px;}
+  .count-row{display:grid; grid-template-columns:repeat(4,1fr); gap:8px;}
+  .count-choice{position:relative; display:block;}
+  .count-choice input{position:absolute; opacity:0; pointer-events:none;}
+  .count-choice span{display:grid; place-items:center; min-height:46px; border:3px solid var(--ink-900); border-radius:14px; box-shadow:0 4px 0 var(--ink-900); background:#fff; color:var(--ink-900); font-weight:900; cursor:pointer;}
+  .count-choice input:checked + span{background:var(--gold);}
+  .goal-checks{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px;}
+  .goal-check{display:flex; gap:8px; align-items:center; min-height:42px; padding:8px; border:2px solid rgba(21,32,43,.18); border-radius:12px; background:#fff; font-weight:900; cursor:pointer;}
+  .goal-check input{width:20px; min-height:20px; accent-color:var(--orange);}
+  .task-list{display:grid; gap:10px; margin-top:12px;}
+  .task-card{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; align-items:center; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); padding:12px; background:linear-gradient(180deg,#fff,#f7fbfd);}
+  .task-card strong{display:block; font-size:19px; line-height:1.15;}
+  .task-meta{display:flex; flex-wrap:wrap; gap:7px; margin-top:7px;}
+  .pill{display:inline-flex; min-height:28px; align-items:center; padding:3px 9px; border:2px solid var(--ink-900); border-radius:999px; background:#eef8ff; color:var(--ink-700); font-weight:900; font-size:13px;}
+  .pill.on{background:#e8fbef; color:#176b2a;}
+  .pill.off{background:#f4f0f0; color:#7a2b2b;}
   .empty{display:grid; place-items:center; min-height:160px; border:2px dashed rgba(21,32,43,.25); border-radius:16px; background:#f7fafc; text-align:center; padding:18px;}
   .status{font-weight:900; color:var(--ink-500);}
   .hidden{display:none!important;}
@@ -72,7 +88,8 @@
     .top{align-items:flex-start; flex-direction:column;}
     .actions{justify-content:flex-start;}
     .grid{grid-template-columns:1fr;}
-    .class-form,.class-card,.student-form,.student-row{grid-template-columns:1fr;}
+    .class-form,.class-card,.student-form,.student-row,.task-card{grid-template-columns:1fr;}
+    .goal-checks{grid-template-columns:1fr;}
     .mini-actions,.student-actions{justify-content:flex-start;}
     h1{font-size:28px;}
   }
@@ -117,7 +134,37 @@
 
     <section class="panel">
       <h2>Taken</h2>
-      <div class="empty">
+      <form class="task-form" id="taskForm">
+        <div>
+          <label for="taskClass">Klas</label>
+          <select id="taskClass" required></select>
+        </div>
+        <div>
+          <label for="taskTitle">Titel taak</label>
+          <input id="taskTitle" type="text" maxlength="80" placeholder="Bijvoorbeeld: Mix oefenen week 1" required />
+        </div>
+        <div>
+          <label>Aantal vragen</label>
+          <div class="count-row">
+            <label class="count-choice"><input type="radio" name="taskCount" value="10" checked /><span>10</span></label>
+            <label class="count-choice"><input type="radio" name="taskCount" value="15" /><span>15</span></label>
+            <label class="count-choice"><input type="radio" name="taskCount" value="20" /><span>20</span></label>
+            <label class="count-choice"><input type="radio" name="taskCount" value="30" /><span>30</span></label>
+          </div>
+        </div>
+        <div>
+          <label>Doelen in Mixmodus</label>
+          <div class="mini-actions" style="justify-content:flex-start; margin-bottom:8px;">
+            <button class="smallbtn" type="button" id="allGoalsBtn">Alle doelen</button>
+            <button class="smallbtn" type="button" id="noGoalsBtn">Geen</button>
+          </div>
+          <div class="goal-checks" id="goalChecks"></div>
+        </div>
+        <button class="formbtn" id="createTaskBtn" type="submit">Taak klaarzetten</button>
+      </form>
+      <div class="msg" id="taskMessage" aria-live="polite">Zet een Mixmodus-taak klaar voor een klas.</div>
+      <div class="task-list" id="taskList"></div>
+      <div class="empty hidden" id="taskEmpty">
         <div>
           <strong>Nog geen taken</strong>
           <p>In de MVP starten we met taken voor Mixmodus. Daarna kunnen losse doelen erbij.</p>
@@ -147,14 +194,43 @@
   const classList = document.getElementById("classList");
   const classEmpty = document.getElementById("classEmpty");
   const classMessage = document.getElementById("classMessage");
+  const taskForm = document.getElementById("taskForm");
+  const taskClass = document.getElementById("taskClass");
+  const taskTitle = document.getElementById("taskTitle");
+  const goalChecks = document.getElementById("goalChecks");
+  const taskMessage = document.getElementById("taskMessage");
+  const taskList = document.getElementById("taskList");
+  const taskEmpty = document.getElementById("taskEmpty");
+  const createTaskBtn = document.getElementById("createTaskBtn");
+  const allGoalsBtn = document.getElementById("allGoalsBtn");
+  const noGoalsBtn = document.getElementById("noGoalsBtn");
   let currentUser = null;
+  let currentClasses = [];
+  let currentTasks = [];
 
   const CODE_WORDS = ["BOEK", "ZON", "STER", "TAAL", "LEES", "PEN", "VLAM", "BRUG", "GOUD", "KERN", "WOLK", "MAAN"];
+  const MIX_GOALS = [
+    { id: "hzd", label: "Hoofdzaak of detail" },
+    { id: "td", label: "Tekstdoel herkennen" },
+    { id: "tsk", label: "Tekstsoort kiezen" },
+    { id: "fom", label: "Feit of mening" },
+    { id: "sign", label: "Signaalwoorden" },
+    { id: "vw", label: "Verwijswoorden" },
+    { id: "tk", label: "Titel of tussenkop" },
+    { id: "sam", label: "Samenvatting kiezen" },
+    { id: "conc", label: "Conclusie trekken" }
+  ];
 
   function setClassMessage(text, kind) {
     classMessage.textContent = text;
     classMessage.classList.remove("good", "bad");
     if (kind) classMessage.classList.add(kind);
+  }
+
+  function setTaskMessage(text, kind) {
+    taskMessage.textContent = text;
+    taskMessage.classList.remove("good", "bad");
+    if (kind) taskMessage.classList.add(kind);
   }
 
   function makeClassCode() {
@@ -172,6 +248,38 @@
       id: user.id,
       display_name: user.email ? user.email.split("@")[0] : "Leerkracht"
     });
+  }
+
+  function renderGoalChecks() {
+    goalChecks.innerHTML = "";
+    MIX_GOALS.forEach((goal) => {
+      const label = document.createElement("label");
+      label.className = "goal-check";
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.value = goal.id;
+      input.checked = true;
+      input.setAttribute("data-goal-check", "");
+      const span = document.createElement("span");
+      span.textContent = goal.label;
+      label.append(input, span);
+      goalChecks.appendChild(label);
+    });
+  }
+
+  function selectedGoals() {
+    return Array.from(goalChecks.querySelectorAll("[data-goal-check]"))
+      .filter((box) => box.checked)
+      .map((box) => box.value);
+  }
+
+  function setAllGoals(on) {
+    goalChecks.querySelectorAll("[data-goal-check]").forEach((box) => { box.checked = on; });
+  }
+
+  function selectedCount() {
+    const checked = taskForm.querySelector("input[name='taskCount']:checked");
+    return checked ? Number(checked.value) : 10;
   }
 
   function renderClasses(classes) {
@@ -219,6 +327,27 @@
       card.append(info, actions);
       card.appendChild(studentsPanel);
       classList.appendChild(card);
+    });
+  }
+
+  function renderClassOptions(classes) {
+    taskClass.innerHTML = "";
+    if (!classes.length) {
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = "Maak eerst een klas aan";
+      taskClass.appendChild(opt);
+      taskClass.disabled = true;
+      createTaskBtn.disabled = true;
+      return;
+    }
+    taskClass.disabled = false;
+    createTaskBtn.disabled = false;
+    classes.forEach((klass) => {
+      const opt = document.createElement("option");
+      opt.value = klass.id;
+      opt.textContent = klass.name + " (" + klass.class_code + ")";
+      taskClass.appendChild(opt);
     });
   }
 
@@ -342,8 +471,63 @@
       return;
     }
     const withStudents = await loadStudentsForClasses(data || []);
+    currentClasses = withStudents;
     renderClasses(withStudents);
+    renderClassOptions(withStudents);
     if ((data || []).length === 0) setClassMessage("Maak een klas aan. De klascode wordt automatisch gemaakt.", "");
+  }
+
+  async function loadTasks() {
+    const { data, error } = await client
+      .from("assignments")
+      .select("id,class_id,title,mode,goals,question_count,active,created_at,due_at")
+      .order("created_at", { ascending: false });
+    if (error) {
+      setTaskMessage("Taken laden lukte niet: " + error.message, "bad");
+      return;
+    }
+    currentTasks = data || [];
+    renderTasks(currentTasks);
+  }
+
+  function renderTasks(tasks) {
+    taskList.innerHTML = "";
+    taskEmpty.classList.toggle("hidden", tasks.length > 0);
+    tasks.forEach((task) => {
+      const klass = currentClasses.find((item) => item.id === task.class_id);
+      const card = document.createElement("article");
+      card.className = "task-card";
+      const info = document.createElement("div");
+      const title = document.createElement("strong");
+      title.textContent = task.title;
+      const meta = document.createElement("div");
+      meta.className = "task-meta";
+      const cls = document.createElement("span");
+      cls.className = "pill";
+      cls.textContent = klass ? klass.name : "Onbekende klas";
+      const count = document.createElement("span");
+      count.className = "pill";
+      count.textContent = task.question_count + " vragen";
+      const active = document.createElement("span");
+      active.className = "pill " + (task.active ? "on" : "off");
+      active.textContent = task.active ? "Actief" : "Uit";
+      const goals = document.createElement("span");
+      goals.className = "pill";
+      goals.textContent = (task.goals || []).length + " doelen";
+      meta.append(cls, count, goals, active);
+      info.append(title, meta);
+
+      const actions = document.createElement("div");
+      actions.className = "mini-actions";
+      const toggle = document.createElement("button");
+      toggle.className = "smallbtn";
+      toggle.type = "button";
+      toggle.textContent = task.active ? "Zet uit" : "Zet aan";
+      toggle.addEventListener("click", () => toggleTask(task));
+      actions.appendChild(toggle);
+      card.append(info, actions);
+      taskList.appendChild(card);
+    });
   }
 
   async function createClass(name) {
@@ -414,6 +598,58 @@
     setClassMessage("Leerlingcode botste te vaak. Probeer nog een keer.", "bad");
   }
 
+  async function createTask() {
+    if (!currentUser) return;
+    const classId = taskClass.value;
+    const title = taskTitle.value.trim();
+    const goals = selectedGoals();
+    if (!classId) {
+      setTaskMessage("Kies eerst een klas.", "bad");
+      return;
+    }
+    if (!title) {
+      setTaskMessage("Vul een taaknaam in.", "bad");
+      return;
+    }
+    if (!goals.length) {
+      setTaskMessage("Kies minimaal een doel voor Mixmodus.", "bad");
+      return;
+    }
+    createTaskBtn.disabled = true;
+    setTaskMessage("Taak wordt klaargezet...", "");
+    const { error } = await client.from("assignments").insert({
+      teacher_id: currentUser.id,
+      class_id: classId,
+      title,
+      mode: "mix",
+      goals,
+      question_count: selectedCount(),
+      settings: { source: "dashboard-v1" },
+      active: true
+    });
+    createTaskBtn.disabled = false;
+    if (error) {
+      setTaskMessage("Taak maken lukte niet: " + error.message, "bad");
+      return;
+    }
+    taskTitle.value = "";
+    setTaskMessage("Taak klaargezet.", "good");
+    await loadTasks();
+  }
+
+  async function toggleTask(task) {
+    const { error } = await client
+      .from("assignments")
+      .update({ active: !task.active })
+      .eq("id", task.id);
+    if (error) {
+      setTaskMessage("Taak aanpassen lukte niet: " + error.message, "bad");
+      return;
+    }
+    setTaskMessage(task.active ? "Taak uitgezet." : "Taak aangezet.", "good");
+    await loadTasks();
+  }
+
   async function deactivateStudent(klass, student) {
     const ok = window.confirm("Wil je " + student.display_name + " deactiveren in " + klass.name + "?");
     if (!ok) return;
@@ -439,6 +675,7 @@
     await ensureProfile(currentUser);
     welcome.textContent = "Welkom, " + (currentUser.email || "leerkracht") + ".";
     await loadClasses();
+    await loadTasks();
     loading.classList.add("hidden");
     dashboard.classList.remove("hidden");
   }
@@ -453,11 +690,20 @@
     await createClass(name);
   });
 
+  taskForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await createTask();
+  });
+
+  allGoalsBtn.addEventListener("click", () => setAllGoals(true));
+  noGoalsBtn.addEventListener("click", () => setAllGoals(false));
+
   logoutBtn.addEventListener("click", async () => {
     await client.auth.signOut();
     window.location.href = "../auth/login.html";
   });
 
+  renderGoalChecks();
   init();
 </script>
 </body>
