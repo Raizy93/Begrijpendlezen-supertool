@@ -299,6 +299,17 @@
     sessionStorage.removeItem("supertool_student");
   }
 
+  async function clearTeacherSession() {
+    try {
+      await client.auth.signOut({ scope: "local" });
+    } catch (error) {
+      // De leerlinglogin moet ook zonder netwerk een achtergebleven lokaal leerkrachtaccount wissen.
+    }
+    Object.keys(localStorage).forEach((key) => {
+      if (/^sb-.*-auth-token$/.test(key)) localStorage.removeItem(key);
+    });
+  }
+
   function renderStudents() {
     els.students.innerHTML = "";
     state.students.forEach((student) => {
@@ -364,6 +375,7 @@
       setMessage("Deze code klopt niet bij deze naam.", "bad");
       return;
     }
+    await clearTeacherSession();
     state.loginCode = loginCode;
     saveStudentSession(data[0], loginCode);
     await loadTasks(data[0].student_id, loginCode, data[0].display_name, data[0].class_name);

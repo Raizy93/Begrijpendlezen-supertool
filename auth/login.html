@@ -103,6 +103,14 @@
 <script src="../supabase-config.js"></script>
 <script src="supabase-client.js"></script>
 <script>
+  try {
+    const studentSession = JSON.parse(sessionStorage.getItem("supertool_student") || "null");
+    if (studentSession && studentSession.studentId && studentSession.loginCode) {
+      window.location.replace("../leerling/index.html");
+    }
+  } catch (error) {
+    sessionStorage.removeItem("supertool_student");
+  }
   const client = window.createSupertoolClient();
   const form = document.getElementById("authForm");
   const submitBtn = document.getElementById("submitBtn");

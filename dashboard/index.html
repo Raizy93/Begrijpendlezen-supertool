@@ -1545,6 +1545,15 @@
   }
 
   async function init() {
+    try {
+      const studentSession = JSON.parse(sessionStorage.getItem("supertool_student") || "null");
+      if (studentSession && studentSession.studentId && studentSession.loginCode) {
+        window.location.replace("../leerling/index.html");
+        return;
+      }
+    } catch (error) {
+      sessionStorage.removeItem("supertool_student");
+    }
     const { data } = await client.auth.getSession();
     if (!data.session) {
       window.location.href = "../auth/login.html";

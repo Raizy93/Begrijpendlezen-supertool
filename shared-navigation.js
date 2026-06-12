@@ -58,6 +58,7 @@
 
   const container = navigationContainer();
   if (!container || container.querySelector("[data-context-navigation]")) return;
+  const studentSession = readStudentSession();
   const fullscreenButton = container.querySelector("#fsBtn, .fsbtn");
   const insert = (link) => container.insertBefore(link, fullscreenButton || null);
   const hasGoalsLink = Array.from(container.querySelectorAll("a")).some((link) => {
@@ -68,6 +69,6 @@
     }
   });
   if (!hasGoalsLink) insert(makeLink(container, "Doelen", goalsUrl));
-  insert(makeLink(container, readStudentSession() ? "Mijn leren" : "Leerling", studentUrl));
-  if (hasTeacherSession()) insert(makeLink(container, "Dashboard", dashboardUrl));
+  insert(makeLink(container, studentSession ? "Mijn leren" : "Leerling", studentUrl));
+  if (!studentSession && hasTeacherSession()) insert(makeLink(container, "Dashboard", dashboardUrl));
 })();
