@@ -69,10 +69,11 @@
   .progress-header{display:grid; grid-template-columns:210px minmax(200px,1fr) 150px 145px 116px; gap:9px; padding:0 10px; color:var(--ink-500); font-size:12px; font-weight:900;}
   .progress-row{display:grid; grid-template-columns:210px minmax(200px,1fr) 150px 145px 116px; gap:9px; align-items:center; padding:9px 10px; border:2px solid rgba(21,32,43,.14); border-radius:12px; background:#fff;}
   .progress-name{font-weight:900; color:var(--ink-700);}
-  .progress-bar{height:14px; overflow:hidden; border:2px solid var(--ink-900); border-radius:999px; background:#edf2f5;}
-  .progress-fill{height:100%; min-width:2px; background:var(--red);}
+  .progress-bar{position:relative; height:24px; overflow:hidden; border:2px solid var(--ink-900); border-radius:999px; background:#edf2f5;}
+  .progress-fill{position:absolute; inset:0 auto 0 0; min-width:2px; background:var(--red);}
   .progress-fill.developing{background:var(--gold);}
   .progress-fill.strong{background:var(--green);}
+  .progress-percent{position:absolute; inset:0; z-index:1; display:grid; place-items:center; color:var(--ink-900); font-size:12px; font-weight:900; text-shadow:0 1px 0 rgba(255,255,255,.9); pointer-events:none;}
   .progress-score{text-align:left; font-weight:900; color:var(--ink-700); white-space:nowrap;}
   .growth{font-size:12px; line-height:1.25; font-weight:900; color:var(--ink-500);}
   .growth.up{color:#176b2a;}
@@ -569,7 +570,7 @@
     };
   }
 
-  function createProgressBar(percentage) {
+  function createProgressBar(percentage, showPercentage) {
     const bar = document.createElement("div");
     bar.className = "progress-bar";
     bar.setAttribute("aria-label", percentage + " procent");
@@ -579,6 +580,12 @@
     else if (percentage >= 60) fill.classList.add("developing");
     fill.style.width = percentage + "%";
     bar.appendChild(fill);
+    if (showPercentage) {
+      const label = document.createElement("span");
+      label.className = "progress-percent";
+      label.textContent = percentage + "%";
+      bar.appendChild(label);
+    }
     return bar;
   }
 
@@ -617,10 +624,10 @@
       const name = document.createElement("div");
       name.className = "progress-name";
       name.textContent = goal.label;
-      const bar = createProgressBar(goal.percentage);
+      const bar = createProgressBar(goal.percentage, true);
       const score = document.createElement("div");
       score.className = "progress-score";
-      score.textContent = levelLabel(goal.percentage) + " - " + goal.percentage + "%";
+      score.textContent = levelLabel(goal.percentage);
       const growth = document.createElement("div");
       growth.className = "growth";
       if (goal.development.status === "insufficient") {
