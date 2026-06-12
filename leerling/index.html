@@ -28,8 +28,8 @@
   h1{font-family:var(--font-display); font-size:34px; line-height:.95; margin:0; letter-spacing:0; -webkit-text-stroke:1.4px var(--ink-900); text-shadow:3px 3px 0 var(--ink-900);}
   .sub{font-weight:900; margin-top:3px;}
   .home{display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:48px; padding:0 14px; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); background:#fff; color:var(--ink-900); text-decoration:none; font-weight:900;}
-  .wrap{display:grid; place-items:center;}
-  .card{width:min(760px,100%); background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:22px; box-shadow:0 7px 0 var(--ink-900); padding:24px;}
+  .wrap{display:grid; place-items:start center;}
+  .card{width:min(1080px,100%); background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:22px; box-shadow:0 7px 0 var(--ink-900); padding:24px;}
   .card h2{font-family:var(--font-display); font-size:40px; line-height:1; margin:0 0 8px; color:#fff; -webkit-text-stroke:1.3px var(--ink-900); text-shadow:3px 3px 0 var(--ink-900);}
   .card p{font-size:16px; line-height:1.45; font-weight:800; margin:0 0 16px; color:var(--ink-700);}
   label{display:block; font-weight:900; margin:12px 0 6px;}
@@ -52,6 +52,36 @@
   .task strong{display:block; font-size:20px;}
   .pill{display:inline-flex; min-height:28px; align-items:center; padding:3px 9px; border:2px solid var(--ink-900); border-radius:999px; background:var(--gold); font-weight:900; margin:7px 6px 0 0;}
   .pill.done{background:#c9f2d4; color:#176b2a;}
+  .student-dashboard{display:grid; gap:18px;}
+  .student-section{display:grid; gap:10px;}
+  .section-head{display:flex; align-items:end; justify-content:space-between; gap:12px; border-bottom:2px solid rgba(21,32,43,.12); padding-bottom:8px;}
+  .section-head h3{margin:0; font-size:24px; color:var(--ink-900);}
+  .section-head span{color:var(--ink-500); font-size:13px; font-weight:900;}
+  .task-group{display:grid; gap:9px;}
+  .task-group-title{display:flex; align-items:center; justify-content:space-between; gap:8px; font-weight:900; color:var(--ink-700);}
+  .task-count{display:inline-flex; min-width:28px; min-height:26px; align-items:center; justify-content:center; border:2px solid var(--ink-900); border-radius:999px; background:#fff; padding:2px 7px;}
+  .completed-toggle{width:100%; min-height:44px; display:flex; align-items:center; justify-content:space-between; border:3px solid var(--ink-900); border-radius:14px; box-shadow:0 4px 0 var(--ink-900); padding:0 12px; background:#effcf3; color:var(--ink-900); font-weight:900; cursor:pointer;}
+  .task-details{grid-column:1/-1; display:grid; gap:6px; border-top:2px solid rgba(21,32,43,.12); padding-top:9px;}
+  .task-detail-row{display:grid; grid-template-columns:minmax(135px,1fr) minmax(100px,1.4fr) auto; gap:8px; align-items:center; padding:6px 8px; border:2px solid rgba(21,32,43,.12); border-radius:10px; background:#fff;}
+  .progress-grid{display:grid; gap:8px;}
+  .progress-row{display:grid; grid-template-columns:minmax(155px,1fr) minmax(130px,1.5fr) auto auto auto; gap:9px; align-items:center; padding:9px 10px; border:2px solid rgba(21,32,43,.14); border-radius:12px; background:#fff;}
+  .progress-name{font-weight:900; color:var(--ink-700);}
+  .progress-bar{height:14px; overflow:hidden; border:2px solid var(--ink-900); border-radius:999px; background:#edf2f5;}
+  .progress-fill{height:100%; min-width:2px; background:var(--red);}
+  .progress-fill.developing{background:var(--gold);}
+  .progress-fill.strong{background:var(--green);}
+  .progress-score{min-width:72px; text-align:right; font-weight:900; color:var(--ink-700);}
+  .growth{min-width:100px; font-size:12px; font-weight:900; color:var(--ink-500);}
+  .growth.up{color:#176b2a;}
+  .growth.down{color:#9d2525;}
+  .practice-btn{min-height:34px; border:2px solid var(--ink-900); border-radius:10px; box-shadow:0 3px 0 var(--ink-900); padding:0 9px; background:var(--gold); color:var(--ink-900); font-weight:900; cursor:pointer;}
+  .progress-advice{padding:11px 12px; border:2px solid #d69823; border-radius:12px; background:#fff5df; color:#744000; font-weight:900;}
+  .milestones{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px;}
+  .milestone{padding:11px; border:2px solid rgba(21,32,43,.16); border-radius:12px; background:#f7fafc;}
+  .milestone.earned{background:#e8fbef; border-color:#35b852;}
+  .milestone strong{display:block; margin-bottom:3px;}
+  .milestone span{color:var(--ink-500); font-size:12px; font-weight:800;}
+  .practice-note{margin:0!important; color:var(--ink-500)!important; font-size:12px!important;}
   .empty{display:grid; place-items:center; min-height:150px; border:2px dashed rgba(21,32,43,.25); border-radius:16px; background:#f7fafc; text-align:center; padding:18px; margin-top:14px;}
   .hidden{display:none!important;}
   @media (max-width:760px){
@@ -59,8 +89,10 @@
     .top{align-items:flex-start;}
     h1{font-size:28px;}
     .card{padding:18px;}
-    .row,.task{grid-template-columns:1fr;}
+    .row,.task,.task-detail-row,.progress-row{grid-template-columns:1fr;}
     .students{grid-template-columns:1fr;}
+    .milestones{grid-template-columns:1fr;}
+    .progress-score{text-align:left;}
   }
 </style>
 </head>
@@ -112,14 +144,40 @@
       </div>
 
       <div id="stepTasks" class="hidden">
-        <h2>Taken</h2>
+        <h2>Mijn leren</h2>
         <p id="taskIntro">Hier staan je klaargezette taken.</p>
-        <div id="taskList" class="task-list"></div>
-        <div id="taskEmpty" class="empty hidden">
-          <div>
-            <strong>Nog geen taken</strong>
-            <p>Je leerkracht heeft nog geen taak klaargezet voor deze klas.</p>
-          </div>
+        <div class="student-dashboard">
+          <section class="student-section">
+            <div class="section-head">
+              <h3>Mijn taken</h3>
+              <span>Maak eerst wat je leerkracht heeft klaargezet.</span>
+            </div>
+            <div id="taskList" class="task-list"></div>
+            <div id="taskEmpty" class="empty hidden">
+              <div>
+                <strong>Geen openstaande taken</strong>
+                <p>Je hebt alles af of je leerkracht heeft nog niets klaargezet.</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="student-section" id="progressSection">
+            <div class="section-head">
+              <h3>Mijn voortgang</h3>
+              <span>Gebaseerd op taken van je leerkracht.</span>
+            </div>
+            <div class="progress-advice" id="progressAdvice">Maak eerst een paar taken. Daarna zie je hier waar je sterk in bent en wat je nog kunt oefenen.</div>
+            <div class="progress-grid" id="progressGrid"></div>
+            <p class="practice-note">Zelf oefenen helpt je leren, maar telt voorlopig niet mee in deze voortgang.</p>
+          </section>
+
+          <section class="student-section">
+            <div class="section-head">
+              <h3>Mijn mijlpalen</h3>
+              <span>Kleine stappen tellen ook.</span>
+            </div>
+            <div class="milestones" id="milestones"></div>
+          </section>
         </div>
         <button class="btn secondary" id="studentLogout" type="button">Uitloggen</button>
       </div>
@@ -162,9 +220,28 @@
     taskIntro: document.getElementById("taskIntro"),
     taskList: document.getElementById("taskList"),
     taskEmpty: document.getElementById("taskEmpty"),
+    progressGrid: document.getElementById("progressGrid"),
+    progressAdvice: document.getElementById("progressAdvice"),
+    milestones: document.getElementById("milestones"),
     studentLogout: document.getElementById("studentLogout"),
     message: document.getElementById("message")
   };
+  let completedTasksOpen = false;
+  const openCompletedTaskIds = new Set();
+  let progressAttempts = [];
+  let currentStudentTasks = [];
+
+  const GOALS = [
+    { id: "hzd", label: "Hoofdzaak of detail", href: "../Hoofdzaak%20vs%20Detail/index.html" },
+    { id: "td", label: "Tekstdoel herkennen", href: "../Tekstdoel%20herkennen/index.html" },
+    { id: "tsk", label: "Tekstsoort kiezen", href: "../Tekstsoort%20kiezen/index.html" },
+    { id: "fom", label: "Feit of mening", href: "../Feit%20of%20mening/index.html" },
+    { id: "sign", label: "Signaalwoorden", href: "../Signaalwoorden/index.html" },
+    { id: "vw", label: "Verwijswoorden", href: "../Verwijswoorden/index.html" },
+    { id: "tk", label: "Titel of tussenkop", href: "../Titel%20of%20tussenkop/index.html" },
+    { id: "sam", label: "Samenvatting kiezen", href: "../Samenvatting%20kiezen/index.html" },
+    { id: "conc", label: "Conclusie trekken", href: "../Conclusie%20trekken/index.html" }
+  ];
 
   function show(step) {
     els.stepClass.classList.toggle("hidden", step !== "class");
@@ -279,24 +356,64 @@
 
   async function loadTasks(studentId, loginCode, displayName, className) {
     setMessage("Taken worden geladen...", "");
-    const { data, error } = await client.rpc("student_assignments_status", {
-      p_student_id: studentId,
-      p_login_code: loginCode
-    });
-    if (error) {
-      setMessage("Taken laden lukte niet: " + error.message, "bad");
+    const [taskResult, progressResult] = await Promise.all([
+      client.rpc("student_assignments_status", {
+        p_student_id: studentId,
+        p_login_code: loginCode
+      }),
+      client.rpc("student_progress", {
+        p_student_id: studentId,
+        p_login_code: loginCode
+      })
+    ]);
+    if (taskResult.error) {
+      setMessage("Taken laden lukte niet: " + taskResult.error.message, "bad");
       return;
     }
     els.taskIntro.textContent = "Welkom " + displayName + " uit " + className + ".";
-    renderTasks(data || []);
-    setMessage("Je bent ingelogd.", "good");
+    progressAttempts = progressResult.error ? [] : (progressResult.data || []);
+    renderTasks(taskResult.data || []);
+    renderProgress(progressAttempts);
+    renderMilestones(progressAttempts);
+    setMessage(progressResult.error
+      ? "Je taken zijn geladen. Je voortgang kon nog niet worden opgehaald."
+      : "Je taken en voortgang zijn geladen.", progressResult.error ? "bad" : "good");
     show("tasks");
   }
 
   function renderTasks(tasks) {
+    currentStudentTasks = tasks;
     els.taskList.innerHTML = "";
-    els.taskEmpty.classList.toggle("hidden", tasks.length > 0);
-    tasks.forEach((task) => {
+    const openTasks = tasks.filter((task) => !task.completed);
+    const completedTasks = tasks.filter((task) => task.completed);
+    els.taskEmpty.classList.toggle("hidden", openTasks.length > 0);
+
+    if (openTasks.length) {
+      const group = document.createElement("div");
+      group.className = "task-group";
+      const title = document.createElement("div");
+      title.className = "task-group-title";
+      title.innerHTML = "<span>Openstaande taken</span><span class=\"task-count\">" + openTasks.length + "</span>";
+      group.appendChild(title);
+      openTasks.forEach((task) => group.appendChild(renderTaskCard(task)));
+      els.taskList.appendChild(group);
+    }
+
+    if (completedTasks.length) {
+      const toggle = document.createElement("button");
+      toggle.className = "completed-toggle";
+      toggle.type = "button";
+      toggle.innerHTML = "<span>" + (completedTasksOpen ? "Afgeronde taken verbergen" : "Afgeronde taken") + "</span><span class=\"task-count\">" + completedTasks.length + "</span>";
+      toggle.addEventListener("click", () => {
+        completedTasksOpen = !completedTasksOpen;
+        renderTasks(tasks);
+      });
+      els.taskList.appendChild(toggle);
+      if (completedTasksOpen) completedTasks.forEach((task) => els.taskList.appendChild(renderTaskCard(task)));
+    }
+  }
+
+  function renderTaskCard(task) {
       const card = document.createElement("article");
       card.className = "task";
       if (task.completed) card.classList.add("done");
@@ -319,15 +436,191 @@
       const btn = document.createElement("button");
       btn.className = "btn";
       btn.type = "button";
-      btn.textContent = task.completed ? "Afgerond" : "Start";
-      btn.disabled = !!task.completed;
+      btn.textContent = task.completed
+        ? (openCompletedTaskIds.has(task.assignment_id) ? "Details verbergen" : "Bekijk details")
+        : "Start";
       btn.addEventListener("click", () => {
-        if (task.completed) return;
+        if (task.completed) {
+          if (openCompletedTaskIds.has(task.assignment_id)) openCompletedTaskIds.delete(task.assignment_id);
+          else openCompletedTaskIds.add(task.assignment_id);
+          renderTasksFromCurrentSession();
+          return;
+        }
         sessionStorage.setItem("supertool_assignment", JSON.stringify(task));
         window.location.href = "../Mixmodus/index.html?assignment=1";
       });
       card.append(info, btn);
-      els.taskList.appendChild(card);
+      if (task.completed && openCompletedTaskIds.has(task.assignment_id)) {
+        const latest = latestAttemptForAssignment(task.assignment_id);
+        const details = renderTaskDetails(latest);
+        card.appendChild(details);
+      }
+      return card;
+  }
+
+  function renderTasksFromCurrentSession() {
+    renderTasks(currentStudentTasks);
+  }
+
+  function latestAttemptForAssignment(assignmentId) {
+    return progressAttempts
+      .filter((attempt) => attempt.assignment_id === assignmentId)
+      .sort((a, b) => new Date(b.finished_at) - new Date(a.finished_at))[0] || null;
+  }
+
+  function normalizedSummary(summary) {
+    if (!summary || typeof summary !== "object") return [];
+    return Object.keys(summary).map((goalId) => ({
+      goalId,
+      good: Number((summary[goalId] || {}).good || 0),
+      total: Number((summary[goalId] || {}).total || 0)
+    })).filter((item) => item.total > 0);
+  }
+
+  function goalById(goalId) {
+    return GOALS.find((goal) => goal.id === goalId) || { id: goalId, label: goalId, href: "../index.html" };
+  }
+
+  function renderTaskDetails(attempt) {
+    const details = document.createElement("div");
+    details.className = "task-details";
+    if (!attempt) {
+      details.textContent = "De doelscores van deze taak zijn niet beschikbaar.";
+      return details;
+    }
+    normalizedSummary(attempt.goal_summary).forEach((item) => {
+      const goal = goalById(item.goalId);
+      const percentage = Math.round((item.good / item.total) * 100);
+      const row = document.createElement("div");
+      row.className = "task-detail-row";
+      const name = document.createElement("div");
+      name.className = "progress-name";
+      name.textContent = goal.label;
+      const bar = createProgressBar(percentage);
+      const score = document.createElement("div");
+      score.className = "progress-score";
+      score.textContent = item.good + "/" + item.total + " - " + percentage + "%";
+      row.append(name, bar, score);
+      details.appendChild(row);
+    });
+    return details;
+  }
+
+  function progressData(attempts) {
+    const byGoal = new Map();
+    attempts.slice().sort((a, b) => new Date(a.finished_at) - new Date(b.finished_at)).forEach((attempt) => {
+      normalizedSummary(attempt.goal_summary).forEach((item) => {
+        const current = byGoal.get(item.goalId) || { good: 0, total: 0, measurements: [] };
+        current.good += item.good;
+        current.total += item.total;
+        current.measurements.push({
+          percentage: Math.round((item.good / item.total) * 100),
+          date: attempt.finished_at
+        });
+        byGoal.set(item.goalId, current);
+      });
+    });
+    return GOALS.map((goal) => {
+      const value = byGoal.get(goal.id);
+      if (!value || !value.total) return null;
+      const first = value.measurements[0].percentage;
+      const latest = value.measurements[value.measurements.length - 1].percentage;
+      return {
+        ...goal,
+        good: value.good,
+        total: value.total,
+        percentage: Math.round((value.good / value.total) * 100),
+        first,
+        latest,
+        growth: latest - first,
+        measurements: value.measurements.length
+      };
+    }).filter(Boolean);
+  }
+
+  function createProgressBar(percentage) {
+    const bar = document.createElement("div");
+    bar.className = "progress-bar";
+    bar.setAttribute("aria-label", percentage + " procent");
+    const fill = document.createElement("div");
+    fill.className = "progress-fill";
+    if (percentage >= 80) fill.classList.add("strong");
+    else if (percentage >= 60) fill.classList.add("developing");
+    fill.style.width = percentage + "%";
+    bar.appendChild(fill);
+    return bar;
+  }
+
+  function levelLabel(percentage) {
+    if (percentage >= 80) return "Sterk";
+    if (percentage >= 60) return "Goed op weg";
+    return "Nog oefenen";
+  }
+
+  function renderProgress(attempts) {
+    els.progressGrid.innerHTML = "";
+    const data = progressData(attempts);
+    if (!data.length) {
+      els.progressAdvice.textContent = "Maak eerst een paar taken. Daarna zie je hier waar je sterk in bent en wat je nog kunt oefenen.";
+      return;
+    }
+    const lowest = data.reduce((current, goal) => !current || goal.percentage < current.percentage ? goal : current, null);
+    els.progressAdvice.textContent = lowest.percentage < 60
+      ? "Slim om nu te oefenen: " + lowest.label + ". Je staat hier op " + lowest.percentage + "%."
+      : lowest.percentage < 80
+        ? "Je bent goed op weg. Met extra oefenen in " + lowest.label + " kun je verder groeien."
+        : "Sterk gewerkt. Al je gemeten doelen staan op 80% of hoger.";
+
+    data.forEach((goal) => {
+      const row = document.createElement("div");
+      row.className = "progress-row";
+      const name = document.createElement("div");
+      name.className = "progress-name";
+      name.textContent = goal.label;
+      const bar = createProgressBar(goal.percentage);
+      const score = document.createElement("div");
+      score.className = "progress-score";
+      score.textContent = levelLabel(goal.percentage) + " - " + goal.percentage + "%";
+      const growth = document.createElement("div");
+      growth.className = "growth";
+      if (goal.measurements < 2) {
+        growth.textContent = "Nog 1 meting";
+      } else {
+        growth.textContent = goal.first + "% -> " + goal.latest + "%";
+        if (goal.growth >= 5) growth.classList.add("up");
+        else if (goal.growth <= -5) growth.classList.add("down");
+      }
+      const practice = document.createElement("button");
+      practice.className = "practice-btn";
+      practice.type = "button";
+      practice.textContent = "Oefen dit doel";
+      practice.addEventListener("click", () => { window.location.href = goal.href; });
+      row.append(name, bar, score, growth, practice);
+      els.progressGrid.appendChild(row);
+    });
+  }
+
+  function renderMilestones(attempts) {
+    els.milestones.innerHTML = "";
+    const data = progressData(attempts);
+    const completed = new Set(attempts.map((attempt) => attempt.assignment_id)).size;
+    const strongGoals = data.filter((goal) => goal.percentage >= 80).length;
+    const growingGoals = data.filter((goal) => goal.measurements >= 2 && goal.growth >= 10).length;
+    const milestones = [
+      { earned: completed >= 5, title: "Doorzetter", text: completed + " taken afgerond - doel: 5" },
+      { earned: data.length >= 9, title: "Alles geprobeerd", text: data.length + " van 9 leesdoelen geoefend" },
+      { earned: strongGoals >= 3, title: "Sterke basis", text: strongGoals + " doelen op 80% of hoger" },
+      { earned: growingGoals >= 1, title: "Ik groei", text: growingGoals + " doel(en) minstens 10 punten gegroeid" }
+    ];
+    milestones.forEach((item) => {
+      const card = document.createElement("div");
+      card.className = "milestone" + (item.earned ? " earned" : "");
+      const title = document.createElement("strong");
+      title.textContent = (item.earned ? "Behaald: " : "Volgende stap: ") + item.title;
+      const text = document.createElement("span");
+      text.textContent = item.text;
+      card.append(title, text);
+      els.milestones.appendChild(card);
     });
   }
 
