@@ -68,6 +68,9 @@
   .analysis-fill.strong{background:var(--green);}
   .analysis-score{min-width:82px; text-align:right; font-weight:900; color:var(--ink-700);}
   .analysis-note{margin:10px 0 0; color:var(--ink-500); font-size:12px; font-weight:800;}
+  .student-analysis-picker{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;}
+  .student-analysis-picker .smallbtn.selected{background:var(--gold);}
+  .student-analysis-title{margin:0 0 10px; font-size:18px; font-weight:900; color:var(--ink-900);}
   .student-form{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:end; margin-bottom:10px;}
   .student-form input{min-height:42px; border-width:2px; font-size:15px;}
   .student-form .formbtn{min-height:42px; border-width:2px; box-shadow:0 3px 0 var(--ink-900); background:var(--green);}
@@ -242,6 +245,8 @@
   let taskFormOpen = false;
   const openClassIds = new Set();
   const openClassAnalysisIds = new Set();
+  const openStudentAnalysisIds = new Set();
+  const selectedAnalysisStudentIds = new Map();
   const openTaskIds = new Set();
 
   const CODE_WORDS = ["BOEK", "ZON", "STER", "TAAL", "LEES", "PEN", "VLAM", "BRUG", "GOUD", "KERN", "WOLK", "MAAN"];
@@ -330,9 +335,10 @@
     classes.forEach((klass) => {
       const studentsOpen = openClassIds.has(klass.id);
       const analysisOpen = openClassAnalysisIds.has(klass.id);
+      const studentAnalysisOpen = openStudentAnalysisIds.has(klass.id);
       const card = document.createElement("article");
       card.className = "class-card";
-      card.classList.toggle("is-open", studentsOpen || analysisOpen);
+      card.classList.toggle("is-open", studentsOpen || analysisOpen || studentAnalysisOpen);
       const info = document.createElement("div");
       const title = document.createElement("strong");
       title.textContent = klass.name;
@@ -364,12 +370,24 @@
       const toggleAnalysis = document.createElement("button");
       toggleAnalysis.className = "smallbtn";
       toggleAnalysis.type = "button";
-      toggleAnalysis.textContent = analysisOpen ? "Analyse verbergen" : "Analyse tonen";
+      toggleAnalysis.textContent = analysisOpen ? "Groepsanalyse verbergen" : "Groepsanalyse tonen";
       toggleAnalysis.addEventListener("click", () => {
         if (openClassAnalysisIds.has(klass.id)) {
           openClassAnalysisIds.delete(klass.id);
         } else {
           openClassAnalysisIds.add(klass.id);
+        }
+        renderClasses(currentClasses);
+      });
+      const toggleStudentAnalysis = document.createElement("button");
+      toggleStudentAnalysis.className = "smallbtn";
+      toggleStudentAnalysis.type = "button";
+      toggleStudentAnalysis.textContent = studentAnalysisOpen ? "Leerlinganalyse verbergen" : "Analyse per leerling";
+      toggleStudentAnalysis.addEventListener("click", () => {
+        if (openStudentAnalysisIds.has(klass.id)) {
+          openStudentAnalysisIds.delete(klass.id);
+        } else {
+          openStudentAnalysisIds.add(klass.id);
         }
         renderClasses(currentClasses);
       });
@@ -390,14 +408,16 @@
       archive.type = "button";
       archive.textContent = "Archiveer";
       archive.addEventListener("click", () => archiveClass(klass));
-      actions.append(toggleStudents, toggleAnalysis, copy, archive);
+      actions.append(toggleStudents, toggleAnalysis, toggleStudentAnalysis, copy, archive);
 
       const studentsPanel = renderStudentsPanel(klass);
       studentsPanel.classList.toggle("hidden", !studentsOpen);
       const analysisPanel = renderClassAnalysisPanel(klass);
       analysisPanel.classList.toggle("hidden", !analysisOpen);
+      const studentAnalysisPanel = renderStudentAnalysisPanel(klass);
+      studentAnalysisPanel.classList.toggle("hidden", !studentAnalysisOpen);
       card.append(info, actions);
-      card.append(studentsPanel, analysisPanel);
+      card.append(studentsPanel, analysisPanel, studentAnalysisPanel);
       classList.appendChild(card);
     });
   }
@@ -468,11 +488,13 @@
     return panel;
   }
 
-  function classAnalysisData(klass) {
+  function classAnalysisData(klass, studentId) {
     const taskIds = new Set(currentTasks
       .filter((task) => task.class_id === klass.id)
       .map((task) => task.id));
-    const attempts = currentAttempts.filter((attempt) => taskIds.has(attempt.assignment_id));
+    const attempts = currentAttempts.filter((attempt) => {
+      return taskIds.has(attempt.assignment_id) && (!studentId || attempt.student_id === studentId);
+    });
     const byGoal = new Map();
 
     attempts.forEach((attempt) => {
@@ -579,6 +601,121 @@
     const note = document.createElement("p");
     note.className = "analysis-note";
     note.textContent = "Gebaseerd op " + data.attempts.length + " afgeronde " + (data.attempts.length === 1 ? "taakresultaat" : "taakresultaten") + ". Meer gemaakte vragen geven een betrouwbaarder groepsbeeld.";
+    panel.append(summary, advice, goalList, note);
+    return panel;
+  }
+
+  function renderStudentAnalysisPanel(klass) {
+    const panel = document.createElement("div");
+    panel.className = "analysis-panel";
+    const students = klass.students || [];
+
+    if (!students.length) {
+      const empty = document.createElement("div");
+      empty.className = "student-empty";
+      empty.textContent = "Voeg eerst leerlingen toe om individuele analyses te bekijken.";
+      panel.appendChild(empty);
+      return panel;
+    }
+
+    const picker = document.createElement("div");
+    picker.className = "student-analysis-picker";
+    const selectedId = selectedAnalysisStudentIds.get(klass.id);
+    students.forEach((student) => {
+      const button = document.createElement("button");
+      button.className = "smallbtn";
+      button.classList.toggle("selected", selectedId === student.id);
+      button.type = "button";
+      button.textContent = student.display_name;
+      button.addEventListener("click", () => {
+        selectedAnalysisStudentIds.set(klass.id, student.id);
+        renderClasses(currentClasses);
+      });
+      picker.appendChild(button);
+    });
+    panel.appendChild(picker);
+
+    const student = students.find((item) => item.id === selectedId);
+    if (!student) {
+      const prompt = document.createElement("div");
+      prompt.className = "student-empty";
+      prompt.textContent = "Kies een leerling om de persoonlijke analyse te bekijken.";
+      panel.appendChild(prompt);
+      return panel;
+    }
+
+    const title = document.createElement("h3");
+    title.className = "student-analysis-title";
+    title.textContent = "Analyse van " + student.display_name;
+    panel.appendChild(title);
+
+    const data = classAnalysisData(klass, student.id);
+    if (!data.attempts.length || !data.goals.length) {
+      const empty = document.createElement("div");
+      empty.className = "student-empty";
+      empty.textContent = student.display_name + " heeft nog geen afgeronde taken met analysegegevens.";
+      panel.appendChild(empty);
+      return panel;
+    }
+
+    const summary = document.createElement("div");
+    summary.className = "analysis-summary";
+    const stats = [
+      ["Gemiddelde", data.percentage + "%"],
+      ["Taken afgerond", String(data.attempts.length)],
+      ["Beantwoorde vragen", String(data.totalQuestions)]
+    ];
+    stats.forEach(([label, value]) => {
+      const stat = document.createElement("div");
+      stat.className = "analysis-stat";
+      const caption = document.createElement("span");
+      caption.textContent = label;
+      const number = document.createElement("strong");
+      number.textContent = value;
+      stat.append(caption, number);
+      summary.appendChild(stat);
+    });
+
+    const lowest = data.goals.reduce((lowestGoal, goal) => {
+      return !lowestGoal || goal.percentage < lowestGoal.percentage ? goal : lowestGoal;
+    }, null);
+    const advice = document.createElement("div");
+    advice.className = "analysis-advice";
+    if (lowest.percentage < 60) {
+      advice.textContent = "Extra aandacht: " + lowest.label + " (" + lowest.percentage + "%). " + student.display_name + " heeft bij dit doel de meeste ondersteuning nodig.";
+    } else if (lowest.percentage < 80) {
+      advice.textContent = "Verder ontwikkelen: " + lowest.label + " (" + lowest.percentage + "%). Plan hiervoor gerichte herhaling in.";
+    } else {
+      advice.textContent = "Sterk leerlingbeeld. Het laagst gemeten doel is " + lowest.label + " met " + lowest.percentage + "%.";
+    }
+
+    const goalList = document.createElement("div");
+    goalList.className = "analysis-goals";
+    data.goals.forEach((goal) => {
+      const row = document.createElement("div");
+      row.className = "analysis-row";
+      const name = document.createElement("div");
+      name.className = "analysis-goal";
+      name.textContent = goal.label;
+      const bar = document.createElement("div");
+      bar.className = "analysis-bar";
+      bar.setAttribute("aria-label", goal.label + ": " + goal.percentage + " procent");
+      const fill = document.createElement("div");
+      fill.className = "analysis-fill";
+      if (goal.percentage >= 80) fill.classList.add("strong");
+      else if (goal.percentage >= 60) fill.classList.add("developing");
+      fill.style.width = goal.percentage + "%";
+      bar.appendChild(fill);
+      const score = document.createElement("div");
+      score.className = "analysis-score";
+      score.textContent = goal.percentage + "% - " + goal.good + "/" + goal.total;
+      row.append(name, bar, score);
+      goalList.appendChild(row);
+    });
+
+    const note = document.createElement("p");
+    note.className = "analysis-note";
+    note.textContent = "Gebaseerd op " + data.attempts.length + " afgeronde " + (data.attempts.length === 1 ? "taak" : "taken") + ". Meer gemaakte vragen geven een betrouwbaarder leerlingbeeld.";
     panel.append(summary, advice, goalList, note);
     return panel;
   }
