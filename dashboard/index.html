@@ -45,7 +45,8 @@
   .class-card{display:grid; grid-template-columns:1fr; gap:14px; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); padding:14px; background:linear-gradient(180deg,#fff,#f7fbfd);}
   .class-card.is-open{background:linear-gradient(180deg,#fff,#f2fbff);}
   .class-card strong{display:block; font-size:21px; line-height:1.2; overflow-wrap:anywhere;}
-  .class-meta{display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; align-items:center;}
+  .class-title-row{display:flex; flex-wrap:wrap; gap:9px; align-items:center;}
+  .class-meta{display:flex; flex-wrap:wrap; gap:8px; margin-top:5px; align-items:center;}
   .class-actions{display:flex; gap:10px; flex-wrap:wrap; align-items:center; padding-top:12px; border-top:2px solid rgba(21,32,43,.12);}
   .code{display:inline-flex; align-items:center; min-height:30px; padding:4px 10px; border:2px solid var(--ink-900); border-radius:999px; background:var(--gold); font-weight:900; letter-spacing:.04em;}
   .muted{color:var(--ink-500); font-weight:900; font-size:13px;}
@@ -381,18 +382,21 @@
       card.className = "class-card";
       card.classList.toggle("is-open", studentsOpen || analysisOpen || studentAnalysisOpen);
       const info = document.createElement("div");
+      const titleRow = document.createElement("div");
+      titleRow.className = "class-title-row";
       const title = document.createElement("strong");
       title.textContent = klass.name;
-      const meta = document.createElement("div");
-      meta.className = "class-meta";
       const code = document.createElement("span");
       code.className = "code";
       code.textContent = "Klascode: " + klass.class_code;
+      titleRow.append(title, code);
+      const meta = document.createElement("div");
+      meta.className = "class-meta";
       const muted = document.createElement("span");
       muted.className = "muted";
-      muted.textContent = "Aangemaakt op " + new Date(klass.created_at).toLocaleDateString("nl-NL");
-      meta.append(code, muted);
-      info.append(title, meta);
+      muted.textContent = "Gemaakt op: " + new Date(klass.created_at).toLocaleDateString("nl-NL");
+      meta.append(muted);
+      info.append(titleRow, meta);
 
       const actions = document.createElement("div");
       actions.className = "class-actions";
