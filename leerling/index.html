@@ -66,15 +66,15 @@
   .task-details{grid-column:1/-1; display:grid; gap:6px; border-top:2px solid rgba(21,32,43,.12); padding-top:9px;}
   .task-detail-row{display:grid; grid-template-columns:minmax(135px,1fr) minmax(100px,1.4fr) auto; gap:8px; align-items:center; padding:6px 8px; border:2px solid rgba(21,32,43,.12); border-radius:10px; background:#fff;}
   .progress-grid{display:grid; gap:8px;}
-  .progress-header{display:grid; grid-template-columns:220px minmax(220px,1fr) 160px 105px 116px; gap:9px; padding:0 10px; color:var(--ink-500); font-size:12px; font-weight:900;}
-  .progress-row{display:grid; grid-template-columns:220px minmax(220px,1fr) 160px 105px 116px; gap:9px; align-items:center; padding:9px 10px; border:2px solid rgba(21,32,43,.14); border-radius:12px; background:#fff;}
+  .progress-header{display:grid; grid-template-columns:210px minmax(200px,1fr) 150px 145px 116px; gap:9px; padding:0 10px; color:var(--ink-500); font-size:12px; font-weight:900;}
+  .progress-row{display:grid; grid-template-columns:210px minmax(200px,1fr) 150px 145px 116px; gap:9px; align-items:center; padding:9px 10px; border:2px solid rgba(21,32,43,.14); border-radius:12px; background:#fff;}
   .progress-name{font-weight:900; color:var(--ink-700);}
   .progress-bar{height:14px; overflow:hidden; border:2px solid var(--ink-900); border-radius:999px; background:#edf2f5;}
   .progress-fill{height:100%; min-width:2px; background:var(--red);}
   .progress-fill.developing{background:var(--gold);}
   .progress-fill.strong{background:var(--green);}
   .progress-score{text-align:left; font-weight:900; color:var(--ink-700); white-space:nowrap;}
-  .growth{font-size:12px; font-weight:900; color:var(--ink-500); white-space:nowrap;}
+  .growth{font-size:12px; line-height:1.25; font-weight:900; color:var(--ink-500);}
   .growth.up{color:#176b2a;}
   .growth.down{color:#9d2525;}
   .practice-btn{min-height:34px; border:2px solid var(--ink-900); border-radius:10px; box-shadow:0 3px 0 var(--ink-900); padding:0 9px; background:var(--gold); color:var(--ink-900); font-weight:900; cursor:pointer;}
@@ -527,29 +527,46 @@
         const current = byGoal.get(item.goalId) || { good: 0, total: 0, measurements: [] };
         current.good += item.good;
         current.total += item.total;
-        current.measurements.push({
-          percentage: Math.round((item.good / item.total) * 100),
-          date: attempt.finished_at
-        });
+        current.measurements.push({ good: item.good, total: item.total, date: attempt.finished_at });
         byGoal.set(item.goalId, current);
       });
     });
     return GOALS.map((goal) => {
       const value = byGoal.get(goal.id);
       if (!value || !value.total) return null;
-      const first = value.measurements[0].percentage;
-      const latest = value.measurements[value.measurements.length - 1].percentage;
+      const development = developmentData(value.measurements);
       return {
         ...goal,
         good: value.good,
         total: value.total,
         percentage: Math.round((value.good / value.total) * 100),
-        first,
-        latest,
-        growth: latest - first,
+        development,
         measurements: value.measurements.length
       };
     }).filter(Boolean);
+  }
+
+  function developmentData(measurements) {
+    if (measurements.length < 4) return { status: "insufficient" };
+    const recentCount = measurements.length === 4 ? 2 : 3;
+    const recent = measurements.slice(-recentCount);
+    const earlier = measurements.slice(Math.max(0, measurements.length - recentCount - 3), -recentCount);
+    if (earlier.length < 2) return { status: "insufficient" };
+
+    const percentage = (items) => {
+      const good = items.reduce((sum, item) => sum + item.good, 0);
+      const total = items.reduce((sum, item) => sum + item.total, 0);
+      return total ? Math.round((good / total) * 100) : 0;
+    };
+    const earlierPercentage = percentage(earlier);
+    const recentPercentage = percentage(recent);
+    const difference = recentPercentage - earlierPercentage;
+    return {
+      status: difference >= 5 ? "up" : difference <= -5 ? "down" : "stable",
+      earlier: earlierPercentage,
+      recent: recentPercentage,
+      difference
+    };
   }
 
   function createProgressBar(percentage) {
@@ -587,7 +604,7 @@
 
     const header = document.createElement("div");
     header.className = "progress-header";
-    ["Leerdoel:", "Voortgang:", "Niveau:", "Groei:", "Zelf oefenen:"].forEach((label) => {
+    ["Leerdoel:", "Voortgang:", "Niveau:", "Ontwikkeling:", "Zelf oefenen:"].forEach((label) => {
       const cell = document.createElement("div");
       cell.textContent = label;
       header.appendChild(cell);
@@ -606,13 +623,18 @@
       score.textContent = levelLabel(goal.percentage) + " - " + goal.percentage + "%";
       const growth = document.createElement("div");
       growth.className = "growth";
-      if (goal.measurements < 2) {
-        growth.textContent = "Nog 1 meting";
+      if (goal.development.status === "insufficient") {
+        growth.textContent = "Nog te weinig metingen";
+      } else if (goal.development.status === "up") {
+        growth.textContent = "Vooruitgegaan\n" + goal.development.earlier + "% -> " + goal.development.recent + "%";
+        growth.classList.add("up");
+      } else if (goal.development.status === "down") {
+        growth.textContent = "Extra aandacht\n" + goal.development.earlier + "% -> " + goal.development.recent + "%";
+        growth.classList.add("down");
       } else {
-        growth.textContent = goal.first + "% -> " + goal.latest + "%";
-        if (goal.growth >= 5) growth.classList.add("up");
-        else if (goal.growth <= -5) growth.classList.add("down");
+        growth.textContent = "Stabiel\n" + goal.development.earlier + "% -> " + goal.development.recent + "%";
       }
+      growth.style.whiteSpace = "pre-line";
       const practice = document.createElement("button");
       practice.className = "practice-btn";
       practice.type = "button";
@@ -629,13 +651,13 @@
     const completed = new Set(attempts.map((attempt) => attempt.assignment_id)).size;
     const answeredQuestions = attempts.reduce((sum, attempt) => sum + Number(attempt.total || 0), 0);
     const strongGoals = data.filter((goal) => goal.percentage >= 80).length;
-    const growingGoals = data.filter((goal) => goal.measurements >= 2 && goal.growth >= 10).length;
+    const growingGoals = data.filter((goal) => goal.development.status === "up").length;
     const milestones = [
       milestoneSteps("Doorzetter", completed, 5, "taken afgerond", "5"),
       milestoneSteps("Vragenmaker", answeredQuestions, 30, "vragen beantwoord", "30"),
       milestoneLimited("Alles geprobeerd", data.length, 9, "leesdoelen geoefend", "9"),
       milestoneLimited("Sterke basis", strongGoals, 9, "doelen op 80% of hoger", "80"),
-      milestoneLimited("Ik groei", growingGoals, 9, "doelen minstens 10 punten gegroeid", "+")
+      milestoneLimited("Ik ontwikkel", growingGoals, 9, "doelen vooruitgegaan", "+")
     ];
     milestones.forEach((item) => {
       const card = document.createElement("div");
