@@ -27,7 +27,9 @@
   .logo{width:54px; height:54px; border-radius:50%; border:3px solid var(--ink-900); box-shadow:0 4px 0 var(--ink-900); background:#fff; object-fit:cover;}
   h1{font-family:var(--font-display); font-size:34px; line-height:.95; margin:0; letter-spacing:0; -webkit-text-stroke:1.4px var(--ink-900); text-shadow:3px 3px 0 var(--ink-900);}
   .sub{font-weight:900; margin-top:3px;}
-  .home{display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:48px; padding:0 14px; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); background:#fff; color:var(--ink-900); text-decoration:none; font-weight:900;}
+  .top-actions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;}
+  .home{display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:48px; padding:0 14px; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); background:#fff; color:var(--ink-900); text-decoration:none; font-weight:900; cursor:pointer;}
+  .home.logout{background:var(--gold);}
   .wrap{display:grid; place-items:start center;}
   .card{width:min(1080px,100%); background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:22px; box-shadow:0 7px 0 var(--ink-900); padding:24px;}
   .card h2{font-family:var(--font-display); font-size:40px; line-height:1; margin:0 0 8px; color:#fff; -webkit-text-stroke:1.3px var(--ink-900); text-shadow:3px 3px 0 var(--ink-900);}
@@ -64,29 +66,35 @@
   .task-details{grid-column:1/-1; display:grid; gap:6px; border-top:2px solid rgba(21,32,43,.12); padding-top:9px;}
   .task-detail-row{display:grid; grid-template-columns:minmax(135px,1fr) minmax(100px,1.4fr) auto; gap:8px; align-items:center; padding:6px 8px; border:2px solid rgba(21,32,43,.12); border-radius:10px; background:#fff;}
   .progress-grid{display:grid; gap:8px;}
-  .progress-row{display:grid; grid-template-columns:minmax(155px,1fr) minmax(130px,1.5fr) auto auto auto; gap:9px; align-items:center; padding:9px 10px; border:2px solid rgba(21,32,43,.14); border-radius:12px; background:#fff;}
+  .progress-row{display:grid; grid-template-columns:220px minmax(220px,1fr) 160px 105px 116px; gap:9px; align-items:center; padding:9px 10px; border:2px solid rgba(21,32,43,.14); border-radius:12px; background:#fff;}
   .progress-name{font-weight:900; color:var(--ink-700);}
   .progress-bar{height:14px; overflow:hidden; border:2px solid var(--ink-900); border-radius:999px; background:#edf2f5;}
   .progress-fill{height:100%; min-width:2px; background:var(--red);}
   .progress-fill.developing{background:var(--gold);}
   .progress-fill.strong{background:var(--green);}
-  .progress-score{min-width:72px; text-align:right; font-weight:900; color:var(--ink-700);}
-  .growth{min-width:100px; font-size:12px; font-weight:900; color:var(--ink-500);}
+  .progress-score{text-align:left; font-weight:900; color:var(--ink-700); white-space:nowrap;}
+  .growth{font-size:12px; font-weight:900; color:var(--ink-500); white-space:nowrap;}
   .growth.up{color:#176b2a;}
   .growth.down{color:#9d2525;}
   .practice-btn{min-height:34px; border:2px solid var(--ink-900); border-radius:10px; box-shadow:0 3px 0 var(--ink-900); padding:0 9px; background:var(--gold); color:var(--ink-900); font-weight:900; cursor:pointer;}
   .progress-advice{padding:11px 12px; border:2px solid #d69823; border-radius:12px; background:#fff5df; color:#744000; font-weight:900;}
-  .milestones{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px;}
-  .milestone{padding:11px; border:2px solid rgba(21,32,43,.16); border-radius:12px; background:#f7fafc;}
+  .milestones{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px;}
+  .milestone{display:grid; grid-template-columns:48px minmax(0,1fr); gap:10px; align-items:center; padding:12px; border:2px solid rgba(21,32,43,.16); border-radius:12px; background:#f7fafc;}
   .milestone.earned{background:#e8fbef; border-color:#35b852;}
-  .milestone strong{display:block; margin-bottom:3px;}
-  .milestone span{color:var(--ink-500); font-size:12px; font-weight:800;}
+  .milestone-icon{width:48px; height:48px; display:grid; place-items:center; border:2px solid var(--ink-900); border-radius:50%; background:#fff; color:var(--ink-700); font-size:22px; font-weight:900;}
+  .milestone.earned .milestone-icon{background:var(--green); color:#fff;}
+  .milestone-copy strong{display:block; margin-bottom:3px; font-size:16px;}
+  .milestone-copy span{display:block; color:var(--ink-500); font-size:12px; font-weight:800;}
+  .milestone-track{height:8px; overflow:hidden; margin-top:7px; border:1px solid var(--ink-900); border-radius:999px; background:#e6ecef;}
+  .milestone-fill{height:100%; background:var(--gold);}
+  .milestone.earned .milestone-fill{background:var(--green);}
   .practice-note{margin:0!important; color:var(--ink-500)!important; font-size:12px!important;}
   .empty{display:grid; place-items:center; min-height:150px; border:2px dashed rgba(21,32,43,.25); border-radius:16px; background:#f7fafc; text-align:center; padding:18px; margin-top:14px;}
   .hidden{display:none!important;}
   @media (max-width:760px){
     #app{padding:16px;}
-    .top{align-items:flex-start;}
+    .top{align-items:flex-start; flex-direction:column;}
+    .top-actions{justify-content:flex-start;}
     h1{font-size:28px;}
     .card{padding:18px;}
     .row,.task,.task-detail-row,.progress-row{grid-template-columns:1fr;}
@@ -106,7 +114,10 @@
         <div class="sub">Begrijpend lezen - Supertool</div>
       </div>
     </div>
-    <a class="home" href="../index.html">Doelen</a>
+    <div class="top-actions">
+      <a class="home" href="../index.html">Doelen</a>
+      <button class="home logout hidden" id="studentLogout" type="button">Uitloggen</button>
+    </div>
   </header>
 
   <main class="wrap">
@@ -179,7 +190,6 @@
             <div class="milestones" id="milestones"></div>
           </section>
         </div>
-        <button class="btn secondary" id="studentLogout" type="button">Uitloggen</button>
       </div>
 
       <div class="msg" id="message" aria-live="polite">We bewaren alleen wat nodig is voor je taak en voortgang.</div>
@@ -248,6 +258,7 @@
     els.stepStudent.classList.toggle("hidden", step !== "student");
     els.stepCode.classList.toggle("hidden", step !== "code");
     els.stepTasks.classList.toggle("hidden", step !== "tasks");
+    els.studentLogout.classList.toggle("hidden", step !== "tasks");
   }
 
   function setMessage(text, kind) {
@@ -607,19 +618,31 @@
     const strongGoals = data.filter((goal) => goal.percentage >= 80).length;
     const growingGoals = data.filter((goal) => goal.measurements >= 2 && goal.growth >= 10).length;
     const milestones = [
-      { earned: completed >= 5, title: "Doorzetter", text: completed + " taken afgerond - doel: 5" },
-      { earned: data.length >= 9, title: "Alles geprobeerd", text: data.length + " van 9 leesdoelen geoefend" },
-      { earned: strongGoals >= 3, title: "Sterke basis", text: strongGoals + " doelen op 80% of hoger" },
-      { earned: growingGoals >= 1, title: "Ik groei", text: growingGoals + " doel(en) minstens 10 punten gegroeid" }
+      { earned: completed >= 5, title: "Doorzetter", text: completed + " taken afgerond", value: completed, target: 5, icon: "5" },
+      { earned: data.length >= 9, title: "Alles geprobeerd", text: data.length + " van 9 leesdoelen geoefend", value: data.length, target: 9, icon: "9" },
+      { earned: strongGoals >= 3, title: "Sterke basis", text: strongGoals + " doelen op 80% of hoger", value: strongGoals, target: 3, icon: "80" },
+      { earned: growingGoals >= 1, title: "Ik groei", text: growingGoals + " doel(en) minstens 10 punten gegroeid", value: growingGoals, target: 1, icon: "+" }
     ];
     milestones.forEach((item) => {
       const card = document.createElement("div");
       card.className = "milestone" + (item.earned ? " earned" : "");
+      const icon = document.createElement("div");
+      icon.className = "milestone-icon";
+      icon.textContent = item.earned ? "OK" : item.icon;
+      const copy = document.createElement("div");
+      copy.className = "milestone-copy";
       const title = document.createElement("strong");
       title.textContent = (item.earned ? "Behaald: " : "Volgende stap: ") + item.title;
       const text = document.createElement("span");
       text.textContent = item.text;
-      card.append(title, text);
+      const track = document.createElement("div");
+      track.className = "milestone-track";
+      const fill = document.createElement("div");
+      fill.className = "milestone-fill";
+      fill.style.width = Math.min(100, Math.round((item.value / item.target) * 100)) + "%";
+      track.appendChild(fill);
+      copy.append(title, text, track);
+      card.append(icon, copy);
       els.milestones.appendChild(card);
     });
   }
