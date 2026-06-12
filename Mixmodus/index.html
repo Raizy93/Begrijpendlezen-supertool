@@ -231,5 +231,6 @@
   function exitFS(){ const x = document.exitFullscreen || document.webkitExitFullscreen; if (x) { try { const p = x.call(document); if (p && p.catch) p.catch(()=>{}); } catch(e){} } }
   fsBtn.addEventListener("click", function(){ fsElement() ? exitFS() : enterFS(); });
 </script>
+<script src="../shared-navigation.js"></script>
 </body>
 </html>

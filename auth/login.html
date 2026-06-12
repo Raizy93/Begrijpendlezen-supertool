@@ -22,12 +22,13 @@
   }
   body::before{content:""; position:fixed; inset:0; pointer-events:none; opacity:.48; background-image:radial-gradient(rgba(255,255,255,.16) 2px, transparent 2px); background-size:34px 34px;}
   #app{min-height:100vh; display:grid; grid-template-rows:auto 1fr; gap:22px; padding:22px; position:relative; z-index:1;}
-  .top{display:flex; align-items:center; justify-content:space-between; gap:14px;}
+  .top{display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;}
   .brand{display:flex; align-items:center; gap:12px; min-width:0;}
   .logo{width:54px; height:54px; border-radius:50%; border:3px solid var(--ink-900); box-shadow:0 4px 0 var(--ink-900); background:#fff; object-fit:cover;}
   h1{font-family:var(--font-display); font-size:34px; line-height:.95; margin:0; letter-spacing:0; -webkit-text-stroke:1.4px var(--ink-900); text-shadow:3px 3px 0 var(--ink-900);}
   .sub{font-weight:900; margin-top:3px;}
   .home{display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:48px; padding:0 14px; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); background:#fff; color:var(--ink-900); text-decoration:none; font-weight:900;}
+  .top-actions{display:flex; align-items:center; justify-content:flex-end; gap:10px; flex-wrap:wrap;}
   .wrap{display:grid; place-items:center;}
   .card{width:min(560px,100%); background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:22px; box-shadow:0 7px 0 var(--ink-900); padding:24px;}
   .card h2{font-family:var(--font-display); font-size:40px; line-height:1; margin:0 0 8px; color:#fff; -webkit-text-stroke:1.3px var(--ink-900); text-shadow:3px 3px 0 var(--ink-900);}
@@ -47,6 +48,7 @@
   @media (max-width:620px){
     #app{padding:16px;}
     .top{align-items:flex-start;}
+    .top-actions{justify-content:flex-start;}
     h1{font-size:28px;}
     .card{padding:18px;}
   }
@@ -62,10 +64,13 @@
         <div class="sub">Begrijpend lezen - Supertool</div>
       </div>
     </div>
-    <a class="home" href="../index.html">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
-      Doelen
-    </a>
+    <div class="top-actions">
+      <a class="home" href="../leerling/index.html">Leerling</a>
+      <a class="home" href="../index.html">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>
+        Doelen
+      </a>
+    </div>
   </header>
 
   <main class="wrap">
