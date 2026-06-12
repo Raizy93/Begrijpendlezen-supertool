@@ -66,6 +66,7 @@
   .task-details{grid-column:1/-1; display:grid; gap:6px; border-top:2px solid rgba(21,32,43,.12); padding-top:9px;}
   .task-detail-row{display:grid; grid-template-columns:minmax(135px,1fr) minmax(100px,1.4fr) auto; gap:8px; align-items:center; padding:6px 8px; border:2px solid rgba(21,32,43,.12); border-radius:10px; background:#fff;}
   .progress-grid{display:grid; gap:8px;}
+  .progress-header{display:grid; grid-template-columns:220px minmax(220px,1fr) 160px 105px 116px; gap:9px; padding:0 10px; color:var(--ink-500); font-size:12px; font-weight:900;}
   .progress-row{display:grid; grid-template-columns:220px minmax(220px,1fr) 160px 105px 116px; gap:9px; align-items:center; padding:9px 10px; border:2px solid rgba(21,32,43,.14); border-radius:12px; background:#fff;}
   .progress-name{font-weight:900; color:var(--ink-700);}
   .progress-bar{height:14px; overflow:hidden; border:2px solid var(--ink-900); border-radius:999px; background:#edf2f5;}
@@ -85,6 +86,7 @@
   .milestone.earned .milestone-icon{background:var(--green); color:#fff;}
   .milestone-copy strong{display:block; margin-bottom:3px; font-size:16px;}
   .milestone-copy span{display:block; color:var(--ink-500); font-size:12px; font-weight:800;}
+  .milestone-copy .milestone-next{margin-top:4px; color:var(--ink-700); font-weight:900;}
   .milestone-track{height:8px; overflow:hidden; margin-top:7px; border:1px solid var(--ink-900); border-radius:999px; background:#e6ecef;}
   .milestone-fill{height:100%; background:var(--gold);}
   .milestone.earned .milestone-fill{background:var(--green);}
@@ -98,6 +100,7 @@
     h1{font-size:28px;}
     .card{padding:18px;}
     .row,.task,.task-detail-row,.progress-row{grid-template-columns:1fr;}
+    .progress-header{display:none;}
     .students{grid-template-columns:1fr;}
     .milestones{grid-template-columns:1fr;}
     .progress-score{text-align:left;}
@@ -582,6 +585,15 @@
         ? "Je bent goed op weg. Met extra oefenen in " + lowest.label + " kun je verder groeien."
         : "Sterk gewerkt. Al je gemeten doelen staan op 80% of hoger.";
 
+    const header = document.createElement("div");
+    header.className = "progress-header";
+    ["Leerdoel:", "Voortgang:", "Niveau:", "Groei:", "Zelf oefenen:"].forEach((label) => {
+      const cell = document.createElement("div");
+      cell.textContent = label;
+      header.appendChild(cell);
+    });
+    els.progressGrid.appendChild(header);
+
     data.forEach((goal) => {
       const row = document.createElement("div");
       row.className = "progress-row";
@@ -615,13 +627,15 @@
     els.milestones.innerHTML = "";
     const data = progressData(attempts);
     const completed = new Set(attempts.map((attempt) => attempt.assignment_id)).size;
+    const answeredQuestions = attempts.reduce((sum, attempt) => sum + Number(attempt.total || 0), 0);
     const strongGoals = data.filter((goal) => goal.percentage >= 80).length;
     const growingGoals = data.filter((goal) => goal.measurements >= 2 && goal.growth >= 10).length;
     const milestones = [
-      { earned: completed >= 5, title: "Doorzetter", text: completed + " taken afgerond", value: completed, target: 5, icon: "5" },
-      { earned: data.length >= 9, title: "Alles geprobeerd", text: data.length + " van 9 leesdoelen geoefend", value: data.length, target: 9, icon: "9" },
-      { earned: strongGoals >= 3, title: "Sterke basis", text: strongGoals + " doelen op 80% of hoger", value: strongGoals, target: 3, icon: "80" },
-      { earned: growingGoals >= 1, title: "Ik groei", text: growingGoals + " doel(en) minstens 10 punten gegroeid", value: growingGoals, target: 1, icon: "+" }
+      milestoneSteps("Doorzetter", completed, 5, "taken afgerond", "5"),
+      milestoneSteps("Vragenmaker", answeredQuestions, 30, "vragen beantwoord", "30"),
+      milestoneLimited("Alles geprobeerd", data.length, 9, "leesdoelen geoefend", "9"),
+      milestoneLimited("Sterke basis", strongGoals, 9, "doelen op 80% of hoger", "80"),
+      milestoneLimited("Ik groei", growingGoals, 9, "doelen minstens 10 punten gegroeid", "+")
     ];
     milestones.forEach((item) => {
       const card = document.createElement("div");
@@ -635,16 +649,53 @@
       title.textContent = (item.earned ? "Behaald: " : "Volgende stap: ") + item.title;
       const text = document.createElement("span");
       text.textContent = item.text;
+      const next = document.createElement("span");
+      next.className = "milestone-next";
+      next.textContent = item.complete ? "Alle stappen van deze mijlpaal zijn behaald." : "Volgende mijlpaal: " + item.target + " " + item.unit;
       const track = document.createElement("div");
       track.className = "milestone-track";
       const fill = document.createElement("div");
       fill.className = "milestone-fill";
-      fill.style.width = Math.min(100, Math.round((item.value / item.target) * 100)) + "%";
+      fill.style.width = item.progress + "%";
       track.appendChild(fill);
-      copy.append(title, text, track);
+      copy.append(title, text, next, track);
       card.append(icon, copy);
       els.milestones.appendChild(card);
     });
+  }
+
+  function milestoneSteps(title, value, step, unit, icon) {
+    const reached = Math.floor(value / step) * step;
+    const target = reached + step;
+    const progress = Math.round(((value - reached) / step) * 100);
+    return {
+      title,
+      value,
+      target,
+      unit,
+      icon,
+      earned: reached >= step,
+      complete: false,
+      progress,
+      text: value + " " + unit + (reached >= step ? " - laatste mijlpaal: " + reached : "")
+    };
+  }
+
+  function milestoneLimited(title, value, maximum, unit, icon) {
+    const complete = value >= maximum;
+    const target = complete ? maximum : Math.min(maximum, value + 1);
+    const progress = complete ? 100 : Math.round((value / Math.max(1, target)) * 100);
+    return {
+      title,
+      value,
+      target,
+      unit,
+      icon,
+      earned: value > 0,
+      complete,
+      progress,
+      text: value + " van " + maximum + " " + unit
+    };
   }
 
   els.classForm.addEventListener("submit", (event) => {
