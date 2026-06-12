@@ -42,10 +42,11 @@
   .formbtn:disabled{opacity:.62; cursor:not-allowed;}
   .task-toggle{width:100%; margin:10px 0 12px; background:var(--gold); color:var(--ink-900);}
   .class-list{display:grid; gap:10px; margin-top:12px;}
-  .class-card{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; align-items:center; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); padding:12px; background:linear-gradient(180deg,#fff,#f7fbfd);}
+  .class-card{display:grid; grid-template-columns:1fr; gap:14px; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); padding:14px; background:linear-gradient(180deg,#fff,#f7fbfd);}
   .class-card.is-open{background:linear-gradient(180deg,#fff,#f2fbff);}
-  .class-card strong{display:block; font-size:20px; line-height:1.1;}
-  .class-meta{display:flex; flex-wrap:wrap; gap:8px; margin-top:7px; align-items:center;}
+  .class-card strong{display:block; font-size:21px; line-height:1.2; overflow-wrap:anywhere;}
+  .class-meta{display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; align-items:center;}
+  .class-actions{display:flex; gap:10px; flex-wrap:wrap; align-items:center; padding-top:12px; border-top:2px solid rgba(21,32,43,.12);}
   .code{display:inline-flex; align-items:center; min-height:30px; padding:4px 10px; border:2px solid var(--ink-900); border-radius:999px; background:var(--gold); font-weight:900; letter-spacing:.04em;}
   .muted{color:var(--ink-500); font-weight:900; font-size:13px;}
   .mini-actions{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;}
@@ -93,10 +94,19 @@
   .goal-checks{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px;}
   .goal-check{display:flex; gap:8px; align-items:center; min-height:42px; padding:8px; border:2px solid rgba(21,32,43,.18); border-radius:12px; background:#fff; font-weight:900; cursor:pointer;}
   .goal-check input{width:20px; min-height:20px; accent-color:var(--orange);}
-  .task-list{display:grid; gap:10px; margin-top:12px;}
-  .task-card{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; align-items:center; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); padding:12px; background:linear-gradient(180deg,#fff,#f7fbfd);}
+  .task-list{display:grid; gap:16px; margin-top:12px;}
+  .task-section{display:grid; gap:10px;}
+  .task-section-header{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; border:2px solid rgba(21,32,43,.18); border-radius:12px; background:#eef8ff;}
+  .task-section-header strong{font-size:18px;}
+  .task-section-count{display:inline-flex; align-items:center; justify-content:center; min-width:30px; min-height:26px; padding:2px 8px; border:2px solid var(--ink-900); border-radius:999px; background:#fff; font-weight:900;}
+  .task-section-list{display:grid; gap:10px;}
+  .task-section-empty{padding:12px; border:2px dashed rgba(21,32,43,.2); border-radius:12px; background:#f7fafc; color:var(--ink-500); font-weight:900; text-align:center;}
+  .archive-toggle{width:100%; min-height:46px; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:0 12px; border:3px solid var(--ink-900); border-radius:14px; box-shadow:0 4px 0 var(--ink-900); background:#fff; color:var(--ink-900); font-weight:900; cursor:pointer;}
+  .archive-toggle:hover{background:var(--gold);}
+  .task-card{display:grid; grid-template-columns:1fr; gap:12px; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); padding:12px; background:linear-gradient(180deg,#fff,#f7fbfd);}
   .task-card.is-open{background:linear-gradient(180deg,#fff,#f2fbff);}
   .task-card strong{display:block; font-size:19px; line-height:1.15;}
+  .task-actions{display:flex; gap:8px; flex-wrap:wrap; padding-top:10px; border-top:2px solid rgba(21,32,43,.12);}
   .task-meta{display:flex; flex-wrap:wrap; gap:7px; margin-top:7px;}
   .pill{display:inline-flex; min-height:28px; align-items:center; padding:3px 9px; border:2px solid var(--ink-900); border-radius:999px; background:#eef8ff; color:var(--ink-700); font-weight:900; font-size:13px;}
   .pill.on{background:#e8fbef; color:#176b2a;}
@@ -117,7 +127,7 @@
     .top{align-items:flex-start; flex-direction:column;}
     .actions{justify-content:flex-start;}
     .grid{grid-template-columns:1fr;}
-    .class-form,.class-card,.student-form,.student-row,.task-card,.result-row{grid-template-columns:1fr;}
+    .class-form,.student-form,.student-row,.result-row{grid-template-columns:1fr;}
     .goal-checks{grid-template-columns:1fr;}
     .analysis-summary{grid-template-columns:1fr;}
     .analysis-row{grid-template-columns:1fr;}
@@ -248,6 +258,7 @@
   const openStudentAnalysisIds = new Set();
   const selectedAnalysisStudentIds = new Map();
   const openTaskIds = new Set();
+  let archivedTasksOpen = false;
 
   const CODE_WORDS = ["BOEK", "ZON", "STER", "TAAL", "LEES", "PEN", "VLAM", "BRUG", "GOUD", "KERN", "WOLK", "MAAN"];
   const MIX_GOALS = [
@@ -341,20 +352,17 @@
       card.classList.toggle("is-open", studentsOpen || analysisOpen || studentAnalysisOpen);
       const info = document.createElement("div");
       const title = document.createElement("strong");
-      title.textContent = klass.name;
+      title.textContent = klass.name + " - " + klass.class_code;
       const meta = document.createElement("div");
       meta.className = "class-meta";
-      const code = document.createElement("span");
-      code.className = "code";
-      code.textContent = klass.class_code;
       const muted = document.createElement("span");
       muted.className = "muted";
       muted.textContent = "Aangemaakt op " + new Date(klass.created_at).toLocaleDateString("nl-NL");
-      meta.append(code, muted);
+      meta.append(muted);
       info.append(title, meta);
 
       const actions = document.createElement("div");
-      actions.className = "mini-actions";
+      actions.className = "class-actions";
       const toggleStudents = document.createElement("button");
       toggleStudents.className = "smallbtn";
       toggleStudents.type = "button";
@@ -858,87 +866,148 @@
   function renderTasks(tasks) {
     taskList.innerHTML = "";
     taskEmpty.classList.toggle("hidden", tasks.length > 0);
-    tasks.forEach((task) => {
-      const klass = currentClasses.find((item) => item.id === task.class_id);
-      const results = currentAttempts.filter((attempt) => attempt.assignment_id === task.id);
-      const isOpen = openTaskIds.has(task.id);
-      const card = document.createElement("article");
-      card.className = "task-card";
-      card.classList.toggle("is-open", isOpen);
-      const info = document.createElement("div");
-      const title = document.createElement("strong");
-      title.textContent = task.title;
-      const meta = document.createElement("div");
-      meta.className = "task-meta";
-      const cls = document.createElement("span");
-      cls.className = "pill";
-      cls.textContent = klass ? klass.name : "Onbekende klas";
-      const count = document.createElement("span");
-      count.className = "pill";
-      count.textContent = task.question_count + " vragen";
-      const active = document.createElement("span");
-      active.className = "pill " + (task.active ? "on" : "off");
-      active.textContent = task.active ? "Actief" : "Uit";
-      const goals = document.createElement("span");
-      goals.className = "pill";
-      goals.textContent = (task.goals || []).length + " doelen";
-      meta.append(cls, count, goals, active);
-      info.append(title, meta);
+    if (!tasks.length) return;
 
-      const actions = document.createElement("div");
-      actions.className = "mini-actions";
-      const toggleResults = document.createElement("button");
-      toggleResults.className = "smallbtn";
-      toggleResults.type = "button";
-      toggleResults.textContent = isOpen ? "Resultaten verbergen" : "Resultaten tonen (" + results.length + ")";
-      toggleResults.addEventListener("click", () => {
-        if (openTaskIds.has(task.id)) {
-          openTaskIds.delete(task.id);
-        } else {
-          openTaskIds.add(task.id);
-        }
-        renderTasks(currentTasks);
-      });
-      const toggle = document.createElement("button");
-      toggle.className = "smallbtn";
-      toggle.type = "button";
-      toggle.textContent = task.active ? "Zet uit" : "Zet aan";
-      toggle.addEventListener("click", () => toggleTask(task));
-      actions.append(toggleResults, toggle);
-      card.append(info, actions);
-      const resultList = document.createElement("div");
-      resultList.className = "result-list";
-      resultList.classList.toggle("hidden", !isOpen);
-      if (!results.length) {
-        const empty = document.createElement("div");
-        empty.className = "result-empty";
-        empty.textContent = "Nog geen resultaten voor deze taak.";
-        resultList.appendChild(empty);
-      } else {
-        results.forEach((attempt) => {
-          const row = document.createElement("div");
-          row.className = "result-row";
-          const who = document.createElement("div");
-          who.innerHTML = "<strong>" + studentName(attempt.student_id) + "</strong><br><span class=\"muted\">" + new Date(attempt.finished_at).toLocaleString("nl-NL") + "</span>";
-          const goalResults = document.createElement("div");
-          goalResults.className = "goal-results";
-          normalizedSummary(attempt.goal_summary).forEach((item) => {
-            const chip = document.createElement("span");
-            chip.className = "goal-score " + (item.good === item.total ? "perfect" : "miss");
-            chip.textContent = item.label + ": " + item.good + "/" + item.total;
-            goalResults.appendChild(chip);
-          });
-          if (goalResults.children.length) who.appendChild(goalResults);
-          const score = document.createElement("div");
-          score.className = "score";
-          score.textContent = attempt.score + "/" + attempt.total;
-          row.append(who, score);
-          resultList.appendChild(row);
-        });
-      }
-      card.appendChild(resultList);
-      taskList.appendChild(card);
+    const activeTasks = tasks.filter((task) => task.active);
+    const archivedTasks = tasks.filter((task) => !task.active);
+    taskList.appendChild(renderTaskSection("Actieve taken", activeTasks, "Er staan momenteel geen actieve taken klaar."));
+
+    const archiveSection = document.createElement("section");
+    archiveSection.className = "task-section";
+    const archiveToggle = document.createElement("button");
+    archiveToggle.className = "archive-toggle";
+    archiveToggle.type = "button";
+    const archiveLabel = document.createElement("span");
+    archiveLabel.textContent = archivedTasksOpen ? "Gearchiveerde taken verbergen" : "Gearchiveerde taken";
+    const archiveCount = document.createElement("span");
+    archiveCount.className = "task-section-count";
+    archiveCount.textContent = String(archivedTasks.length);
+    archiveToggle.append(archiveLabel, archiveCount);
+    archiveToggle.addEventListener("click", () => {
+      archivedTasksOpen = !archivedTasksOpen;
+      renderTasks(currentTasks);
     });
+    archiveSection.appendChild(archiveToggle);
+
+    const archivedList = document.createElement("div");
+    archivedList.className = "task-section-list";
+    archivedList.classList.toggle("hidden", !archivedTasksOpen);
+    if (!archivedTasks.length) {
+      const empty = document.createElement("div");
+      empty.className = "task-section-empty";
+      empty.textContent = "Er zijn nog geen gearchiveerde taken.";
+      archivedList.appendChild(empty);
+    } else {
+      archivedTasks.forEach((task) => archivedList.appendChild(renderTaskCard(task)));
+    }
+    archiveSection.appendChild(archivedList);
+    taskList.appendChild(archiveSection);
+  }
+
+  function renderTaskSection(titleText, tasks, emptyText) {
+    const section = document.createElement("section");
+    section.className = "task-section";
+    const header = document.createElement("div");
+    header.className = "task-section-header";
+    const title = document.createElement("strong");
+    title.textContent = titleText;
+    const count = document.createElement("span");
+    count.className = "task-section-count";
+    count.textContent = String(tasks.length);
+    header.append(title, count);
+    section.appendChild(header);
+    const list = document.createElement("div");
+    list.className = "task-section-list";
+    if (!tasks.length) {
+      const empty = document.createElement("div");
+      empty.className = "task-section-empty";
+      empty.textContent = emptyText;
+      list.appendChild(empty);
+    } else {
+      tasks.forEach((task) => list.appendChild(renderTaskCard(task)));
+    }
+    section.appendChild(list);
+    return section;
+  }
+
+  function renderTaskCard(task) {
+    const klass = currentClasses.find((item) => item.id === task.class_id);
+    const results = currentAttempts.filter((attempt) => attempt.assignment_id === task.id);
+    const isOpen = openTaskIds.has(task.id);
+    const card = document.createElement("article");
+    card.className = "task-card";
+    card.classList.toggle("is-open", isOpen);
+    const info = document.createElement("div");
+    const title = document.createElement("strong");
+    title.textContent = task.title;
+    const meta = document.createElement("div");
+    meta.className = "task-meta";
+    const cls = document.createElement("span");
+    cls.className = "pill";
+    cls.textContent = klass ? klass.name : "Onbekende klas";
+    const count = document.createElement("span");
+    count.className = "pill";
+    count.textContent = task.question_count + " vragen";
+    const active = document.createElement("span");
+    active.className = "pill " + (task.active ? "on" : "off");
+    active.textContent = task.active ? "Actief" : "Gearchiveerd";
+    const goals = document.createElement("span");
+    goals.className = "pill";
+    goals.textContent = (task.goals || []).length + " doelen";
+    meta.append(cls, count, goals, active);
+    info.append(title, meta);
+
+    const actions = document.createElement("div");
+    actions.className = "task-actions";
+    const toggleResults = document.createElement("button");
+    toggleResults.className = "smallbtn";
+    toggleResults.type = "button";
+    toggleResults.textContent = isOpen ? "Resultaten verbergen" : "Resultaten tonen (" + results.length + ")";
+    toggleResults.addEventListener("click", () => {
+      if (openTaskIds.has(task.id)) openTaskIds.delete(task.id);
+      else openTaskIds.add(task.id);
+      renderTasks(currentTasks);
+    });
+    const toggle = document.createElement("button");
+    toggle.className = "smallbtn";
+    toggle.type = "button";
+    toggle.textContent = task.active ? "Archiveer taak" : "Maak weer actief";
+    toggle.addEventListener("click", () => toggleTask(task));
+    actions.append(toggleResults, toggle);
+    card.append(info, actions);
+
+    const resultList = document.createElement("div");
+    resultList.className = "result-list";
+    resultList.classList.toggle("hidden", !isOpen);
+    if (!results.length) {
+      const empty = document.createElement("div");
+      empty.className = "result-empty";
+      empty.textContent = "Nog geen resultaten voor deze taak.";
+      resultList.appendChild(empty);
+    } else {
+      results.forEach((attempt) => {
+        const row = document.createElement("div");
+        row.className = "result-row";
+        const who = document.createElement("div");
+        who.innerHTML = "<strong>" + studentName(attempt.student_id) + "</strong><br><span class=\"muted\">" + new Date(attempt.finished_at).toLocaleString("nl-NL") + "</span>";
+        const goalResults = document.createElement("div");
+        goalResults.className = "goal-results";
+        normalizedSummary(attempt.goal_summary).forEach((item) => {
+          const chip = document.createElement("span");
+          chip.className = "goal-score " + (item.good === item.total ? "perfect" : "miss");
+          chip.textContent = item.label + ": " + item.good + "/" + item.total;
+          goalResults.appendChild(chip);
+        });
+        if (goalResults.children.length) who.appendChild(goalResults);
+        const score = document.createElement("div");
+        score.className = "score";
+        score.textContent = attempt.score + "/" + attempt.total;
+        row.append(who, score);
+        resultList.appendChild(row);
+      });
+    }
+    card.appendChild(resultList);
+    return card;
   }
 
   async function createClass(name) {
@@ -1059,7 +1128,7 @@
       setTaskMessage("Taak aanpassen lukte niet: " + error.message, "bad");
       return;
     }
-    setTaskMessage(task.active ? "Taak uitgezet." : "Taak aangezet.", "good");
+    setTaskMessage(task.active ? "Taak gearchiveerd." : "Taak weer actief gemaakt.", "good");
     await loadTasks();
   }
 
