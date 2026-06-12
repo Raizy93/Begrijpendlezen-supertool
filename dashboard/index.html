@@ -133,8 +133,19 @@
   .task-analysis-fill.developing{background:var(--gold);}
   .task-analysis-fill.strong{background:var(--green);}
   .task-analysis-score{font-size:12px; font-weight:900; color:var(--ink-700); white-space:nowrap;}
-  .task-student-select{max-width:320px; min-height:40px; border-width:2px; font-size:14px;}
   .task-analysis-advice{padding:8px 10px; border:2px solid #d69823; border-radius:10px; background:#fff5df; color:#744000; font-size:13px; font-weight:900;}
+  .task-student-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px;}
+  .task-student-card{display:grid; gap:7px; padding:9px; border:2px solid rgba(21,32,43,.18); border-radius:11px; background:#fff;}
+  .task-student-card.missing{background:#f4f6f7; color:var(--ink-500);}
+  .task-student-head{display:flex; align-items:center; justify-content:space-between; gap:8px;}
+  .task-student-name{min-width:0; overflow-wrap:anywhere; font-size:15px; font-weight:900; color:var(--ink-900);}
+  .task-student-total{flex:0 0 auto; padding:3px 7px; border:2px solid var(--ink-900); border-radius:999px; background:#fff5df; color:#744000; font-size:12px; font-weight:900;}
+  .task-student-total.strong{background:#e8fbef; color:#176b2a;}
+  .task-student-total.weak{background:#fdeaea; color:#9d2525;}
+  .task-student-mini-goals{display:grid; gap:5px;}
+  .task-student-mini-row{display:grid; grid-template-columns:minmax(92px,1fr) minmax(55px,.85fr) auto; gap:6px; align-items:center;}
+  .task-student-mini-name{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--ink-700); font-size:11px; font-weight:900;}
+  .task-student-mini-score{font-size:11px; font-weight:900; color:var(--ink-700); white-space:nowrap;}
   .empty{display:grid; place-items:center; min-height:160px; border:2px dashed rgba(21,32,43,.25); border-radius:16px; background:#f7fafc; text-align:center; padding:18px;}
   .status{font-weight:900; color:var(--ink-500);}
   .hidden{display:none!important;}
@@ -150,6 +161,7 @@
     .analysis-score{text-align:left;}
     .task-analysis-summary{grid-template-columns:1fr;}
     .task-analysis-row{grid-template-columns:1fr;}
+    .task-student-grid{grid-template-columns:1fr;}
     .mini-actions,.student-actions{justify-content:flex-start;}
     h1{font-size:28px;}
   }
@@ -275,9 +287,7 @@
   const openClassAnalysisIds = new Set();
   const openStudentAnalysisIds = new Set();
   const selectedAnalysisStudentIds = new Map();
-  const openTaskIds = new Set();
   const taskDetailModes = new Map();
-  const selectedTaskStudentIds = new Map();
   let archivedTasksOpen = false;
 
   const CODE_WORDS = ["BOEK", "ZON", "STER", "TAAL", "LEES", "PEN", "VLAM", "BRUG", "GOUD", "KERN", "WOLK", "MAAN"];
@@ -372,13 +382,16 @@
       card.classList.toggle("is-open", studentsOpen || analysisOpen || studentAnalysisOpen);
       const info = document.createElement("div");
       const title = document.createElement("strong");
-      title.textContent = klass.name + " - " + klass.class_code;
+      title.textContent = klass.name;
       const meta = document.createElement("div");
       meta.className = "class-meta";
+      const code = document.createElement("span");
+      code.className = "code";
+      code.textContent = "Klascode: " + klass.class_code;
       const muted = document.createElement("span");
       muted.className = "muted";
       muted.textContent = "Aangemaakt op " + new Date(klass.created_at).toLocaleDateString("nl-NL");
-      meta.append(muted);
+      meta.append(code, muted);
       info.append(title, meta);
 
       const actions = document.createElement("div");
@@ -1116,43 +1129,61 @@
       return panel;
     }
 
-    const select = document.createElement("select");
-    select.className = "task-student-select";
-    const placeholder = document.createElement("option");
-    placeholder.value = "";
-    placeholder.textContent = "Kies een leerling";
-    select.appendChild(placeholder);
+    const grid = document.createElement("div");
+    grid.className = "task-student-grid";
     students.forEach((student) => {
-      const option = document.createElement("option");
-      option.value = student.id;
-      option.textContent = student.display_name;
-      select.appendChild(option);
-    });
-    select.value = selectedTaskStudentIds.get(task.id) || "";
-    select.addEventListener("change", () => {
-      if (select.value) selectedTaskStudentIds.set(task.id, select.value);
-      else selectedTaskStudentIds.delete(task.id);
-      renderTasks(currentTasks);
-    });
-    panel.appendChild(select);
+      const studentResults = results.filter((attempt) => attempt.student_id === student.id);
+      const card = document.createElement("article");
+      card.className = "task-student-card";
+      const head = document.createElement("div");
+      head.className = "task-student-head";
+      const name = document.createElement("div");
+      name.className = "task-student-name";
+      name.textContent = student.display_name;
+      const total = document.createElement("span");
+      total.className = "task-student-total";
+      head.append(name, total);
+      card.appendChild(head);
 
-    const selectedId = selectedTaskStudentIds.get(task.id);
-    if (!selectedId) {
-      panel.appendChild(taskAnalysisEmpty("Kies een leerling om de analyse van deze taak te bekijken."));
-      return panel;
-    }
-    const student = students.find((item) => item.id === selectedId);
-    const studentResults = results.filter((attempt) => attempt.student_id === selectedId);
-    if (!studentResults.length) {
-      panel.appendChild(taskAnalysisEmpty((student ? student.display_name : "Deze leerling") + " heeft deze taak niet afgerond."));
-      return panel;
-    }
-    const data = taskAnalysisData(studentResults);
-    appendCompactTaskAnalysis(panel, data, [
-      ["Leerling", student ? student.display_name : "Onbekend"],
-      ["Score", data.good + "/" + data.total],
-      ["Percentage", data.percentage + "%"]
-    ], "leerling");
+      if (!studentResults.length) {
+        card.classList.add("missing");
+        total.textContent = "Niet gemaakt";
+        grid.appendChild(card);
+        return;
+      }
+
+      const data = taskAnalysisData(studentResults);
+      total.textContent = data.good + "/" + data.total + " - " + data.percentage + "%";
+      if (data.percentage >= 80) total.classList.add("strong");
+      else if (data.percentage < 60) total.classList.add("weak");
+
+      const goals = document.createElement("div");
+      goals.className = "task-student-mini-goals";
+      data.goals.forEach((goal) => {
+        const row = document.createElement("div");
+        row.className = "task-student-mini-row";
+        const goalName = document.createElement("div");
+        goalName.className = "task-student-mini-name";
+        goalName.title = goal.label;
+        goalName.textContent = goal.label;
+        const bar = document.createElement("div");
+        bar.className = "task-analysis-bar";
+        const fill = document.createElement("div");
+        fill.className = "task-analysis-fill";
+        if (goal.percentage >= 80) fill.classList.add("strong");
+        else if (goal.percentage >= 60) fill.classList.add("developing");
+        fill.style.width = goal.percentage + "%";
+        bar.appendChild(fill);
+        const score = document.createElement("div");
+        score.className = "task-student-mini-score";
+        score.textContent = goal.good + "/" + goal.total;
+        row.append(goalName, bar, score);
+        goals.appendChild(row);
+      });
+      card.appendChild(goals);
+      grid.appendChild(card);
+    });
+    panel.appendChild(grid);
     return panel;
   }
 
