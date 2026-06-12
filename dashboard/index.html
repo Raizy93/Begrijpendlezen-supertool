@@ -95,6 +95,16 @@
   .goal-checks{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px;}
   .goal-check{display:flex; gap:8px; align-items:center; min-height:42px; padding:8px; border:2px solid rgba(21,32,43,.18); border-radius:12px; background:#fff; font-weight:900; cursor:pointer;}
   .goal-check input{width:20px; min-height:20px; accent-color:var(--orange);}
+  .audience-row{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px;}
+  .audience-choice{position:relative; display:block; margin:0;}
+  .audience-choice input{position:absolute; opacity:0; pointer-events:none;}
+  .audience-choice span{display:grid; place-items:center; min-height:44px; padding:8px; border:3px solid var(--ink-900); border-radius:14px; background:#fff; color:var(--ink-900); font-weight:900; cursor:pointer; text-align:center;}
+  .audience-choice input:checked + span{background:var(--gold); box-shadow:0 3px 0 var(--ink-900);}
+  .recipient-panel{display:grid; gap:8px; margin-top:10px; padding:10px; border:2px solid rgba(21,32,43,.18); border-radius:12px; background:#f7fafc;}
+  .recipient-checks{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; max-height:240px; overflow:auto; padding-right:3px;}
+  .recipient-check{display:flex; align-items:center; gap:7px; min-height:38px; margin:0; padding:7px 8px; border:2px solid rgba(21,32,43,.16); border-radius:10px; background:#fff; font-weight:900; cursor:pointer;}
+  .recipient-check input{width:19px; min-height:19px; accent-color:var(--orange);}
+  .recipient-summary{color:var(--ink-500); font-size:13px; font-weight:900;}
   .task-list{display:grid; gap:16px; margin-top:12px;}
   .task-section{display:grid; gap:10px;}
   .task-section-header{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; border:2px solid rgba(21,32,43,.18); border-radius:12px; background:#eef8ff;}
@@ -157,6 +167,7 @@
     .grid{grid-template-columns:1fr;}
     .class-form,.student-form,.student-row,.result-row{grid-template-columns:1fr;}
     .goal-checks{grid-template-columns:1fr;}
+    .audience-row,.recipient-checks{grid-template-columns:1fr;}
     .analysis-summary{grid-template-columns:1fr;}
     .analysis-row{grid-template-columns:1fr;}
     .analysis-score{text-align:left;}
@@ -212,6 +223,21 @@
         <div>
           <label for="taskClass">Klas</label>
           <select id="taskClass" required></select>
+        </div>
+        <div>
+          <label>Voor wie is deze taak?</label>
+          <div class="audience-row">
+            <label class="audience-choice"><input type="radio" name="taskAudience" value="class" checked /><span>Hele klas</span></label>
+            <label class="audience-choice"><input type="radio" name="taskAudience" value="selected" /><span>Geselecteerde leerlingen</span></label>
+          </div>
+          <div class="recipient-panel hidden" id="recipientPanel">
+            <div class="mini-actions" style="justify-content:flex-start;">
+              <button class="smallbtn" type="button" id="allRecipientsBtn">Iedereen</button>
+              <button class="smallbtn" type="button" id="noRecipientsBtn">Niemand</button>
+            </div>
+            <div class="recipient-checks" id="recipientChecks"></div>
+            <div class="recipient-summary" id="recipientSummary">Kies minimaal één leerling.</div>
+          </div>
         </div>
         <div>
           <label for="taskTitle">Titel taak</label>
@@ -271,6 +297,11 @@
   const taskFormToggle = document.getElementById("taskFormToggle");
   const taskForm = document.getElementById("taskForm");
   const taskClass = document.getElementById("taskClass");
+  const recipientPanel = document.getElementById("recipientPanel");
+  const recipientChecks = document.getElementById("recipientChecks");
+  const recipientSummary = document.getElementById("recipientSummary");
+  const allRecipientsBtn = document.getElementById("allRecipientsBtn");
+  const noRecipientsBtn = document.getElementById("noRecipientsBtn");
   const taskTitle = document.getElementById("taskTitle");
   const goalChecks = document.getElementById("goalChecks");
   const taskMessage = document.getElementById("taskMessage");
@@ -369,6 +400,65 @@
   function selectedCount() {
     const checked = taskForm.querySelector("input[name='taskCount']:checked");
     return checked ? Number(checked.value) : 10;
+  }
+
+  function selectedAudience() {
+    const checked = taskForm.querySelector("input[name='taskAudience']:checked");
+    return checked ? checked.value : "class";
+  }
+
+  function selectedRecipientIds() {
+    return Array.from(recipientChecks.querySelectorAll("[data-recipient-check]"))
+      .filter((box) => box.checked)
+      .map((box) => box.value);
+  }
+
+  function setAllRecipients(on) {
+    recipientChecks.querySelectorAll("[data-recipient-check]").forEach((box) => { box.checked = on; });
+    updateRecipientSummary();
+  }
+
+  function updateRecipientSummary() {
+    const selected = selectedRecipientIds().length;
+    const total = recipientChecks.querySelectorAll("[data-recipient-check]").length;
+    recipientSummary.textContent = selected
+      ? selected + " van " + total + " leerlingen geselecteerd."
+      : "Kies minimaal één leerling.";
+  }
+
+  function updateAudiencePanel() {
+    const selected = selectedAudience() === "selected";
+    recipientPanel.classList.toggle("hidden", !selected);
+    if (selected) updateRecipientSummary();
+  }
+
+  function renderRecipientChecks() {
+    recipientChecks.innerHTML = "";
+    const klass = currentClasses.find((item) => item.id === taskClass.value);
+    const students = klass ? (klass.students || []) : [];
+    if (!students.length) {
+      const empty = document.createElement("div");
+      empty.className = "student-empty";
+      empty.textContent = "Deze klas heeft nog geen leerlingen.";
+      recipientChecks.appendChild(empty);
+      updateRecipientSummary();
+      return;
+    }
+    students.forEach((student) => {
+      const label = document.createElement("label");
+      label.className = "recipient-check";
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.value = student.id;
+      input.checked = true;
+      input.setAttribute("data-recipient-check", "");
+      input.addEventListener("change", updateRecipientSummary);
+      const name = document.createElement("span");
+      name.textContent = student.display_name;
+      label.append(input, name);
+      recipientChecks.appendChild(label);
+    });
+    updateRecipientSummary();
   }
 
   function renderClasses(classes) {
@@ -476,6 +566,7 @@
       taskClass.appendChild(opt);
       taskClass.disabled = true;
       createTaskBtn.disabled = true;
+      renderRecipientChecks();
       return;
     }
     taskClass.disabled = false;
@@ -486,6 +577,7 @@
       opt.textContent = klass.name + " (" + klass.class_code + ")";
       taskClass.appendChild(opt);
     });
+    renderRecipientChecks();
   }
 
   function renderStudentsPanel(klass) {
@@ -849,16 +941,36 @@
   async function loadTasks() {
     const { data, error } = await client
       .from("assignments")
-      .select("id,class_id,title,mode,goals,question_count,active,created_at,due_at")
+      .select("id,class_id,title,mode,goals,question_count,active,created_at,due_at,settings")
       .order("created_at", { ascending: false });
     if (error) {
       setTaskMessage("Taken laden lukte niet: " + error.message, "bad");
       return;
     }
-    currentTasks = data || [];
+    currentTasks = await loadTaskRecipients(data || []);
     await loadAttempts();
     renderTasks(currentTasks);
     renderClasses(currentClasses);
+  }
+
+  async function loadTaskRecipients(tasks) {
+    if (!tasks.length) return tasks;
+    const selectedTasks = tasks.filter((task) => task.settings && task.settings.audience === "selected");
+    if (!selectedTasks.length) return tasks.map((task) => ({ ...task, recipient_ids: [] }));
+    const { data, error } = await client
+      .from("assignment_students")
+      .select("assignment_id,student_id")
+      .in("assignment_id", selectedTasks.map((task) => task.id));
+    if (error) {
+      setTaskMessage("Toegewezen leerlingen laden lukte niet: " + error.message, "bad");
+      return tasks.map((task) => ({ ...task, recipient_ids: [] }));
+    }
+    return tasks.map((task) => ({
+      ...task,
+      recipient_ids: (data || [])
+        .filter((row) => row.assignment_id === task.id)
+        .map((row) => row.student_id)
+    }));
   }
 
   async function loadAttempts() {
@@ -992,7 +1104,13 @@
     const goals = document.createElement("span");
     goals.className = "pill";
     goals.textContent = (task.goals || []).length + " doelen";
-    meta.append(cls, count, goals, active);
+    const audience = document.createElement("span");
+    audience.className = "pill";
+    const selectedAudience = task.settings && task.settings.audience === "selected";
+    audience.textContent = selectedAudience
+      ? (task.recipient_ids || []).length + " leerlingen"
+      : "Hele klas";
+    meta.append(cls, count, goals, audience, active);
     info.append(title, meta);
 
     const actions = document.createElement("div");
@@ -1115,7 +1233,10 @@
     }
     const data = taskAnalysisData(results);
     const participation = new Set(results.map((attempt) => attempt.student_id)).size;
-    const totalStudents = klass ? (klass.students || []).length : 0;
+    const selectedAudience = task.settings && task.settings.audience === "selected";
+    const totalStudents = selectedAudience
+      ? (task.recipient_ids || []).length
+      : (klass ? (klass.students || []).length : 0);
     appendCompactTaskAnalysis(panel, data, [
       ["Gemiddelde", data.percentage + "%"],
       ["Deelname", participation + " van " + totalStudents],
@@ -1127,7 +1248,12 @@
   function renderTaskStudentAnalysis(task, klass, results) {
     const panel = document.createElement("div");
     panel.className = "task-analysis";
-    const students = klass ? (klass.students || []) : [];
+    const classStudents = klass ? (klass.students || []) : [];
+    const selectedAudience = task.settings && task.settings.audience === "selected";
+    const recipientIds = new Set(task.recipient_ids || []);
+    const students = selectedAudience
+      ? classStudents.filter((student) => recipientIds.has(student.id))
+      : classStudents;
     if (!students.length) {
       panel.appendChild(taskAnalysisEmpty("Er zijn geen leerlingen beschikbaar voor deze taak."));
       return panel;
@@ -1325,6 +1451,8 @@
     const classId = taskClass.value;
     const title = taskTitle.value.trim();
     const goals = selectedGoals();
+    const audience = selectedAudience();
+    const recipientIds = audience === "selected" ? selectedRecipientIds() : [];
     if (!classId) {
       setTaskMessage("Kies eerst een klas.", "bad");
       return;
@@ -1337,25 +1465,52 @@
       setTaskMessage("Kies minimaal een doel voor Mixmodus.", "bad");
       return;
     }
+    if (audience === "selected" && !recipientIds.length) {
+      setTaskMessage("Kies minimaal één leerling voor deze taak.", "bad");
+      return;
+    }
     createTaskBtn.disabled = true;
     setTaskMessage("Taak wordt klaargezet...", "");
-    const { error } = await client.from("assignments").insert({
+    const { data: assignment, error } = await client.from("assignments").insert({
       teacher_id: currentUser.id,
       class_id: classId,
       title,
       mode: "mix",
       goals,
       question_count: selectedCount(),
-      settings: { source: "dashboard-v1" },
+      settings: {
+        source: "dashboard-v1",
+        audience,
+        recipient_count: audience === "selected" ? recipientIds.length : null
+      },
       active: true
-    });
-    createTaskBtn.disabled = false;
+    }).select("id").single();
     if (error) {
+      createTaskBtn.disabled = false;
       setTaskMessage("Taak maken lukte niet: " + error.message, "bad");
       return;
     }
+    if (audience === "selected") {
+      const recipients = recipientIds.map((studentId) => ({
+        assignment_id: assignment.id,
+        student_id: studentId
+      }));
+      const { error: recipientError } = await client.from("assignment_students").insert(recipients);
+      if (recipientError) {
+        await client.from("assignments").delete().eq("id", assignment.id);
+        createTaskBtn.disabled = false;
+        setTaskMessage("Leerlingen koppelen lukte niet: " + recipientError.message, "bad");
+        return;
+      }
+    }
+    createTaskBtn.disabled = false;
     taskTitle.value = "";
-    setTaskMessage("Taak klaargezet.", "good");
+    const classAudience = taskForm.querySelector("input[name='taskAudience'][value='class']");
+    if (classAudience) classAudience.checked = true;
+    updateAudiencePanel();
+    setTaskMessage(audience === "selected"
+      ? "Taak klaargezet voor " + recipientIds.length + " leerlingen."
+      : "Taak klaargezet voor de hele klas.", "good");
     setTaskFormOpen(false);
     await loadTasks();
   }
@@ -1420,6 +1575,12 @@
 
   allGoalsBtn.addEventListener("click", () => setAllGoals(true));
   noGoalsBtn.addEventListener("click", () => setAllGoals(false));
+  allRecipientsBtn.addEventListener("click", () => setAllRecipients(true));
+  noRecipientsBtn.addEventListener("click", () => setAllRecipients(false));
+  taskClass.addEventListener("change", renderRecipientChecks);
+  taskForm.querySelectorAll("input[name='taskAudience']").forEach((radio) => {
+    radio.addEventListener("change", updateAudiencePanel);
+  });
   taskFormToggle.addEventListener("click", () => setTaskFormOpen(!taskFormOpen));
 
   logoutBtn.addEventListener("click", async () => {
@@ -1428,6 +1589,7 @@
   });
 
   renderGoalChecks();
+  updateAudiencePanel();
   setTaskFormOpen(false);
   init();
 </script>
