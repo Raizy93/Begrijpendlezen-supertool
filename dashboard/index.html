@@ -250,7 +250,7 @@
         </div>
         <div class="theme-picker">
           <label for="taskTheme"><strong>Thema (optioneel)</strong></label>
-          <select class="theme-select" id="taskTheme"></select>
+          <div id="taskTheme"></div>
           <small id="taskThemeInfo">Kies 'Alle thema's' voor algemeen oefenen.</small>
         </div>
         <div>
@@ -421,17 +421,17 @@
   }
 
   function selectedTaskTheme() {
-    return taskTheme.value || "all";
+    return taskTheme.getSelected ? taskTheme.getSelected() : ["all"];
   }
 
   function availableThemeQuestions() {
     const goals = new Set(selectedGoals());
-    const theme = selectedTaskTheme();
+    const themes = selectedTaskTheme();
     return THEME_COLLECTIONS.reduce((total, source) => {
       if (!goals.has(source.goal)) return total;
       return total + source.items().reduce((count, item) => {
         const labels = SupertoolThemes.getItemThemes(source.collection, item);
-        if (theme !== "all" && !labels.includes(theme)) return count;
+        if (!themes.includes("all") && !themes.some((theme) => labels.includes(theme))) return count;
         return count + (Array.isArray(item.vragen) && item.vragen.length ? item.vragen.length : 1);
       }, 0);
     }, 0);
@@ -440,7 +440,7 @@
   function updateThemeAvailability() {
     const count = availableThemeQuestions();
     const chosenCount = selectedCount();
-    const name = SupertoolThemes.label(selectedTaskTheme());
+    const name = SupertoolThemes.selectionLabel(selectedTaskTheme());
     taskThemeInfo.textContent = name + ": " + count + " unieke passende vragen beschikbaar."
       + (count > 0 && count < chosenCount ? " In deze taak kunnen vragen terugkomen." : "");
   }
@@ -1175,7 +1175,10 @@
       : "Hele klas";
     const theme = document.createElement("span");
     theme.className = "pill";
-    theme.textContent = SupertoolThemes.label(task.settings && task.settings.theme);
+    const taskThemes = task.settings && Array.isArray(task.settings.themes) && task.settings.themes.length
+      ? task.settings.themes
+      : [task.settings && task.settings.theme || "all"];
+    theme.textContent = SupertoolThemes.selectionLabel(taskThemes);
     meta.append(cls, count, goals, theme, audience, active);
     info.append(title, meta);
 
@@ -1492,7 +1495,7 @@
     const classId = taskClass.value;
     const title = taskTitle.value.trim();
     const goals = selectedGoals();
-    const theme = selectedTaskTheme();
+    const themes = selectedTaskTheme();
     const audience = selectedAudience();
     const recipientIds = audience === "selected" ? selectedRecipientIds() : [];
     if (!classId) {
@@ -1526,7 +1529,7 @@
       question_count: selectedCount(),
       settings: {
         source: "dashboard-v1",
-        theme,
+        themes,
         audience,
         recipient_count: audience === "selected" ? recipientIds.length : null
       },
@@ -1552,7 +1555,7 @@
     }
     createTaskBtn.disabled = false;
     taskTitle.value = "";
-    taskTheme.value = "all";
+    if (taskTheme.setSelected) taskTheme.setSelected(["all"]);
     updateThemeAvailability();
     const classAudience = taskForm.querySelector("input[name='taskAudience'][value='class']");
     if (classAudience) classAudience.checked = true;
@@ -1636,7 +1639,6 @@
   allRecipientsBtn.addEventListener("click", () => setAllRecipients(true));
   noRecipientsBtn.addEventListener("click", () => setAllRecipients(false));
   taskClass.addEventListener("change", renderRecipientChecks);
-  taskTheme.addEventListener("change", updateThemeAvailability);
   taskForm.addEventListener("change", (event) => {
     if (event.target.matches("[data-goal-check], input[name='taskCount']")) updateThemeAvailability();
   });
@@ -1651,8 +1653,10 @@
   });
 
   renderGoalChecks();
-  const dashboardThemeSelect = SupertoolThemes.makeSelect("all");
-  Array.from(dashboardThemeSelect.options).forEach((option) => taskTheme.appendChild(option.cloneNode(true)));
+  const dashboardThemeSelect = SupertoolThemes.makeMultiSelect(["all"], null, updateThemeAvailability);
+  taskTheme.appendChild(dashboardThemeSelect);
+  taskTheme.getSelected = () => dashboardThemeSelect.getSelected();
+  taskTheme.setSelected = (values) => dashboardThemeSelect.setSelected(values);
   updateThemeAvailability();
   updateAudiencePanel();
   setTaskFormOpen(false);

@@ -460,7 +460,10 @@
       count.textContent = task.question_count + " vragen";
       const theme = document.createElement("span");
       theme.className = "pill";
-      theme.textContent = SupertoolThemes.label(task.settings && task.settings.theme);
+      const taskThemes = task.settings && Array.isArray(task.settings.themes) && task.settings.themes.length
+        ? task.settings.themes
+        : [task.settings && task.settings.theme || "all"];
+      theme.textContent = SupertoolThemes.selectionLabel(taskThemes);
       info.append(title, mode, count, theme);
       if (task.completed) {
         const done = document.createElement("span");

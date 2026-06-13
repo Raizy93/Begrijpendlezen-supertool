@@ -171,7 +171,9 @@
     }
 
     function start() {
-      pool = shuffle(items);
+      const available = window.SupertoolThemes ? window.SupertoolThemes.activeItems("td", items) : items;
+      pool = shuffle(available);
+      if (!pool.length) return;
       idx = 0;
       good = 0;
       bad = 0;

@@ -43,6 +43,7 @@
     "fom:10": ["samenleving", "school-dagelijks"]
   };
   let preparedState = null;
+  let activeThemes = [ALL];
 
   const KEYWORDS = {
     "natuur-milieu": ["natuur", "milieu", "klimaat", "recycl", "afval", "wateronderzoek", "rivier", "bos", "bospad", "storm", "weer", "oceaan", "tuin", "plant", "bloem", "fossiel", "energie"],
@@ -93,16 +94,25 @@
     return validThemes(item.themas);
   }
 
-  function selectedTheme() {
-    const value = new URLSearchParams(window.location.search).get("theme") || ALL;
-    return value === ALL || THEMES.some((theme) => theme.id === value) ? value : ALL;
+  function normalizeSelection(values) {
+    const selected = validThemes(Array.isArray(values) ? values : []);
+    return selected.length ? selected : [ALL];
   }
 
-  function filter(collection, items, theme) {
-    const chosen = theme || selectedTheme();
+  function selectedThemes() {
+    return activeThemes.slice();
+  }
+
+  function setSelectedThemes(values) {
+    activeThemes = normalizeSelection(values);
+    return selectedThemes();
+  }
+
+  function filter(collection, items, themes) {
+    const chosen = normalizeSelection(themes || activeThemes);
     return (items || []).filter((item) => {
       const labels = getItemThemes(collection, item);
-      return chosen === ALL || labels.includes(chosen);
+      return chosen.includes(ALL) || chosen.some((theme) => labels.includes(theme));
     });
   }
 
@@ -116,15 +126,12 @@
         return total + (Array.isArray(item.vragen) && item.vragen.length ? item.vragen.length : 1);
       }, 0);
     });
-    const chosen = selectedTheme();
-    window[globalName] = filter(collection, items, chosen);
     preparedState = {
       collection,
-      selected: chosen,
       counts,
-      available: window[globalName].reduce((total, item) => total + (Array.isArray(item.vragen) && item.vragen.length ? item.vragen.length : 1), 0)
+      items
     };
-    return window[globalName];
+    return items;
   }
 
   function enrichGlobals() {
@@ -141,6 +148,19 @@
     if (!themeId || themeId === ALL) return "Alle thema's";
     const theme = THEMES.find((entry) => entry.id === themeId);
     return theme ? theme.label : "Alle thema's";
+  }
+
+  function selectionLabel(values) {
+    const selected = normalizeSelection(values);
+    if (selected.includes(ALL)) return "Alle thema's";
+    if (selected.length === 1) return label(selected[0]);
+    return selected.length + " thema's";
+  }
+
+  function questionCount(collection, items, themes) {
+    return filter(collection, items, themes).reduce((total, item) => {
+      return total + (Array.isArray(item.vragen) && item.vragen.length ? item.vragen.length : 1);
+    }, 0);
   }
 
   function makeSelect(value, counts) {
@@ -161,6 +181,65 @@
     return select;
   }
 
+  function makeMultiSelect(values, counts, onChange) {
+    let selected = normalizeSelection(values);
+    const details = document.createElement("details");
+    details.className = "theme-multiselect";
+    const summary = document.createElement("summary");
+    const summaryText = document.createElement("span");
+    const chevron = document.createElement("span");
+    chevron.textContent = "▾";
+    summary.append(summaryText, chevron);
+    const panel = document.createElement("div");
+    panel.className = "theme-options";
+
+    function updateSummary() {
+      summaryText.textContent = selectionLabel(selected);
+    }
+
+    function emit() {
+      selected = normalizeSelection(selected);
+      updateSummary();
+      if (typeof onChange === "function") onChange(selected.slice());
+    }
+
+    [{ id: ALL, label: "Alle thema's" }].concat(THEMES).forEach((theme) => {
+      const option = document.createElement("label");
+      option.className = "theme-option";
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.value = theme.id;
+      input.checked = selected.includes(theme.id);
+      if (counts && theme.id !== ALL && !counts[theme.id]) input.disabled = true;
+      const text = document.createElement("span");
+      text.textContent = theme.label + (input.disabled ? " (nog niet beschikbaar)" : "");
+      input.addEventListener("change", function () {
+        if (theme.id === ALL && input.checked) {
+          selected = [ALL];
+        } else if (theme.id === ALL) {
+          selected = [];
+        } else {
+          selected = selected.filter((value) => value !== ALL && value !== theme.id);
+          if (input.checked) selected.push(theme.id);
+        }
+        if (!selected.length) selected = [ALL];
+        panel.querySelectorAll("input").forEach((box) => { box.checked = selected.includes(box.value); });
+        emit();
+      });
+      option.append(input, text);
+      panel.appendChild(option);
+    });
+    details.getSelected = function () { return selected.slice(); };
+    details.setSelected = function (valuesToSet) {
+      selected = normalizeSelection(valuesToSet);
+      panel.querySelectorAll("input").forEach((box) => { box.checked = selected.includes(box.value); });
+      updateSummary();
+    };
+    updateSummary();
+    details.append(summary, panel);
+    return details;
+  }
+
   function mountStandaloneSelector() {
     if (document.querySelector("[data-theme-standalone]")) return;
     const countRow = document.querySelector(".countrow");
@@ -170,20 +249,20 @@
     wrap.setAttribute("data-theme-standalone", "");
     const title = document.createElement("strong");
     title.textContent = "Thema (optioneel)";
-    const select = makeSelect(selectedTheme(), preparedState && preparedState.counts);
+    const select = makeMultiSelect(activeThemes, preparedState && preparedState.counts, function (values) {
+      setSelectedThemes(values);
+      const available = preparedState ? questionCount(preparedState.collection, preparedState.items, values) : 0;
+      note.textContent = available + " unieke passende vragen beschikbaar.";
+      note.style.color = available ? "" : "#9d2525";
+      document.querySelectorAll("[data-menu-start], [data-td-menu-start], [data-tsk-menu-start], [data-fom-menu-start], [data-sign-menu-start], [data-vw-menu-start], [data-tk-menu-start], [data-sam-menu-start], [data-conc-menu-start]").forEach((button) => { button.disabled = !available; });
+    });
     const note = document.createElement("small");
     note.textContent = preparedState
-      ? preparedState.available + " unieke passende vragen beschikbaar."
+      ? questionCount(preparedState.collection, preparedState.items, activeThemes) + " unieke passende vragen beschikbaar."
       : "Kies 'Alle thema's' voor algemeen oefenen.";
-    select.addEventListener("change", function () {
-      const url = new URL(window.location.href);
-      if (select.value === ALL) url.searchParams.delete("theme");
-      else url.searchParams.set("theme", select.value);
-      window.location.href = url.href;
-    });
     wrap.append(title, select, note);
     countRow.parentElement.insertBefore(wrap, countRow);
-    if (preparedState && preparedState.available === 0) {
+    if (preparedState && questionCount(preparedState.collection, preparedState.items, activeThemes) === 0) {
       note.textContent = "Voor dit leerdoel is binnen dit thema nog geen materiaal beschikbaar. Kies een ander thema.";
       note.style.color = "#9d2525";
       document.querySelectorAll("[data-menu-start], [data-td-menu-start], [data-tsk-menu-start], [data-fom-menu-start], [data-sign-menu-start], [data-vw-menu-start], [data-tk-menu-start], [data-sam-menu-start], [data-conc-menu-start]").forEach((button) => { button.disabled = true; });
@@ -191,17 +270,22 @@
   }
 
   const style = document.createElement("style");
-  style.textContent = ".theme-picker{display:grid;gap:6px;margin:10px 0;padding:10px;border:2px solid rgba(21,32,43,.16);border-radius:12px;background:#f7fafc}.theme-picker strong{font-size:15px}.theme-picker small{color:var(--ink-500,#516174);font-weight:800}.theme-select{width:100%;min-height:44px;padding:7px 10px;border:3px solid var(--ink-900,#15202b);border-radius:12px;background:#fff;color:var(--ink-900,#15202b);font:900 15px var(--font-body,Nunito,system-ui,sans-serif)}";
+  style.textContent = ".theme-picker{display:grid;gap:6px;margin:10px 0;padding:10px;border:2px solid rgba(21,32,43,.16);border-radius:12px;background:#f7fafc}.theme-picker strong{font-size:15px}.theme-picker small{color:var(--ink-500,#516174);font-weight:800}.theme-select{width:100%;min-height:44px;padding:7px 10px;border:3px solid var(--ink-900,#15202b);border-radius:12px;background:#fff;color:var(--ink-900,#15202b);font:900 15px var(--font-body,Nunito,system-ui,sans-serif)}.theme-multiselect{position:relative}.theme-multiselect summary{min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 11px;border:3px solid var(--ink-900,#15202b);border-radius:12px;background:#fff;color:var(--ink-900,#15202b);font:900 15px var(--font-body,Nunito,system-ui,sans-serif);cursor:pointer;list-style:none}.theme-multiselect summary::-webkit-details-marker{display:none}.theme-options{position:absolute;z-index:50;left:0;right:0;top:calc(100% + 5px);display:grid;gap:3px;max-height:280px;overflow:auto;padding:8px;border:3px solid var(--ink-900,#15202b);border-radius:12px;background:#fff;box-shadow:0 6px 0 var(--ink-900,#15202b)}.theme-option{display:flex;align-items:center;gap:8px;min-height:36px;padding:6px 8px;border-radius:8px;font-weight:900;cursor:pointer}.theme-option:hover{background:#eef8ff}.theme-option input{width:19px;min-height:19px;accent-color:var(--orange,#f57c19)}.theme-option:has(input:disabled){opacity:.48;cursor:not-allowed}";
   document.head.appendChild(style);
 
   window.SupertoolThemes = {
     ALL,
     themes: THEMES.slice(),
     label,
+    selectionLabel,
     makeSelect,
-    selectedTheme,
+    makeMultiSelect,
+    selectedThemes,
+    setSelectedThemes,
     getItemThemes,
     filter,
+    activeItems: function (collection, items) { return filter(collection, items, activeThemes); },
+    questionCount,
     prepareGlobal,
     enrichGlobals,
     mountStandaloneSelector

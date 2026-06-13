@@ -73,7 +73,8 @@
     let queue = [], idx = 0, total = 15, good = 0, bad = 0, streak = 0, bestStreak = 0, answered = false;
 
     function buildQueue(limit) {
-      const grouped = shuffle(texts).map((text) => ({ text, vragen: shuffle(text.vragen) }));
+      const available = window.SupertoolThemes ? window.SupertoolThemes.activeItems("sign", texts) : texts;
+      const grouped = shuffle(available).map((text) => ({ text, vragen: shuffle(text.vragen) }));
       const result = [];
       grouped.forEach((group) => {
         group.vragen.forEach((vraag) => {

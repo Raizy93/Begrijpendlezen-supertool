@@ -518,17 +518,19 @@
       return $$("[data-mix-goal-check]").filter((box) => box.checked).map((box) => box.value);
     }
 
-    function selectedTheme() {
+    function selectedThemes() {
       if (taskContext && taskContext.assignment && taskContext.assignment.settings) {
-        return taskContext.assignment.settings.theme || "all";
+        const settings = taskContext.assignment.settings;
+        if (Array.isArray(settings.themes) && settings.themes.length) return settings.themes.slice();
+        return settings.theme && settings.theme !== "all" ? [settings.theme] : ["all"];
       }
-      return el.theme ? el.theme.value : "all";
+      return el.theme && el.theme.getSelected ? el.theme.getSelected() : ["all"];
     }
 
     function themeItems() {
-      const theme = selectedTheme();
+      const themes = selectedThemes();
       const goals = selectedGoals();
-      return allItems.filter((item) => goals.includes(item.goal) && (theme === "all" || (item.themes || []).includes(theme)));
+      return allItems.filter((item) => goals.includes(item.goal) && (themes.includes("all") || themes.some((theme) => (item.themes || []).includes(theme))));
     }
 
     function setAll(on) {
@@ -543,15 +545,16 @@
       else if (!available.length) el.warning.textContent = "Voor deze combinatie zijn nog geen vragen beschikbaar. Kies een ander thema of extra leesdoel.";
       else if (available.length < total) el.warning.textContent = available.length + " unieke passende vragen beschikbaar. Bij " + total + " vragen kunnen opdrachten terugkomen.";
       else el.warning.textContent = "";
-      if (el.themeInfo) el.themeInfo.textContent = selectedTheme() === "all"
+      if (el.themeInfo) el.themeInfo.textContent = selectedThemes().includes("all")
         ? "Alle onderwerpen doen mee: " + available.length + " unieke vragen beschikbaar."
-        : (window.SupertoolThemes ? window.SupertoolThemes.label(selectedTheme()) : selectedTheme()) + ": " + available.length + " unieke vragen beschikbaar.";
+        : (window.SupertoolThemes ? window.SupertoolThemes.selectionLabel(selectedThemes()) : selectedThemes().join(", ")) + ": " + available.length + " unieke vragen beschikbaar.";
       el.start.disabled = !selected.length || !available.length;
     }
 
     function makeQueue(limit) {
-      const theme = selectedTheme();
-      const allowed = selectedGoals().filter((goal) => allItems.some((item) => item.goal === goal && (theme === "all" || (item.themes || []).includes(theme))));
+      const themes = selectedThemes();
+      const matchesTheme = (item) => themes.includes("all") || themes.some((theme) => (item.themes || []).includes(theme));
+      const allowed = selectedGoals().filter((goal) => allItems.some((item) => item.goal === goal && matchesTheme(item)));
       const picked = [];
       if (!allowed.length) return picked;
 
@@ -562,7 +565,7 @@
       goals.forEach((goal) => {
         const quota = base + (extra > 0 ? 1 : 0);
         if (extra > 0) extra--;
-        const source = allItems.filter((item) => item.goal === goal && (theme === "all" || (item.themes || []).includes(theme)));
+        const source = allItems.filter((item) => item.goal === goal && matchesTheme(item));
         let bag = shuffle(source);
         for (let i = 0; i < quota; i++) {
           if (!bag.length) bag = shuffle(source);
@@ -827,12 +830,13 @@
 
     renderGoalChecks();
     if (el.theme && window.SupertoolThemes) {
-      const taskTheme = taskContext && taskContext.assignment && taskContext.assignment.settings
-        ? taskContext.assignment.settings.theme || "all"
-        : "all";
-      const picker = window.SupertoolThemes.makeSelect(taskTheme);
-      Array.from(picker.options).forEach((option) => el.theme.appendChild(option.cloneNode(true)));
-      el.theme.value = taskTheme;
+      const settings = taskContext && taskContext.assignment ? taskContext.assignment.settings || {} : {};
+      const taskThemes = Array.isArray(settings.themes) && settings.themes.length
+        ? settings.themes
+        : (settings.theme && settings.theme !== "all" ? [settings.theme] : ["all"]);
+      const picker = window.SupertoolThemes.makeMultiSelect(taskThemes, null, syncWarning);
+      el.theme.appendChild(picker);
+      el.theme.getSelected = () => picker.getSelected();
     }
     syncWarning();
     if (taskContext && taskContext.assignment) {
@@ -840,8 +844,8 @@
       if (taskContext.student && taskContext.student.displayName) {
         el.subtitle.textContent += " - " + taskContext.student.displayName;
       }
-      if (selectedTheme() !== "all" && window.SupertoolThemes) {
-        el.subtitle.textContent += " - " + window.SupertoolThemes.label(selectedTheme());
+      if (!selectedThemes().includes("all") && window.SupertoolThemes) {
+        el.subtitle.textContent += " - " + window.SupertoolThemes.selectionLabel(selectedThemes());
       }
       el.reset.classList.add("hidden");
       el.menu.classList.add("hidden");
@@ -859,7 +863,6 @@
       });
     });
     el.goals.addEventListener("change", syncWarning);
-    if (el.theme) el.theme.addEventListener("change", syncWarning);
     el.all.addEventListener("click", () => setAll(true));
     el.none.addEventListener("click", () => setAll(false));
     el.start.addEventListener("click", start);

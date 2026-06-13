@@ -2,7 +2,7 @@
 
 ## Thema's
 
-Een thema is altijd optioneel. Zonder keuze gebruikt de tool `Alle thema's` en doet alle geschikte inhoud mee.
+Een thema is altijd optioneel. Zonder keuze gebruikt de tool `Alle thema's` en doet alle geschikte inhoud mee. Er kunnen ook meerdere thema's tegelijk worden gekozen; een tekst doet mee zodra die bij minimaal een van de gekozen thema's past.
 
 Beschikbare themacodes:
 

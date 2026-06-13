@@ -56,7 +56,8 @@
     let queue = [], idx = 0, total = 10, good = 0, bad = 0, streak = 0, bestStreak = 0, answered = false;
 
     function buildQueue(limit) {
-      return shuffle(texts).slice(0, limit);
+      const available = window.SupertoolThemes ? window.SupertoolThemes.activeItems("conc", texts) : texts;
+      return shuffle(available).slice(0, limit);
     }
 
     function setFeedback(state, html) {

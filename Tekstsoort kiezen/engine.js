@@ -232,7 +232,8 @@
 
     function start() {
       const chosen = selectedTypes();
-      const available = items.filter((item) => chosen.includes(item.type));
+      const themed = window.SupertoolThemes ? window.SupertoolThemes.activeItems("tsk", items) : items;
+      const available = themed.filter((item) => chosen.includes(item.type));
       if (!available.length) {
         el.warning.textContent = "Kies minimaal 1 tekstsoort om te oefenen.";
         return;

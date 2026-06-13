@@ -189,8 +189,10 @@
     }
 
     function startGame(count) {
-      total = count;
-      pool = shuffle(items.slice()).slice(0, total);
+      const available = window.SupertoolThemes ? window.SupertoolThemes.activeItems("hzd", items) : items;
+      pool = shuffle(available.slice()).slice(0, count);
+      total = pool.length;
+      if (!total) return;
       idx = 0; good = 0; bad = 0; streak = 0; bestStreak = 0;
       if (el.start) el.start.style.display = "none";
       if (el.end) el.end.style.display = "none";

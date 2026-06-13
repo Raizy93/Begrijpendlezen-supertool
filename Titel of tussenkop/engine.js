@@ -50,7 +50,8 @@
 
     function buildQueue(limit) {
       const result = [];
-      shuffle(texts).forEach((text) => {
+      const available = window.SupertoolThemes ? window.SupertoolThemes.activeItems("tk", texts) : texts;
+      shuffle(available).forEach((text) => {
         const vragen = shuffle(text.vragen || []);
         if (vragen.length && result.length < limit) {
           result.push({ text, vraag: vragen[0] });
