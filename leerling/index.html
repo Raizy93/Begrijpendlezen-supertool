@@ -48,6 +48,7 @@
   .students{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:14px;}
   .student-btn{min-height:64px; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); background:linear-gradient(180deg,#9d73e8,#7141bd); color:#fff; font-size:18px; font-weight:900; cursor:pointer;}
   .student-btn.active{background:linear-gradient(180deg,#ffd968,#f1ad22); color:var(--ink-900);}
+  .student-step-actions{display:flex; align-items:center; justify-content:flex-start; margin-top:22px; padding-top:18px; border-top:2px solid rgba(21,32,43,.12);}
   .task-list{display:grid; gap:10px; margin-top:14px;}
   .task{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; align-items:center; border:3px solid var(--ink-900); border-radius:16px; box-shadow:0 4px 0 var(--ink-900); padding:12px; background:#f8fbfd;}
   .task.done{background:linear-gradient(180deg,#effcf3,#ddf6e5); border-color:#176b2a;}
@@ -103,6 +104,7 @@
     .row,.task,.task-detail-row,.progress-row{grid-template-columns:1fr;}
     .progress-header{display:none;}
     .students{grid-template-columns:1fr;}
+    .student-step-actions .btn{width:100%;}
     .milestones{grid-template-columns:1fr;}
     .progress-score{text-align:left;}
   }
@@ -142,7 +144,9 @@
         <h2 id="classTitle">Kies je naam</h2>
         <p>Klik op je eigen naam. Staat je naam er niet bij? Vraag het aan je leerkracht.</p>
         <div class="students" id="students"></div>
-        <button class="btn secondary" id="backToCode" type="button">Andere klascode</button>
+        <div class="student-step-actions">
+          <button class="btn secondary" id="backToCode" type="button">Andere klascode</button>
+        </div>
       </div>
 
       <div id="stepCode" class="hidden">
