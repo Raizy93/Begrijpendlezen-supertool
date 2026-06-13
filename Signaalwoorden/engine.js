@@ -115,24 +115,24 @@
       container.appendChild(document.createTextNode(sentence.slice(pos + vraag.mark.length) + " "));
     }
 
-    function appendBlankSentence(container, sentence, word) {
-      const pos = sentence.indexOf(word);
-      if (pos < 0) {
+    function appendBlankSentence(container, sentence) {
+      const parts = sentence.split("{{blank}}");
+      if (parts.length !== 2) {
         container.appendChild(document.createTextNode(sentence + " "));
         return;
       }
-      container.appendChild(document.createTextNode(sentence.slice(0, pos)));
+      container.appendChild(document.createTextNode(parts[0]));
       const mark = document.createElement("mark");
       mark.className = "sig-blank";
       mark.setAttribute("data-sign-mark", "");
       mark.textContent = "_____";
       container.appendChild(mark);
-      container.appendChild(document.createTextNode(sentence.slice(pos + word.length) + " "));
+      container.appendChild(document.createTextNode(parts[1] + " "));
     }
 
     function appendSentence(container, sentence, vraag) {
       if (vraag.type === "verband" && sentence === vraag.zin) appendHighlightedWord(container, sentence, vraag);
-      else if (vraag.type === "kies" && sentence === vraag.target) appendBlankSentence(container, sentence, vraag.correct);
+      else if (vraag.type === "kies" && sentence === vraag.target) appendBlankSentence(container, vraag.zin);
       else container.appendChild(document.createTextNode(sentence + " "));
     }
 

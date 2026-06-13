@@ -94,11 +94,9 @@
       text.sections.forEach((section, index) => {
         const missing = vraag.type === "tussenkop" && vraag.section === index;
         el.story.appendChild(makeHeading("h3", section.kop, missing, "data-tk-missing"));
-        section.zinnen.forEach((zin) => {
-          const p = document.createElement("p");
-          p.textContent = zin;
-          el.story.appendChild(p);
-        });
+        const p = document.createElement("p");
+        p.textContent = section.zinnen.join(" ");
+        el.story.appendChild(p);
       });
     }
 

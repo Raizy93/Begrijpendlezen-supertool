@@ -18,7 +18,7 @@
       titleOptions: ["Leven aan de Romeinse grens", "Een rivier zonder bewoners", "Waarom Romeinen nooit handelden", "De bouw van moderne snelwegen"],
       sign: [
         { type: "verband", zin: "Daardoor was de grens niet alleen een militaire lijn, maar ook een gebied waar mensen elkaar ontmoetten.", mark: "Daardoor", correct: "oorzaak", options: ["oorzaak", "tijd", "voorbeeld", "opsomming"], uitleg: "\"Daardoor\" geeft het gevolg aan van de nederzettingen en contacten rond de forten." },
-        { type: "kies", zin: "Rond de forten ontstonden kleine nederzettingen met ambachtslieden, handelaren en gezinnen. {{blank}} was de grens ook een ontmoetingsgebied.", target: "Daardoor was de grens niet alleen een militaire lijn, maar ook een gebied waar mensen elkaar ontmoetten.", correct: "Daardoor", relatie: "oorzaak", options: ["Daardoor", "Eerst", "Bijvoorbeeld", "Toch"], uitleg: "De tweede zin beschrijft een gevolg van de nederzettingen rond de forten." }
+        { type: "kies", zin: "{{blank}} was de grens niet alleen een militaire lijn, maar ook een gebied waar mensen elkaar ontmoetten.", target: "Daardoor was de grens niet alleen een militaire lijn, maar ook een gebied waar mensen elkaar ontmoetten.", correct: "Daardoor", relatie: "oorzaak", options: ["Daardoor", "Eerst", "Bijvoorbeeld", "Toch"], uitleg: "De ontmoetingen rond de forten waren een gevolg van de nederzettingen die daar ontstonden." }
       ],
       vw: [
         { zin: "Romeinse soldaten bewaakten die grens vanuit forten die dicht bij de rivier stonden.", mark: "die grens", verwijstNaar: "de noordgrens van het Romeinse Rijk", antwoord: "de noordgrens van het Romeinse Rijk", options: ["de noordgrens van het Romeinse Rijk", "de rivier de Rijn", "de Romeinse wegen", "de kleine nederzettingen"], uitleg: "\"Die grens\" verwijst naar de eerder genoemde noordgrens van het Romeinse Rijk." },
@@ -45,7 +45,7 @@
       titleOptions: ["Werken binnen een middeleeuws gilde", "Gratis beroepen voor iedereen", "Machines in moderne fabrieken", "Reizen zonder stadsregels"],
       sign: [
         { type: "verband", zin: "Daarna kon hij gezel worden en uiteindelijk een eigen werkplaats openen.", mark: "Daarna", correct: "tijd", options: ["tijd", "reden", "voorbeeld", "tegenstelling"], uitleg: "\"Daarna\" geeft de volgende stap in de opleiding aan." },
-        { type: "kies", zin: "Gilden bewaakten de kwaliteit, {{blank}} ze beperkten ook wie een beroep mocht beginnen.", target: "Zo bewaakten gilden de kwaliteit, maar beperkten ze ook de vrijheid om zomaar een beroep te beginnen.", correct: "maar", relatie: "tegenstelling", options: ["maar", "daarom", "bijvoorbeeld", "vervolgens"], uitleg: "De zin noemt eerst een voordeel en daarna een beperking. \"Maar\" laat die tegenstelling zien." }
+        { type: "kies", zin: "Zo bewaakten gilden de kwaliteit, {{blank}} beperkten ze ook de vrijheid om zomaar een beroep te beginnen.", target: "Zo bewaakten gilden de kwaliteit, maar beperkten ze ook de vrijheid om zomaar een beroep te beginnen.", correct: "maar", relatie: "tegenstelling", options: ["maar", "daarom", "bijvoorbeeld", "vervolgens"], uitleg: "De zin noemt eerst een voordeel en daarna een beperking. \"Maar\" laat die tegenstelling zien." }
       ],
       vw: [
         { zin: "Bakkers, smeden en kleermakers hadden ieder hun eigen vereniging.", mark: "hun", verwijstNaar: "Bakkers, smeden en kleermakers", antwoord: "de ambachtslieden", options: ["de ambachtslieden", "de inwoners", "de leerlingen", "de producten"], uitleg: "\"Hun\" verwijst naar de genoemde ambachtslieden: bakkers, smeden en kleermakers." },
@@ -72,7 +72,7 @@
       titleOptions: ["Hoe de drukpers informatie veranderde", "Waarom mensen stopten met lezen", "De uitvinding van digitaal nieuws", "Een zeldzame metalen pen"],
       sign: [
         { type: "verband", zin: "Hierdoor konden teksten sneller en in grotere aantallen worden verspreid.", mark: "Hierdoor", correct: "oorzaak", options: ["oorzaak", "voorbeeld", "tijd", "opsomming"], uitleg: "\"Hierdoor\" kondigt het gevolg van drukken met losse letters aan." },
-        { type: "kies", zin: "Boeken werden met de hand overgeschreven. {{blank}} waren ze duur en zeldzaam.", target: "Dat kostte veel tijd, waardoor boeken duur en zeldzaam waren.", correct: "Daardoor", relatie: "oorzaak", options: ["Daardoor", "Toch", "Eerst", "Bijvoorbeeld"], uitleg: "De hoge prijs en zeldzaamheid zijn een gevolg van het tijdrovende overschrijven." }
+        { type: "kies", zin: "{{blank}} waren boeken duur en zeldzaam.", target: "Dat kostte veel tijd, waardoor boeken duur en zeldzaam waren.", correct: "Daardoor", relatie: "oorzaak", options: ["Daardoor", "Toch", "Eerst", "Bijvoorbeeld"], uitleg: "De hoge prijs en zeldzaamheid zijn een gevolg van het tijdrovende overschrijven." }
       ],
       vw: [
         { zin: "Dat kostte veel tijd, waardoor boeken duur en zeldzaam waren.", mark: "Dat", verwijstNaar: "met de hand overgeschreven", antwoord: "boeken met de hand overschrijven", options: ["boeken met de hand overschrijven", "metalen letters maken", "nieuws verspreiden", "boeken verkopen"], uitleg: "\"Dat\" verwijst naar het met de hand overschrijven van boeken." },
@@ -89,7 +89,7 @@
       themas: ["geschiedenis", "wereld"],
       alineas: [
         ["Nederland gebruikte vroeger op sommige plaatsen water om vijandelijke legers tegen te houden.", "Bij gevaar konden lage stukken land gecontroleerd onder water worden gezet.", "Het water was te diep om gemakkelijk doorheen te lopen, maar vaak te ondiep voor grote boten."],
-        ["Forten bewaakten wegen en dijken die boven het water uitstaken.", "Toch werkte deze verdediging niet onder alle omstandigheden, bijvoorbeeld wanneer het water bevroor.", "Het landschap zelf werd zo onderdeel van een uitgebreid verdedigingssysteem."]
+        ["Forten bewaakten de wegen en dijken die als droge doorgangen boven het water uitstaken.", "Samen vormden het water en de forten een waterlinie.", "Toch werkte deze verdediging niet onder alle omstandigheden, bijvoorbeeld wanneer het water bevroor.", "Het landschap zelf werd zo onderdeel van een uitgebreid verdedigingssysteem."]
       ],
       sections: [
         { kop: "Land onder water zetten", zinnen: ["Lage gebieden konden bij gevaar gecontroleerd overstromen.", "Het water maakte de doorgang voor soldaten en voertuigen moeilijk.", "De waterhoogte moest daarom precies worden geregeld."] },
@@ -99,11 +99,11 @@
       titleOptions: ["Het landschap als verdedigingsmiddel", "Varen met grote oorlogsschepen", "Waarom alle polders bevroren", "De aanleg van recreatiestranden"],
       sign: [
         { type: "verband", zin: "Toch werkte deze verdediging niet onder alle omstandigheden, bijvoorbeeld wanneer het water bevroor.", mark: "Toch", correct: "tegenstelling", options: ["tegenstelling", "reden", "tijd", "conclusie"], uitleg: "\"Toch\" geeft aan dat er ondanks het slimme systeem ook beperkingen waren." },
-        { type: "kies", zin: "Forten bewaakten wegen en dijken, {{blank}} die boven het water bleven uitsteken.", target: "Forten bewaakten wegen en dijken die boven het water uitstaken.", correct: "omdat", relatie: "reden", options: ["omdat", "daarna", "kortom", "zoals"], uitleg: "De uitstekende wegen en dijken vormden doorgangen en moesten daarom worden bewaakt." }
+        { type: "kies", zin: "Forten bewaakten de wegen en dijken, {{blank}} die als droge doorgangen boven het water uitstaken.", target: "Forten bewaakten de wegen en dijken die als droge doorgangen boven het water uitstaken.", correct: "omdat", relatie: "reden", options: ["omdat", "daarna", "kortom", "zoals"], uitleg: "De uitstekende wegen en dijken vormden doorgangen en moesten daarom worden bewaakt." }
       ],
       vw: [
         { zin: "Het water was te diep om gemakkelijk doorheen te lopen, maar vaak te ondiep voor grote boten.", mark: "Het water", verwijstNaar: "lage stukken land gecontroleerd onder water", antwoord: "het water op de lage stukken land", options: ["het water op de lage stukken land", "het water in de zee", "de bevroren rivier", "het water rond de forten"], uitleg: "\"Het water\" verwijst naar het water waarmee de lage gebieden werden overstroomd." },
-        { zin: "Toch werkte deze verdediging niet onder alle omstandigheden, bijvoorbeeld wanneer het water bevroor.", mark: "deze verdediging", verwijstNaar: "water om vijandelijke legers tegen te houden", antwoord: "land onder water zetten", options: ["land onder water zetten", "grote boten gebruiken", "wegen bouwen", "op forten wonen"], uitleg: "\"Deze verdediging\" verwijst naar het gecontroleerd onder water zetten van land." }
+        { zin: "Toch werkte deze verdediging niet onder alle omstandigheden, bijvoorbeeld wanneer het water bevroor.", mark: "deze verdediging", verwijstNaar: "een waterlinie", antwoord: "de waterlinie", options: ["de waterlinie", "grote boten gebruiken", "wegen bouwen", "op forten wonen"], uitleg: "\"Deze verdediging\" verwijst naar de waterlinie van water en forten." }
       ],
       summary: "Door land gecontroleerd onder water te zetten en doorgangen met forten te bewaken, gebruikte Nederland het landschap als verdediging.",
       summaryOptions: ["Door land gecontroleerd onder water te zetten en doorgangen met forten te bewaken, gebruikte Nederland het landschap als verdediging.", "Nederland liet alle polders het hele jaar diep onder water staan, zodat oorlogsschepen via weilanden naar iedere stad konden varen en vijanden geen droge weg vonden.", "De forten bij de waterlinie waren vooral warme schuilplaatsen waar bewoners zich tijdens strenge winters tegen bevroren sloten en gladde wegen konden beschermen.", "Sommige wegen en dijken staken boven het water uit."],
@@ -126,7 +126,7 @@
       titleOptions: ["Van fabriekswerk naar meer onderwijs", "Waarom machines speelgoed werden", "Een vrije dag in de moderne fabriek", "Rijke kinderen zonder school"],
       sign: [
         { type: "verband", zin: "Daardoor veranderde langzaam het dagelijks leven van veel kinderen.", mark: "Daardoor", correct: "oorzaak", options: ["oorzaak", "voorbeeld", "opsomming", "tijd"], uitleg: "\"Daardoor\" geeft het gevolg van de nieuwe wetten en het belangrijker worden van onderwijs aan." },
-        { type: "kies", zin: "Kinderen werkten lange dagen. {{blank}} gingen zij vaak weinig naar school.", target: "Kinderen die dagelijks werkten, gingen meestal weinig of helemaal niet naar school.", correct: "Daardoor", relatie: "oorzaak", options: ["Daardoor", "Toch", "Bijvoorbeeld", "Vervolgens"], uitleg: "Weinig onderwijs was een gevolg van de lange werkdagen." }
+        { type: "kies", zin: "Kinderen werkten dagelijks; {{blank}} gingen zij meestal weinig of helemaal niet naar school.", target: "Kinderen die dagelijks werkten, gingen meestal weinig of helemaal niet naar school.", correct: "daardoor", relatie: "oorzaak", options: ["daardoor", "toch", "bijvoorbeeld", "vervolgens"], uitleg: "Weinig onderwijs was een gevolg van de lange werkdagen." }
       ],
       vw: [
         { zin: "Hun inkomen was voor arme gezinnen vaak hard nodig.", mark: "Hun", verwijstNaar: "veel kinderen", antwoord: "de werkende kinderen", options: ["de werkende kinderen", "de fabriekseigenaren", "de leraren", "de machines"], uitleg: "\"Hun\" verwijst naar de kinderen die in fabrieken en werkplaatsen werkten." },
@@ -143,7 +143,7 @@
       themas: ["wereld", "natuur-milieu"],
       alineas: [
         ["Een rivierdelta ontstaat waar een rivier zich voor de kust in meerdere takken splitst.", "Het water voert zand en klei mee en laat een deel daarvan achter.", "Daardoor is de bodem in veel delta's vruchtbaar en geschikt voor landbouw."],
-        ["Tegelijk liggen delta's vaak laag en kunnen ze bij hoogwater overstromen.", "Dijken, waterberging en waarschuwingssystemen moeten bewoners beschermen.", "Mensen in een delta profiteren dus van het water, maar moeten ook rekening houden met de risico's ervan."]
+        ["Toch hebben delta's niet alleen voordelen: ze liggen vaak laag en kunnen bij hoogwater overstromen.", "Daarom beschermen bewoners zich met dijken, waterberging en waarschuwingssystemen.", "Mensen in een delta profiteren dus van het water, maar moeten ook rekening houden met de risico's ervan."]
       ],
       sections: [
         { kop: "Vruchtbare grond", zinnen: ["Rivieren brengen zand, klei en voedingsstoffen mee.", "In de delta blijft een deel van dit materiaal achter.", "De bodem is daardoor vaak geschikt voor landbouw."] },
@@ -152,8 +152,8 @@
       titel: "Kansen en risico's in een rivierdelta",
       titleOptions: ["Kansen en risico's in een rivierdelta", "Landbouw zonder water", "Bergen aan de kust", "Waarom rivieren nooit overstromen"],
       sign: [
-        { type: "verband", zin: "Tegelijk liggen delta's vaak laag en kunnen ze bij hoogwater overstromen.", mark: "Tegelijk", correct: "tegenstelling", options: ["tegenstelling", "tijd", "voorbeeld", "conclusie"], uitleg: "\"Tegelijk\" voegt hier een andere, minder gunstige kant van delta's toe." },
-        { type: "kies", zin: "Rivieren laten zand en klei achter. {{blank}} is de bodem vaak vruchtbaar.", target: "Daardoor is de bodem in veel delta's vruchtbaar en geschikt voor landbouw.", correct: "Daardoor", relatie: "oorzaak", options: ["Daardoor", "Echter", "Eerst", "Zoals"], uitleg: "De vruchtbare bodem is een gevolg van het materiaal dat de rivier achterlaat." }
+        { type: "verband", zin: "Toch hebben delta's niet alleen voordelen: ze liggen vaak laag en kunnen bij hoogwater overstromen.", mark: "Toch", correct: "tegenstelling", options: ["tegenstelling", "tijd", "voorbeeld", "conclusie"], uitleg: "\"Toch\" zet het voordeel van vruchtbare grond tegenover het risico van overstromingen." },
+        { type: "kies", zin: "{{blank}} is de bodem in veel delta's vruchtbaar en geschikt voor landbouw.", target: "Daardoor is de bodem in veel delta's vruchtbaar en geschikt voor landbouw.", correct: "Daardoor", relatie: "oorzaak", options: ["Daardoor", "Echter", "Eerst", "Zoals"], uitleg: "De vruchtbare bodem is een gevolg van het materiaal dat de rivier achterlaat." }
       ],
       vw: [
         { zin: "Het water voert zand en klei mee en laat een deel daarvan achter.", mark: "daarvan", verwijstNaar: "zand en klei", antwoord: "het zand en de klei", options: ["het zand en de klei", "de kust", "de landbouw", "de riviertakken"], uitleg: "\"Daarvan\" verwijst naar het zand en de klei die door het water worden meegevoerd." },
@@ -207,7 +207,7 @@
       titleOptions: ["De moesson tussen droogte en overstroming", "Een wind die nooit verandert", "Rijst verbouwen zonder regen", "Sneeuwstormen in Zuid-Azië"],
       sign: [
         { type: "verband", zin: "Te weinig regen kan droogte veroorzaken, terwijl extreem veel regen tot overstromingen leidt.", mark: "terwijl", correct: "tegenstelling", options: ["tegenstelling", "tijd", "voorbeeld", "conclusie"], uitleg: "\"Terwijl\" zet de gevolgen van te weinig en te veel regen tegenover elkaar." },
-        { type: "kies", zin: "De zomerwind brengt vochtige lucht vanaf zee. {{blank}} kan lange tijd veel regen vallen.", target: "Daardoor kan wekenlang veel regen vallen; deze regenperiode wordt de moesson genoemd.", correct: "Daardoor", relatie: "oorzaak", options: ["Daardoor", "Echter", "Vervolgens", "Zoals"], uitleg: "De langdurige regen is een gevolg van de aangevoerde vochtige lucht." }
+        { type: "kies", zin: "{{blank}} kan wekenlang veel regen vallen; deze regenperiode wordt de moesson genoemd.", target: "Daardoor kan wekenlang veel regen vallen; deze regenperiode wordt de moesson genoemd.", correct: "Daardoor", relatie: "oorzaak", options: ["Daardoor", "Echter", "Vervolgens", "Zoals"], uitleg: "De langdurige regen is een gevolg van de aangevoerde vochtige lucht." }
       ],
       vw: [
         { zin: "Daardoor kan wekenlang veel regen vallen; deze regenperiode wordt de moesson genoemd.", mark: "deze regenperiode", verwijstNaar: "wekenlang veel regen", antwoord: "de weken met veel regen", options: ["de weken met veel regen", "de vochtige lucht", "de zomerwind", "de rijstvelden"], uitleg: "\"Deze regenperiode\" verwijst naar de weken waarin veel regen valt." },
@@ -233,8 +233,8 @@
       titel: "Waarom steden extra warm worden",
       titleOptions: ["Waarom steden extra warm worden", "Een koude nacht op het platteland", "Alle daken moeten zwart zijn", "Regenwater zonder planten"],
       sign: [
-        { type: "verband", zin: "Daarom leggen sommige steden groene daken aan en vervangen ze tegels door plantvakken.", mark: "Daarom", correct: "conclusie", options: ["conclusie", "voorbeeld", "tijd", "opsomming"], uitleg: "\"Daarom\" leidt de maatregel af uit de verkoelende werking van bomen en planten." },
-        { type: "kies", zin: "Stenen slaan warmte op. {{blank}} koelt het centrum 's avonds langzaam af.", target: "'s Avonds geven deze materialen de warmte langzaam weer af.", correct: "Daardoor", relatie: "oorzaak", options: ["Daardoor", "Toch", "Bijvoorbeeld", "Eerst"], uitleg: "Het langzaam afkoelen is een gevolg van de opgeslagen warmte." }
+        { type: "verband", zin: "Daarom leggen sommige steden groene daken aan en vervangen ze tegels door plantvakken.", mark: "Daarom", correct: "oorzaak", options: ["oorzaak", "voorbeeld", "tijd", "opsomming"], uitleg: "\"Daarom\" geeft aan dat de verkoelende werking van groen de reden is voor deze maatregelen." },
+        { type: "kies", zin: "{{blank}} geven deze materialen de warmte 's avonds langzaam weer af.", target: "'s Avonds geven deze materialen de warmte langzaam weer af.", correct: "Daardoor", relatie: "oorzaak", options: ["Daardoor", "Toch", "Bijvoorbeeld", "Eerst"], uitleg: "Het langzaam afkoelen is een gevolg van de opgeslagen warmte." }
       ],
       vw: [
         { zin: "'s Avonds geven deze materialen de warmte langzaam weer af.", mark: "deze materialen", verwijstNaar: "Donkere daken, asfalt en stenen", antwoord: "donkere daken, asfalt en stenen", options: ["donkere daken, asfalt en stenen", "bomen en planten", "groene daken", "het platteland"], uitleg: "\"Deze materialen\" verwijst naar de daken, het asfalt en de stenen uit de vorige zin." },
@@ -251,7 +251,7 @@
       themas: ["wereld", "wetenschap-techniek"],
       alineas: [
         ["Het Panamakanaal vormt een vaarroute door het smalle land van Panama.", "Schepen hoeven daardoor niet helemaal om de zuidpunt van Zuid-Amerika te varen.", "Een reeks sluizen tilt schepen omhoog naar een hoger gelegen meer en laat ze later weer dalen."],
-        ["De doorvaart bespaart veel afstand en tijd, maar het kanaal heeft grote hoeveelheden zoet water nodig.", "Bij langdurige droogte kan er minder water voor de sluizen beschikbaar zijn.", "Het kanaal laat zo zien hoe wereldhandel, techniek en natuurlijke omstandigheden met elkaar verbonden zijn."]
+        ["De doorvaart bespaart veel afstand en tijd, maar het kanaal heeft grote hoeveelheden zoet water nodig.", "Bij langdurige droogte is daarvan minder beschikbaar voor de sluizen, waardoor soms minder schepen kunnen passeren.", "Het kanaal laat zo zien hoe wereldhandel, techniek en natuurlijke omstandigheden met elkaar verbonden zijn."]
       ],
       sections: [
         { kop: "Een kortere vaarroute", zinnen: ["Het kanaal verbindt vaarroutes aan twee kanten van Midden-Amerika.", "Schepen vermijden een lange omweg rond Zuid-Amerika.", "Dat bespaart afstand, brandstof en tijd."] },
@@ -261,11 +261,11 @@
       titleOptions: ["Het Panamakanaal: korter varen met sluizen", "Een spoorlijn over de oceaan", "Waarom schepen bergen beklimmen", "Zuid-Amerika zonder handel"],
       sign: [
         { type: "verband", zin: "Schepen hoeven daardoor niet helemaal om de zuidpunt van Zuid-Amerika te varen.", mark: "daardoor", correct: "oorzaak", options: ["oorzaak", "voorbeeld", "tijd", "tegenstelling"], uitleg: "\"Daardoor\" geeft het gevolg aan van de vaarroute door Panama." },
-        { type: "kies", zin: "Het kanaal bespaart veel tijd, {{blank}} het gebruikt ook grote hoeveelheden zoet water.", target: "De doorvaart bespaart veel afstand en tijd, maar het kanaal heeft grote hoeveelheden zoet water nodig.", correct: "maar", relatie: "tegenstelling", options: ["maar", "daarom", "vervolgens", "zoals"], uitleg: "De zin zet een voordeel tegenover een belangrijk nadeel." }
+        { type: "kies", zin: "De doorvaart bespaart veel afstand en tijd, {{blank}} het kanaal heeft grote hoeveelheden zoet water nodig.", target: "De doorvaart bespaart veel afstand en tijd, maar het kanaal heeft grote hoeveelheden zoet water nodig.", correct: "maar", relatie: "tegenstelling", options: ["maar", "daarom", "vervolgens", "zoals"], uitleg: "De zin zet een voordeel tegenover een belangrijk nadeel." }
       ],
       vw: [
         { zin: "Een reeks sluizen tilt schepen omhoog naar een hoger gelegen meer en laat ze later weer dalen.", mark: "ze", verwijstNaar: "schepen", antwoord: "de schepen", options: ["de schepen", "de sluizen", "de oceanen", "de vaarroutes"], uitleg: "\"Ze\" verwijst naar de schepen die later weer naar een lager niveau dalen." },
-        { zin: "Bij langdurige droogte kan er minder water voor de sluizen beschikbaar zijn.", mark: "er", verwijstNaar: "het kanaal", antwoord: "bij het kanaal", options: ["bij het kanaal", "rond Zuid-Amerika", "in de schepen", "op de oceanen"], uitleg: "\"Er\" verwijst naar de omgeving en werking van het kanaal waar water nodig is." }
+        { zin: "Bij langdurige droogte is daarvan minder beschikbaar voor de sluizen, waardoor soms minder schepen kunnen passeren.", mark: "daarvan", verwijstNaar: "grote hoeveelheden zoet water", antwoord: "het zoete water", options: ["het zoete water", "de bespaarde tijd", "de internationale handel", "de schepen"], uitleg: "\"Daarvan\" verwijst naar het zoete water dat de sluizen nodig hebben." }
       ],
       summary: "Het Panamakanaal verkort scheepsroutes met behulp van sluizen, maar de werking ervan vraagt veel zoet water.",
       summaryOptions: ["Het Panamakanaal verkort scheepsroutes met behulp van sluizen, maar de werking ervan vraagt veel zoet water.", "Schepen varen alleen via Panama omdat zij zonder sluizen niet over open oceanen kunnen reizen en nergens anders goederen tussen werelddelen mogen vervoeren.", "Het kanaal gebruikt onbeperkt zout oceaanwater om ieder schip rechtstreeks over de hoogste bergen van Panama te tillen, waardoor droogte geen invloed op de scheepvaart heeft.", "Schepen hoeven niet om de zuidpunt van Zuid-Amerika te varen."],
@@ -288,7 +288,10 @@
     onderwerp: source.onderwerp,
     themas: source.themas,
     titel: source.titel,
-    sections: clone(source.sections),
+    sections: source.sections.map((section, index) => ({
+      kop: section.kop,
+      zinnen: clone(source.alineas[index] || section.zinnen)
+    })),
     vragen: [{ type: "titel", correct: source.titel, options: clone(source.titleOptions), uitleg: "Deze titel noemt het centrale onderwerp en past bij alle delen van de tekst." }]
   })));
   append("SAM_ITEMS", SOURCES.map((source) => ({
