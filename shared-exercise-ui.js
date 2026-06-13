@@ -73,7 +73,7 @@
           badge.setAttribute("aria-hidden", "true");
           button.insertBefore(badge, button.firstChild);
         }
-        badge.textContent = key;
+        if (badge.textContent !== key) badge.textContent = key;
         const decoration = button.querySelector(":scope > .ic, :scope > .icon");
         if (decoration) decoration.classList.add("keyboard-decor-hidden");
         const oldKeyboardHint = button.querySelector(":scope > .kbd");
@@ -82,7 +82,15 @@
     });
   }
 
-  const observer = new MutationObserver(decorateChoices);
+  const observer = new MutationObserver(function (mutations) {
+    const hasNewChoices = mutations.some(function (mutation) {
+      return Array.from(mutation.addedNodes).some(function (node) {
+        if (node.nodeType !== 1) return false;
+        return node.matches(".choices, .choice") || Boolean(node.querySelector(".choices, .choice"));
+      });
+    });
+    if (hasNewChoices) decorateChoices();
+  });
   observer.observe(document.body, { childList: true, subtree: true });
   decorateChoices();
 
