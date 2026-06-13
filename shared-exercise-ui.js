@@ -10,9 +10,20 @@
       border:3px solid rgba(255,255,255,.78); border-radius:13px;
       background:rgba(255,255,255,.2); color:#fff;
       font:900 22px/1 var(--font-body, Nunito, system-ui, sans-serif);
+      padding:0!important; text-align:center; letter-spacing:0;
     }
-    .choice .answer-key::after{content:".";}
     .choice .keyboard-decor-hidden{display:none!important;}
+    .exercise-restart{
+      min-height:48px; padding:9px 15px; display:inline-grid; place-items:center;
+      border:3px solid var(--ink-900, #17212d); border-radius:15px;
+      background:#fff; color:var(--ink-900, #17212d);
+      box-shadow:0 5px 0 var(--ink-900, #17212d);
+      font:900 14px/1.1 var(--font-body, Nunito, system-ui, sans-serif);
+      white-space:nowrap; cursor:pointer;
+    }
+    .exercise-restart:hover{transform:translateY(-1px);}
+    .exercise-restart:active{transform:translateY(3px); box-shadow:0 2px 0 var(--ink-900, #17212d);}
+    .exercise-restart:focus-visible{outline:4px solid #ffd24a; outline-offset:2px;}
 
     @media (min-width:901px){
       #app{gap:10px!important; padding-top:14px!important; padding-bottom:14px!important;}
@@ -73,7 +84,8 @@
           badge.setAttribute("aria-hidden", "true");
           button.insertBefore(badge, button.firstChild);
         }
-        if (badge.textContent !== key) badge.textContent = key;
+        const label = key + ".";
+        if (badge.textContent !== label) badge.textContent = label;
         const decoration = button.querySelector(":scope > .ic, :scope > .icon");
         if (decoration) decoration.classList.add("keyboard-decor-hidden");
         const oldKeyboardHint = button.querySelector(":scope > .kbd");
@@ -94,6 +106,21 @@
   observer.observe(document.body, { childList: true, subtree: true });
   decorateChoices();
 
+  const resetButton = document.querySelector([
+    "[data-hzd-reset]", "[data-td-reset]", "[data-tsk-reset]",
+    "[data-fom-reset]", "[data-sign-reset]", "[data-vw-reset]",
+    "[data-tk-reset]", "[data-sam-reset]", "[data-conc-reset]",
+    "[data-mix-reset]"
+  ].join(","));
+  const navigation = document.querySelector("header .top-actions, header .nav, .board .scores");
+  if (resetButton && navigation) {
+    const fullscreenButton = navigation.querySelector("#fsBtn, .fsbtn");
+    resetButton.className = "exercise-restart";
+    resetButton.textContent = "Start taak opnieuw";
+    resetButton.title = "Start deze taak opnieuw";
+    navigation.insertBefore(resetButton, fullscreenButton || null);
+  }
+
   document.addEventListener("keydown", function (event) {
     if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
     const target = event.target;
@@ -105,5 +132,21 @@
     if (!button) return;
     event.preventDefault();
     button.click();
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== "Enter" || event.defaultPrevented || event.repeat) return;
+    const target = event.target;
+    const tag = target && target.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (target && target.isContentEditable)) return;
+    const nextButton = Array.from(document.querySelectorAll([
+      "[data-hzd-next]", "[data-td-next]", "[data-tsk-next]",
+      "[data-fom-next]", "[data-sign-next]", "[data-vw-next]",
+      "[data-tk-next]", "[data-sam-next]", "[data-conc-next]",
+      "[data-mix-next]"
+    ].join(","))).find(visible);
+    if (!nextButton) return;
+    event.preventDefault();
+    nextButton.click();
   });
 })();
