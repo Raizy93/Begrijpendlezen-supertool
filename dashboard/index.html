@@ -124,14 +124,6 @@
   .pill{display:inline-flex; min-height:28px; align-items:center; padding:3px 9px; border:2px solid var(--ink-900); border-radius:999px; background:#eef8ff; color:var(--ink-700); font-weight:900; font-size:13px;}
   .pill.on{background:#e8fbef; color:#176b2a;}
   .pill.off{background:#f4f0f0; color:#7a2b2b;}
-  .result-list{grid-column:1/-1; display:grid; gap:7px; border-top:2px solid rgba(21,32,43,.12); padding-top:10px; margin-top:4px;}
-  .result-row{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; padding:8px 10px; border:2px solid rgba(21,32,43,.14); border-radius:12px; background:#fff;}
-  .score{font-weight:900; color:#176b2a;}
-  .goal-results{display:flex; flex-wrap:wrap; gap:6px; margin-top:7px;}
-  .goal-score{display:inline-flex; align-items:center; min-height:26px; padding:3px 8px; border:2px solid rgba(21,32,43,.55); border-radius:999px; background:#f7fbfd; color:var(--ink-700); font-weight:900; font-size:12px;}
-  .goal-score.perfect{background:#e8fbef; color:#176b2a;}
-  .goal-score.miss{background:#fff5df; color:#8a4d00;}
-  .result-empty{grid-column:1/-1; color:var(--ink-500); font-weight:900; padding:8px 10px; border:2px dashed rgba(21,32,43,.2); border-radius:12px; background:#f7fafc;}
   .task-analysis{display:grid; gap:8px; padding-top:10px; border-top:2px solid rgba(21,32,43,.12);}
   .task-analysis-summary{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px;}
   .task-analysis-stat{padding:8px 10px; border:2px solid rgba(21,32,43,.16); border-radius:10px; background:#fff;}
@@ -152,6 +144,7 @@
   .task-student-card.missing{background:#f4f6f7; color:var(--ink-500);}
   .task-student-head{display:flex; align-items:center; justify-content:space-between; gap:8px;}
   .task-student-name{min-width:0; overflow-wrap:anywhere; font-size:15px; font-weight:900; color:var(--ink-900);}
+  .task-student-date{color:var(--ink-500); font-size:11px; font-weight:900;}
   .task-student-total{flex:0 0 auto; padding:3px 7px; border:2px solid var(--ink-900); border-radius:999px; background:#fff5df; color:#744000; font-size:12px; font-weight:900;}
   .task-student-total.strong{background:#e8fbef; color:#176b2a;}
   .task-student-total.weak{background:#fdeaea; color:#9d2525;}
@@ -167,7 +160,7 @@
     .top{align-items:flex-start; flex-direction:column;}
     .actions{justify-content:flex-start;}
     .grid{grid-template-columns:1fr;}
-    .class-form,.student-form,.student-row,.result-row{grid-template-columns:1fr;}
+    .class-form,.student-form,.student-row{grid-template-columns:1fr;}
     .goal-checks{grid-template-columns:1fr;}
     .audience-row,.recipient-checks{grid-template-columns:1fr;}
     .analysis-summary{grid-template-columns:1fr;}
@@ -323,6 +316,7 @@
   const openStudentAnalysisIds = new Set();
   const selectedAnalysisStudentIds = new Map();
   const taskDetailModes = new Map();
+  let taskDetailsInitialized = false;
   let archivedTasksOpen = false;
 
   const CODE_WORDS = ["BOEK", "ZON", "STER", "TAAL", "LEES", "PEN", "VLAM", "BRUG", "GOUD", "KERN", "WOLK", "MAAN"];
@@ -1028,6 +1022,10 @@
 
     const activeTasks = tasks.filter((task) => task.active);
     const archivedTasks = tasks.filter((task) => !task.active);
+    if (!taskDetailsInitialized && activeTasks.length) {
+      taskDetailModes.set(activeTasks[0].id, "group");
+      taskDetailsInitialized = true;
+    }
     taskList.appendChild(renderTaskSection("Actieve taken", activeTasks, "Er staan momenteel geen actieve taken klaar."));
 
     const archiveSection = document.createElement("section");
@@ -1124,15 +1122,6 @@
 
     const actions = document.createElement("div");
     actions.className = "task-actions";
-    const toggleResults = document.createElement("button");
-    toggleResults.className = "smallbtn";
-    toggleResults.classList.toggle("selected", detailMode === "results");
-    toggleResults.type = "button";
-    toggleResults.textContent = "Resultaten (" + results.length + ")";
-    toggleResults.addEventListener("click", () => {
-      setTaskDetailMode(task.id, "results");
-      renderTasks(currentTasks);
-    });
     const toggleGroupAnalysis = document.createElement("button");
     toggleGroupAnalysis.className = "smallbtn";
     toggleGroupAnalysis.classList.toggle("selected", detailMode === "group");
@@ -1156,40 +1145,8 @@
     toggle.type = "button";
     toggle.textContent = task.active ? "Archiveer taak" : "Maak weer actief";
     toggle.addEventListener("click", () => toggleTask(task));
-    actions.append(toggleResults, toggleGroupAnalysis, toggleStudentAnalysis, toggle);
+    actions.append(toggleGroupAnalysis, toggleStudentAnalysis, toggle);
     card.append(info, actions);
-
-    const resultList = document.createElement("div");
-    resultList.className = "result-list";
-    resultList.classList.toggle("hidden", detailMode !== "results");
-    if (!results.length) {
-      const empty = document.createElement("div");
-      empty.className = "result-empty";
-      empty.textContent = "Nog geen resultaten voor deze taak.";
-      resultList.appendChild(empty);
-    } else {
-      results.forEach((attempt) => {
-        const row = document.createElement("div");
-        row.className = "result-row";
-        const who = document.createElement("div");
-        who.innerHTML = "<strong>" + studentName(attempt.student_id) + "</strong><br><span class=\"muted\">" + new Date(attempt.finished_at).toLocaleString("nl-NL") + "</span>";
-        const goalResults = document.createElement("div");
-        goalResults.className = "goal-results";
-        normalizedSummary(attempt.goal_summary).forEach((item) => {
-          const chip = document.createElement("span");
-          chip.className = "goal-score " + (item.good === item.total ? "perfect" : "miss");
-          chip.textContent = item.label + ": " + item.good + "/" + item.total;
-          goalResults.appendChild(chip);
-        });
-        if (goalResults.children.length) who.appendChild(goalResults);
-        const score = document.createElement("div");
-        score.className = "score";
-        score.textContent = attempt.score + "/" + attempt.total;
-        row.append(who, score);
-        resultList.appendChild(row);
-      });
-    }
-    card.appendChild(resultList);
     const groupAnalysis = renderTaskGroupAnalysis(task, klass, results);
     groupAnalysis.classList.toggle("hidden", detailMode !== "group");
     const studentAnalysis = renderTaskStudentAnalysis(task, klass, results);
@@ -1286,15 +1243,25 @@
 
       if (!studentResults.length) {
         card.classList.add("missing");
-        total.textContent = "Niet gemaakt";
+        total.textContent = "Nog niet gemaakt";
         grid.appendChild(card);
         return;
       }
 
       const data = taskAnalysisData(studentResults);
+      const latestAttempt = studentResults.slice().sort((a, b) => new Date(b.finished_at) - new Date(a.finished_at))[0];
       total.textContent = data.good + "/" + data.total + " - " + data.percentage + "%";
       if (data.percentage >= 80) total.classList.add("strong");
       else if (data.percentage < 60) total.classList.add("weak");
+
+      const finished = document.createElement("div");
+      finished.className = "task-student-date";
+      finished.textContent = "Afgerond op " + new Date(latestAttempt.finished_at).toLocaleDateString("nl-NL", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      });
+      card.appendChild(finished);
 
       const goals = document.createElement("div");
       goals.className = "task-student-mini-goals";
