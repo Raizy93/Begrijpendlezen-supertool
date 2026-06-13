@@ -27,8 +27,12 @@
   .logo{width:56px; height:56px; border-radius:50%; border:3px solid var(--ink-900); box-shadow:0 4px 0 var(--ink-900); background:#fff; object-fit:cover;}
   h1{font-family:var(--font-display); font-size:38px; margin:0; line-height:.95; letter-spacing:.5px; -webkit-text-stroke:1.5px var(--ink-900); text-shadow:3px 3px 0 var(--ink-900);}
   .sub{font-weight:900; color:rgba(255,255,255,.9); margin-top:3px;}
-  .top-actions{display:flex; gap:10px; align-items:center;}
+  .top-actions{display:flex; gap:10px; align-items:center; justify-content:flex-end; flex-wrap:wrap;}
   .teacherbtn{display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:54px; background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:18px; box-shadow:0 5px 0 var(--ink-900); padding:0 14px; cursor:pointer; transition:transform .09s, box-shadow .09s, background .12s; font-weight:900; text-decoration:none;}
+  .student-identity{display:flex; min-width:0; max-width:190px; flex-direction:column; align-items:flex-start; line-height:1.05; white-space:nowrap;}
+  .student-identity-name{max-width:100%; overflow:hidden; text-overflow:ellipsis; font-size:15px; font-weight:900;}
+  .student-identity-class{margin-top:4px; color:var(--ink-500); font-size:11px; font-weight:900;}
+  .is-hidden{display:none !important;}
   .fsbtn{display:grid; place-items:center; min-width:54px; min-height:54px; background:#fff; color:var(--ink-900); border:3px solid var(--ink-900); border-radius:18px; box-shadow:0 5px 0 var(--ink-900); padding:0 14px; cursor:pointer; transition:transform .09s, box-shadow .09s, background .12s;}
   .teacherbtn:hover,
   .fsbtn:hover{transform:translateY(-2px); box-shadow:0 7px 0 var(--ink-900); background:var(--gold);}
@@ -85,11 +89,11 @@
       </div>
     </div>
     <div class="top-actions">
-      <a class="teacherbtn" href="leerling/index.html">
+      <a class="teacherbtn" id="studentMenuLink" href="leerling/index.html">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        Leerling
+        <span id="studentMenuText">Leerling</span>
       </a>
-      <a class="teacherbtn" href="auth/login.html">
+      <a class="teacherbtn" id="teacherMenuLink" href="auth/login.html">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-8 0v2"/><circle cx="12" cy="7" r="4"/><path d="M20 8v6"/><path d="M23 11h-6"/></svg>
         Leerkracht
       </a>
@@ -133,6 +137,32 @@
   </main>
 </div>
 <script>
+  function readStudentSession(){
+    try {
+      const value = JSON.parse(sessionStorage.getItem("supertool_student") || "null");
+      return value && value.studentId && value.loginCode ? value : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  const studentSession = readStudentSession();
+  if (studentSession) {
+    const studentLink = document.getElementById("studentMenuLink");
+    const studentText = document.getElementById("studentMenuText");
+    const teacherLink = document.getElementById("teacherMenuLink");
+    const displayName = studentSession.displayName || "Leerling";
+    const className = studentSession.className || "Mijn klas";
+    studentLink.href = "leerling/index.html";
+    studentLink.title = "Terug naar Mijn leren";
+    studentLink.setAttribute("aria-label", displayName + " uit " + className + ". Terug naar Mijn leren.");
+    studentText.className = "student-identity";
+    studentText.innerHTML = '<span class="student-identity-name"></span><span class="student-identity-class"></span>';
+    studentText.querySelector(".student-identity-name").textContent = displayName;
+    studentText.querySelector(".student-identity-class").textContent = className + " · Mijn leren";
+    teacherLink.classList.add("is-hidden");
+  }
+
   const fsBtn = document.getElementById("fsBtn");
   const fsTarget = document.documentElement;
   function fsElement(){ return document.fullscreenElement || document.webkitFullscreenElement || null; }
