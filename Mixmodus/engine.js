@@ -258,6 +258,36 @@
     host.appendChild(p);
   }
 
+  function appendSignalBlank(parent, sentence, word) {
+    const pos = findPhrase(sentence, word);
+    if (pos < 0) {
+      parent.append(document.createTextNode(clean(sentence)));
+      return;
+    }
+    parent.append(document.createTextNode(sentence.slice(0, pos)));
+    const span = document.createElement("span");
+    span.className = "blank";
+    span.textContent = "antwoord";
+    parent.appendChild(span);
+    parent.append(document.createTextNode(sentence.slice(pos + word.length)));
+  }
+
+  function renderSignalContext(host, item, vraag) {
+    host.innerHTML = "";
+    const target = vraag.type === "kies" ? vraag.target : vraag.zin;
+    const matching = (item.alineas || []).find((alinea) => alinea.includes(target));
+    const fallback = (item.alineas || []).reduce((all, alinea) => all.concat(alinea), []).slice(0, 4);
+    const sentences = matching || fallback;
+    const p = document.createElement("p");
+    (sentences || []).forEach((sentence, index) => {
+      if (index) p.append(document.createTextNode(" "));
+      if (sentence !== target) p.append(document.createTextNode(clean(sentence)));
+      else if (vraag.type === "kies") appendSignalBlank(p, sentence, vraag.correct);
+      else appendMarkedText(p, sentence, vraag.mark);
+    });
+    host.appendChild(p);
+  }
+
   function textFromSections(host, item, question) {
     host.innerHTML = "";
     if (question.type === "tussenkop" && typeof question.section === "number") {
@@ -337,7 +367,7 @@
           goal: "sign",
           topic: item.onderwerp,
           question: vraag.type === "kies" ? "Welk signaalwoord past op de lege plek?" : "Welk verband geeft het signaalwoord aan?",
-          render: (host) => vraag.type === "kies" ? renderBlank(host, vraag.zin) : (host.innerHTML = "", addMarkedParagraph(host, vraag.zin, vraag.mark)),
+          render: (host) => renderSignalContext(host, item, vraag),
           options: vraag.options.map((o) => makeOption(o, o === vraag.correct, vraag.uitleg, vraag.type === "kies" ? vraag.relatie : "verband"))
         });
       });

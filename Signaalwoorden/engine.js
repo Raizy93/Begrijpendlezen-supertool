@@ -135,9 +135,17 @@
       else container.appendChild(document.createTextNode(sentence + " "));
     }
 
+    function contextAlineas(text, vraag) {
+      const target = vraag.type === "kies" ? vraag.target : vraag.zin;
+      const matching = (text.alineas || []).find((alinea) => alinea.includes(target));
+      if (matching) return [matching];
+      const fallback = (text.alineas || []).reduce((all, alinea) => all.concat(alinea), []).slice(0, 4);
+      return fallback.length ? [fallback] : [];
+    }
+
     function renderStory(text, vraag) {
       el.story.innerHTML = "";
-      text.alineas.forEach((alinea) => {
+      contextAlineas(text, vraag).forEach((alinea) => {
         const p = document.createElement("p");
         alinea.forEach((sentence) => appendSentence(p, sentence, vraag));
         el.story.appendChild(p);
