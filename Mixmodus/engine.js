@@ -308,6 +308,10 @@
     return { label: clean(label), correct: !!correct, uitleg: clean(uitleg), hint: clean(hint || "") };
   }
 
+  function itemThemes(collection, item) {
+    return window.SupertoolThemes ? window.SupertoolThemes.getItemThemes(collection, item) : (item.themas || []);
+  }
+
   function buildItems() {
     const out = [];
     const tskTypes = window.TSK_TYPES || [];
@@ -316,6 +320,7 @@
     (window.HZD_ITEMS || []).forEach((item) => {
       out.push({
         goal: "hzd",
+        themes: itemThemes("hzd", item),
         topic: item.onderwerp,
         question: "Is de gemarkeerde zin hoofdzaak of detail?",
         render: (host) => renderAlineas(host, [item.zinnen], item.zinnen[item.highlightedIndex], item.zinnen[item.highlightedIndex]),
@@ -329,6 +334,7 @@
     (window.TD_ITEMS || []).forEach((item) => {
       out.push({
         goal: "td",
+        themes: itemThemes("td", item),
         topic: item.type,
         question: "Wat is het tekstdoel?",
         render: (host) => renderAlineas(host, item.alineas),
@@ -339,6 +345,7 @@
     (window.TSK_ITEMS || []).forEach((item) => {
       out.push({
         goal: "tsk",
+        themes: itemThemes("tsk", item),
         topic: "Tekstsoort",
         question: "Welke tekstsoort is dit?",
         render: (host) => renderBlocks(host, item.blocks),
@@ -350,6 +357,7 @@
       (item.vragen || []).forEach((vraag) => {
         out.push({
           goal: "fom",
+          themes: itemThemes("fom", item),
           topic: item.onderwerp,
           question: "Is de gemarkeerde zin een feit of mening?",
           render: (host) => renderAlineas(host, item.alineas, vraag.zin, vraag.zin),
@@ -365,6 +373,7 @@
       (item.vragen || []).forEach((vraag) => {
         out.push({
           goal: "sign",
+          themes: itemThemes("sign", item),
           topic: item.onderwerp,
           question: vraag.type === "kies" ? "Welk signaalwoord past op de lege plek?" : "Welk verband geeft het signaalwoord aan?",
           render: (host) => renderSignalContext(host, item, vraag),
@@ -377,6 +386,7 @@
       (item.vragen || []).forEach((vraag) => {
         out.push({
           goal: "vw",
+          themes: itemThemes("vw", item),
           topic: item.onderwerp,
           question: "Waar verwijst het gemarkeerde woord naar?",
           render: (host) => renderVwStory(host, item, vraag),
@@ -390,8 +400,9 @@
     (window.TK_ITEMS || []).forEach((item) => {
       const vraag = (item.vragen || [])[0];
       if (!vraag) return;
-      out.push({
-        goal: "tk",
+        out.push({
+          goal: "tk",
+          themes: itemThemes("tk", item),
         topic: item.onderwerp,
         question: vraag.type === "titel" ? "Welke titel past het best?" : "Welke tussenkop past het best?",
         render: (host) => textFromSections(host, item, vraag),
@@ -402,6 +413,7 @@
     (window.SAM_ITEMS || []).forEach((item) => {
       out.push({
         goal: "sam",
+        themes: itemThemes("sam", item),
         topic: item.onderwerp,
         question: "Welke samenvatting past het best?",
         render: (host) => renderAlineas(host, item.alineas),
@@ -412,6 +424,7 @@
     (window.CONC_ITEMS || []).forEach((item) => {
       out.push({
         goal: "conc",
+        themes: itemThemes("conc", item),
         topic: item.onderwerp,
         question: "Welke conclusie kun je trekken?",
         render: (host) => renderAlineas(host, item.alineas),
@@ -454,7 +467,9 @@
       endScore: $("[data-mix-endscore]"),
       endTotal: $("[data-mix-endtotal]"),
       endMsg: $("[data-mix-endmsg]"),
-      subtitle: $("[data-mix-subtitle]")
+      subtitle: $("[data-mix-subtitle]"),
+      theme: $("[data-mix-theme]"),
+      themeInfo: $("[data-mix-theme-info]")
     };
 
     const allItems = buildItems();
@@ -503,6 +518,19 @@
       return $$("[data-mix-goal-check]").filter((box) => box.checked).map((box) => box.value);
     }
 
+    function selectedTheme() {
+      if (taskContext && taskContext.assignment && taskContext.assignment.settings) {
+        return taskContext.assignment.settings.theme || "all";
+      }
+      return el.theme ? el.theme.value : "all";
+    }
+
+    function themeItems() {
+      const theme = selectedTheme();
+      const goals = selectedGoals();
+      return allItems.filter((item) => goals.includes(item.goal) && (theme === "all" || (item.themes || []).includes(theme)));
+    }
+
     function setAll(on) {
       $$("[data-mix-goal-check]").forEach((box) => { box.checked = on; });
       syncWarning();
@@ -510,12 +538,20 @@
 
     function syncWarning() {
       const selected = selectedGoals();
-      el.warning.textContent = selected.length ? "" : "Kies minimaal een leesdoel.";
-      el.start.disabled = !selected.length;
+      const available = themeItems();
+      if (!selected.length) el.warning.textContent = "Kies minimaal een leesdoel.";
+      else if (!available.length) el.warning.textContent = "Voor deze combinatie zijn nog geen vragen beschikbaar. Kies een ander thema of extra leesdoel.";
+      else if (available.length < total) el.warning.textContent = available.length + " unieke passende vragen beschikbaar. Bij " + total + " vragen kunnen opdrachten terugkomen.";
+      else el.warning.textContent = "";
+      if (el.themeInfo) el.themeInfo.textContent = selectedTheme() === "all"
+        ? "Alle onderwerpen doen mee: " + available.length + " unieke vragen beschikbaar."
+        : (window.SupertoolThemes ? window.SupertoolThemes.label(selectedTheme()) : selectedTheme()) + ": " + available.length + " unieke vragen beschikbaar.";
+      el.start.disabled = !selected.length || !available.length;
     }
 
     function makeQueue(limit) {
-      const allowed = selectedGoals().filter((goal) => allItems.some((item) => item.goal === goal));
+      const theme = selectedTheme();
+      const allowed = selectedGoals().filter((goal) => allItems.some((item) => item.goal === goal && (theme === "all" || (item.themes || []).includes(theme))));
       const picked = [];
       if (!allowed.length) return picked;
 
@@ -526,7 +562,7 @@
       goals.forEach((goal) => {
         const quota = base + (extra > 0 ? 1 : 0);
         if (extra > 0) extra--;
-        const source = allItems.filter((item) => item.goal === goal);
+        const source = allItems.filter((item) => item.goal === goal && (theme === "all" || (item.themes || []).includes(theme)));
         let bag = shuffle(source);
         for (let i = 0; i < quota; i++) {
           if (!bag.length) bag = shuffle(source);
@@ -727,6 +763,14 @@
     async function start() {
       syncWarning();
       if (!selectedGoals().length) return;
+      if (!themeItems().length) {
+        el.endScore.textContent = "0";
+        el.endTotal.textContent = "0";
+        el.endMsg.textContent = "Voor dit thema en deze leesdoelen is nog geen oefenmateriaal beschikbaar.";
+        el.replay.textContent = taskContext ? "Terug naar taken" : "Terug naar instellingen";
+        show("end");
+        return;
+      }
       if (taskContext && taskContext.assignment) {
         total = Number(taskContext.assignment.question_count) || total;
         const restored = await restoreTaskProgress();
@@ -782,11 +826,22 @@
     }
 
     renderGoalChecks();
+    if (el.theme && window.SupertoolThemes) {
+      const taskTheme = taskContext && taskContext.assignment && taskContext.assignment.settings
+        ? taskContext.assignment.settings.theme || "all"
+        : "all";
+      const picker = window.SupertoolThemes.makeSelect(taskTheme);
+      Array.from(picker.options).forEach((option) => el.theme.appendChild(option.cloneNode(true)));
+      el.theme.value = taskTheme;
+    }
     syncWarning();
     if (taskContext && taskContext.assignment) {
       el.subtitle.textContent = taskContext.assignment.title || "Taak oefenen";
       if (taskContext.student && taskContext.student.displayName) {
         el.subtitle.textContent += " - " + taskContext.student.displayName;
+      }
+      if (selectedTheme() !== "all" && window.SupertoolThemes) {
+        el.subtitle.textContent += " - " + window.SupertoolThemes.label(selectedTheme());
       }
       el.reset.classList.add("hidden");
       el.menu.classList.add("hidden");
@@ -800,9 +855,11 @@
         $$("[data-mix-count]").forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
         total = Number(btn.getAttribute("data-mix-count")) || 10;
+        syncWarning();
       });
     });
     el.goals.addEventListener("change", syncWarning);
+    if (el.theme) el.theme.addEventListener("change", syncWarning);
     el.all.addEventListener("click", () => setAll(true));
     el.none.addEventListener("click", () => setAll(false));
     el.start.addEventListener("click", start);

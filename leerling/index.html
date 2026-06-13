@@ -208,6 +208,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../supabase-config.js"></script>
 <script src="../auth/supabase-client.js"></script>
+<script src="../shared-themes.js"></script>
 <script>
   const client = window.createSupertoolClient();
   const state = {
@@ -457,7 +458,10 @@
       const count = document.createElement("span");
       count.className = "pill";
       count.textContent = task.question_count + " vragen";
-      info.append(title, mode, count);
+      const theme = document.createElement("span");
+      theme.className = "pill";
+      theme.textContent = SupertoolThemes.label(task.settings && task.settings.theme);
+      info.append(title, mode, count, theme);
       if (task.completed) {
         const done = document.createElement("span");
         done.className = "pill done";

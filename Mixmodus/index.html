@@ -172,6 +172,11 @@
           <button class="countbtn" data-mix-count="20">20</button>
           <button class="countbtn" data-mix-count="30">30</button>
         </div>
+        <div class="theme-picker">
+          <strong>Thema (optioneel)</strong>
+          <select class="theme-select" data-mix-theme aria-label="Kies een thema"></select>
+          <small data-mix-theme-info>Kies 'Alle thema's' voor algemeen oefenen.</small>
+        </div>
         <p><strong>Doelen</strong></p>
         <div class="goal-actions">
           <button class="smallbtn" data-mix-all>Alle doelen</button>
@@ -218,6 +223,8 @@
 <script src="../Titel%20of%20tussenkop/items.js"></script>
 <script src="../Samenvatting%20kiezen/items.js"></script>
 <script src="../Conclusie%20trekken/items.js"></script>
+<script src="../shared-themes.js"></script>
+<script>SupertoolThemes.enrichGlobals();</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../supabase-config.js"></script>
 <script src="../auth/supabase-client.js"></script>

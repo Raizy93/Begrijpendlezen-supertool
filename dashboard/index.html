@@ -248,6 +248,11 @@
             <label class="count-choice"><input type="radio" name="taskCount" value="30" /><span>30</span></label>
           </div>
         </div>
+        <div class="theme-picker">
+          <label for="taskTheme"><strong>Thema (optioneel)</strong></label>
+          <select class="theme-select" id="taskTheme"></select>
+          <small id="taskThemeInfo">Kies 'Alle thema's' voor algemeen oefenen.</small>
+        </div>
         <div>
           <label>Doelen in Mixmodus</label>
           <div class="mini-actions" style="justify-content:flex-start; margin-bottom:8px;">
@@ -278,6 +283,17 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../supabase-config.js"></script>
 <script src="../auth/supabase-client.js"></script>
+<script src="../Hoofdzaak%20vs%20Detail/items.js"></script>
+<script src="../Tekstdoel%20herkennen/items.js"></script>
+<script src="../Tekstsoort%20kiezen/items.js"></script>
+<script src="../Feit%20of%20mening/items.js"></script>
+<script src="../Signaalwoorden/items.js"></script>
+<script src="../Verwijswoorden/items.js"></script>
+<script src="../Titel%20of%20tussenkop/items.js"></script>
+<script src="../Samenvatting%20kiezen/items.js"></script>
+<script src="../Conclusie%20trekken/items.js"></script>
+<script src="../shared-themes.js"></script>
+<script>SupertoolThemes.enrichGlobals();</script>
 <script>
   const client = window.createSupertoolClient();
   const dashboard = document.getElementById("dashboard");
@@ -299,6 +315,8 @@
   const allRecipientsBtn = document.getElementById("allRecipientsBtn");
   const noRecipientsBtn = document.getElementById("noRecipientsBtn");
   const taskTitle = document.getElementById("taskTitle");
+  const taskTheme = document.getElementById("taskTheme");
+  const taskThemeInfo = document.getElementById("taskThemeInfo");
   const goalChecks = document.getElementById("goalChecks");
   const taskMessage = document.getElementById("taskMessage");
   const taskList = document.getElementById("taskList");
@@ -330,6 +348,18 @@
     { id: "tk", label: "Titel of tussenkop" },
     { id: "sam", label: "Samenvatting kiezen" },
     { id: "conc", label: "Conclusie trekken" }
+  ];
+
+  const THEME_COLLECTIONS = [
+    { goal: "hzd", collection: "hzd", items: () => window.HZD_ITEMS || [] },
+    { goal: "td", collection: "td", items: () => window.TD_ITEMS || [] },
+    { goal: "tsk", collection: "tsk", items: () => window.TSK_ITEMS || [] },
+    { goal: "fom", collection: "fom", items: () => window.FOM_ITEMS || [] },
+    { goal: "sign", collection: "sign", items: () => window.SIGN_ITEMS || [] },
+    { goal: "vw", collection: "vw", items: () => window.VW_ITEMS || [] },
+    { goal: "tk", collection: "tk", items: () => window.TK_ITEMS || [] },
+    { goal: "sam", collection: "sam", items: () => window.SAM_ITEMS || [] },
+    { goal: "conc", collection: "conc", items: () => window.CONC_ITEMS || [] }
   ];
 
   function setClassMessage(text, kind) {
@@ -390,8 +420,34 @@
       .map((box) => box.value);
   }
 
+  function selectedTaskTheme() {
+    return taskTheme.value || "all";
+  }
+
+  function availableThemeQuestions() {
+    const goals = new Set(selectedGoals());
+    const theme = selectedTaskTheme();
+    return THEME_COLLECTIONS.reduce((total, source) => {
+      if (!goals.has(source.goal)) return total;
+      return total + source.items().reduce((count, item) => {
+        const labels = SupertoolThemes.getItemThemes(source.collection, item);
+        if (theme !== "all" && !labels.includes(theme)) return count;
+        return count + (Array.isArray(item.vragen) && item.vragen.length ? item.vragen.length : 1);
+      }, 0);
+    }, 0);
+  }
+
+  function updateThemeAvailability() {
+    const count = availableThemeQuestions();
+    const chosenCount = selectedCount();
+    const name = SupertoolThemes.label(selectedTaskTheme());
+    taskThemeInfo.textContent = name + ": " + count + " unieke passende vragen beschikbaar."
+      + (count > 0 && count < chosenCount ? " In deze taak kunnen vragen terugkomen." : "");
+  }
+
   function setAllGoals(on) {
     goalChecks.querySelectorAll("[data-goal-check]").forEach((box) => { box.checked = on; });
+    updateThemeAvailability();
   }
 
   function selectedCount() {
@@ -1117,7 +1173,10 @@
     audience.textContent = selectedAudience
       ? (task.recipient_ids || []).length + " leerlingen"
       : "Hele klas";
-    meta.append(cls, count, goals, audience, active);
+    const theme = document.createElement("span");
+    theme.className = "pill";
+    theme.textContent = SupertoolThemes.label(task.settings && task.settings.theme);
+    meta.append(cls, count, goals, theme, audience, active);
     info.append(title, meta);
 
     const actions = document.createElement("div");
@@ -1433,6 +1492,7 @@
     const classId = taskClass.value;
     const title = taskTitle.value.trim();
     const goals = selectedGoals();
+    const theme = selectedTaskTheme();
     const audience = selectedAudience();
     const recipientIds = audience === "selected" ? selectedRecipientIds() : [];
     if (!classId) {
@@ -1445,6 +1505,10 @@
     }
     if (!goals.length) {
       setTaskMessage("Kies minimaal een doel voor Mixmodus.", "bad");
+      return;
+    }
+    if (!availableThemeQuestions()) {
+      setTaskMessage("Voor dit thema en deze leesdoelen zijn nog geen vragen beschikbaar.", "bad");
       return;
     }
     if (audience === "selected" && !recipientIds.length) {
@@ -1462,6 +1526,7 @@
       question_count: selectedCount(),
       settings: {
         source: "dashboard-v1",
+        theme,
         audience,
         recipient_count: audience === "selected" ? recipientIds.length : null
       },
@@ -1487,6 +1552,8 @@
     }
     createTaskBtn.disabled = false;
     taskTitle.value = "";
+    taskTheme.value = "all";
+    updateThemeAvailability();
     const classAudience = taskForm.querySelector("input[name='taskAudience'][value='class']");
     if (classAudience) classAudience.checked = true;
     updateAudiencePanel();
@@ -1569,6 +1636,10 @@
   allRecipientsBtn.addEventListener("click", () => setAllRecipients(true));
   noRecipientsBtn.addEventListener("click", () => setAllRecipients(false));
   taskClass.addEventListener("change", renderRecipientChecks);
+  taskTheme.addEventListener("change", updateThemeAvailability);
+  taskForm.addEventListener("change", (event) => {
+    if (event.target.matches("[data-goal-check], input[name='taskCount']")) updateThemeAvailability();
+  });
   taskForm.querySelectorAll("input[name='taskAudience']").forEach((radio) => {
     radio.addEventListener("change", updateAudiencePanel);
   });
@@ -1580,6 +1651,9 @@
   });
 
   renderGoalChecks();
+  const dashboardThemeSelect = SupertoolThemes.makeSelect("all");
+  Array.from(dashboardThemeSelect.options).forEach((option) => taskTheme.appendChild(option.cloneNode(true)));
+  updateThemeAvailability();
   updateAudiencePanel();
   setTaskFormOpen(false);
   init();

@@ -247,6 +247,8 @@
 </div>
 
 <script src="items.js"></script>
+<script src="../shared-themes.js"></script>
+<script>SupertoolThemes.prepareGlobal("vw", "VW_ITEMS");</script>
 <script src="engine.js"></script>
 <script>
   initVW(document.getElementById("app"));
@@ -288,6 +290,7 @@
   document.addEventListener("webkitfullscreenchange", syncFS);
   document.addEventListener("keydown", (e)=>{ if ((e.key === "f" || e.key === "F") && !e.metaKey && !e.ctrlKey){ fsElement() ? exitFS() : enterFS(); } });
 </script>
+<script>SupertoolThemes.mountStandaloneSelector();</script>
 <script src="../shared-navigation.js"></script>
 <script src="../shared-exercise-ui.js"></script>
 </body>
