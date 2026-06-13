@@ -358,7 +358,7 @@
     });
 
     (window.TK_ITEMS || []).forEach((item) => {
-      const vraag = shuffle(item.vragen || [])[0];
+      const vraag = (item.vragen || [])[0];
       if (!vraag) return;
       out.push({
         goal: "tk",
@@ -389,7 +389,10 @@
       });
     });
 
-    return out;
+    return out.map((item, index) => {
+      item.resumeId = item.goal + ":" + index;
+      return item;
+    });
   }
 
   function initMIX(root) {
@@ -523,16 +526,84 @@
       return summary;
     }
 
+    function assignmentId() {
+      if (!taskContext || !taskContext.assignment) return null;
+      return taskContext.assignment.assignment_id || taskContext.assignment.id || null;
+    }
+
+    function progressPayload(nextIndex) {
+      return {
+        version: 1,
+        total,
+        queueIds: queue.map((item) => item.resumeId),
+        nextIndex,
+        good,
+        bad,
+        streak,
+        answers
+      };
+    }
+
+    async function saveTaskProgress(nextIndex) {
+      const id = assignmentId();
+      if (!id || !window.createSupertoolClient) return false;
+      try {
+        const client = window.createSupertoolClient();
+        const { error } = await client.rpc("save_student_assignment_progress", {
+          p_student_id: taskContext.student.studentId,
+          p_login_code: taskContext.student.loginCode,
+          p_assignment_id: id,
+          p_state: progressPayload(nextIndex)
+        });
+        return !error;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    async function restoreTaskProgress() {
+      const id = assignmentId();
+      if (!id || !window.createSupertoolClient) return false;
+      try {
+        const client = window.createSupertoolClient();
+        const { data, error } = await client.rpc("student_assignment_progress", {
+          p_student_id: taskContext.student.studentId,
+          p_login_code: taskContext.student.loginCode,
+          p_assignment_id: id
+        });
+        if (error || !data || data.version !== 1 || !Array.isArray(data.queueIds)) return false;
+
+        const itemMap = new Map(allItems.map((item) => [item.resumeId, item]));
+        const restoredQueue = data.queueIds.map((itemId) => itemMap.get(itemId));
+        const restoredTotal = Number(data.total);
+        const restoredIndex = Number(data.nextIndex);
+        if (!restoredQueue.length || restoredQueue.some((item) => !item)) return false;
+        if (!Number.isInteger(restoredTotal) || restoredTotal !== restoredQueue.length) return false;
+        if (!Number.isInteger(restoredIndex) || restoredIndex < 0 || restoredIndex > restoredTotal) return false;
+
+        total = restoredTotal;
+        queue = restoredQueue;
+        idx = restoredIndex;
+        good = Math.max(0, Number(data.good) || 0);
+        bad = Math.max(0, Number(data.bad) || 0);
+        streak = Math.max(0, Number(data.streak) || 0);
+        answers = Array.isArray(data.answers) ? data.answers.slice(0, restoredIndex) : [];
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
     async function submitTaskResult() {
       if (!taskContext || !window.createSupertoolClient) return { saved: false, error: null };
-      const assignmentId = taskContext.assignment.assignment_id || taskContext.assignment.id;
-      if (!assignmentId) return { saved: false, error: "Taak-id ontbreekt." };
+      const currentAssignmentId = assignmentId();
+      if (!currentAssignmentId) return { saved: false, error: "Taak-id ontbreekt." };
       try {
         const client = window.createSupertoolClient();
         const { error } = await client.rpc("submit_student_attempt", {
           p_student_id: taskContext.student.studentId,
           p_login_code: taskContext.student.loginCode,
-          p_assignment_id: assignmentId,
+          p_assignment_id: currentAssignmentId,
           p_score: good,
           p_total: total,
           p_goal_summary: goalSummary(),
@@ -582,7 +653,7 @@
       updateStats();
     }
 
-    function answer(option, clicked) {
+    async function answer(option, clicked) {
       if (answered) return;
       answered = true;
       const correctOption = queue[idx].options.find((o) => o.correct);
@@ -612,6 +683,7 @@
         correct: !!option.correct
       });
       if (queue[idx].onAnswer) queue[idx].onAnswer(option.correct, el.story);
+      if (taskContext) await saveTaskProgress(idx + 1);
       el.next.disabled = false;
       updateStats();
     }
@@ -622,11 +694,22 @@
       el.end.classList.toggle("hidden", screen !== "end");
     }
 
-    function start() {
+    async function start() {
       syncWarning();
       if (!selectedGoals().length) return;
       if (taskContext && taskContext.assignment) {
         total = Number(taskContext.assignment.question_count) || total;
+        const restored = await restoreTaskProgress();
+        if (restored) {
+          show("game");
+          if (idx >= total) {
+            await finish();
+            return;
+          }
+          renderQuestion();
+          setFeedback("", "Je gaat verder waar je gebleven was: vraag " + (idx + 1) + " van " + total + ".");
+          return;
+        }
       }
       queue = makeQueue(total);
       idx = 0;
@@ -634,6 +717,7 @@
       bad = 0;
       streak = 0;
       answers = [];
+      if (taskContext) await saveTaskProgress(0);
       show("game");
       renderQuestion();
     }
@@ -674,6 +758,7 @@
       if (taskContext.student && taskContext.student.displayName) {
         el.subtitle.textContent += " - " + taskContext.student.displayName;
       }
+      el.reset.classList.add("hidden");
       el.menu.classList.add("hidden");
       start();
     } else if (taskMode) {

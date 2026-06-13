@@ -465,7 +465,9 @@
       btn.type = "button";
       btn.textContent = task.completed
         ? (openCompletedTaskIds.has(task.assignment_id) ? "Details verbergen" : "Bekijk details")
-        : "Start";
+        : task.in_progress
+          ? "Verdergaan (" + (task.progress_current || 0) + "/" + task.question_count + ")"
+          : "Start";
       btn.addEventListener("click", () => {
         if (task.completed) {
           if (openCompletedTaskIds.has(task.assignment_id)) openCompletedTaskIds.delete(task.assignment_id);
