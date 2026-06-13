@@ -64,10 +64,11 @@
   .analysis-goals{display:grid; gap:8px;}
   .analysis-row{display:grid; grid-template-columns:minmax(150px,1fr) minmax(120px,1.3fr) auto; gap:10px; align-items:center; padding:8px 10px; border:2px solid rgba(21,32,43,.14); border-radius:12px; background:#fff;}
   .analysis-goal{font-weight:900; color:var(--ink-700);}
-  .analysis-bar{height:14px; overflow:hidden; border:2px solid var(--ink-900); border-radius:999px; background:#edf2f5;}
-  .analysis-fill{height:100%; min-width:2px; background:var(--red);}
+  .analysis-bar{position:relative; height:24px; overflow:hidden; border:2px solid var(--ink-900); border-radius:999px; background:#edf2f5;}
+  .analysis-fill{position:absolute; inset:0 auto 0 0; min-width:2px; background:var(--red);}
   .analysis-fill.developing{background:var(--gold);}
   .analysis-fill.strong{background:var(--green);}
+  .analysis-percent{position:absolute; inset:0; z-index:1; display:grid; place-items:center; color:var(--ink-900); font-size:12px; font-weight:900; text-shadow:0 1px 0 rgba(255,255,255,.9); pointer-events:none;}
   .analysis-score{min-width:82px; text-align:right; font-weight:900; color:var(--ink-700);}
   .analysis-note{margin:10px 0 0; color:var(--ink-500); font-size:12px; font-weight:800;}
   .student-analysis-picker{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;}
@@ -139,10 +140,11 @@
   .task-analysis-goals{display:grid; gap:6px;}
   .task-analysis-row{display:grid; grid-template-columns:minmax(120px,1fr) minmax(100px,1.2fr) auto; gap:8px; align-items:center; padding:6px 8px; border:2px solid rgba(21,32,43,.12); border-radius:10px; background:#fff;}
   .task-analysis-name{font-size:13px; font-weight:900; color:var(--ink-700);}
-  .task-analysis-bar{height:11px; overflow:hidden; border:2px solid var(--ink-900); border-radius:999px; background:#edf2f5;}
-  .task-analysis-fill{height:100%; min-width:2px; background:var(--red);}
+  .task-analysis-bar{position:relative; height:20px; overflow:hidden; border:2px solid var(--ink-900); border-radius:999px; background:#edf2f5;}
+  .task-analysis-fill{position:absolute; inset:0 auto 0 0; min-width:2px; background:var(--red);}
   .task-analysis-fill.developing{background:var(--gold);}
   .task-analysis-fill.strong{background:var(--green);}
+  .task-analysis-percent{position:absolute; inset:0; z-index:1; display:grid; place-items:center; color:var(--ink-900); font-size:10px; font-weight:900; line-height:1; text-shadow:0 1px 0 rgba(255,255,255,.9); pointer-events:none;}
   .task-analysis-score{font-size:12px; font-weight:900; color:var(--ink-700); white-space:nowrap;}
   .task-analysis-advice{padding:8px 10px; border:2px solid #d69823; border-radius:10px; background:#fff5df; color:#744000; font-size:13px; font-weight:900;}
   .task-student-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px;}
@@ -728,7 +730,10 @@
       if (goal.percentage >= 80) fill.classList.add("strong");
       else if (goal.percentage >= 60) fill.classList.add("developing");
       fill.style.width = goal.percentage + "%";
-      bar.appendChild(fill);
+      const percent = document.createElement("span");
+      percent.className = "analysis-percent";
+      percent.textContent = goal.percentage + "%";
+      bar.append(fill, percent);
       const score = document.createElement("div");
       score.className = "analysis-score";
       score.textContent = goal.percentage + "% · " + goal.good + "/" + goal.total;
@@ -843,7 +848,10 @@
       if (goal.percentage >= 80) fill.classList.add("strong");
       else if (goal.percentage >= 60) fill.classList.add("developing");
       fill.style.width = goal.percentage + "%";
-      bar.appendChild(fill);
+      const percent = document.createElement("span");
+      percent.className = "analysis-percent";
+      percent.textContent = goal.percentage + "%";
+      bar.append(fill, percent);
       const score = document.createElement("div");
       score.className = "analysis-score";
       score.textContent = goal.percentage + "% - " + goal.good + "/" + goal.total;
@@ -1304,7 +1312,10 @@
         if (goal.percentage >= 80) fill.classList.add("strong");
         else if (goal.percentage >= 60) fill.classList.add("developing");
         fill.style.width = goal.percentage + "%";
-        bar.appendChild(fill);
+        const percent = document.createElement("span");
+        percent.className = "task-analysis-percent";
+        percent.textContent = goal.percentage + "%";
+        bar.append(fill, percent);
         const score = document.createElement("div");
         score.className = "task-student-mini-score";
         score.textContent = goal.good + "/" + goal.total;
@@ -1368,7 +1379,10 @@
       if (goal.percentage >= 80) fill.classList.add("strong");
       else if (goal.percentage >= 60) fill.classList.add("developing");
       fill.style.width = goal.percentage + "%";
-      bar.appendChild(fill);
+      const percent = document.createElement("span");
+      percent.className = "task-analysis-percent";
+      percent.textContent = goal.percentage + "%";
+      bar.append(fill, percent);
       const score = document.createElement("div");
       score.className = "task-analysis-score";
       score.textContent = goal.percentage + "% - " + goal.good + "/" + goal.total;
